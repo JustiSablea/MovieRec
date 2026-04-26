@@ -1,7 +1,7 @@
 {
-  "source": "MovieLens ml-32m",
+  "source": "MovieLens ml-32m + TMDb + TMDb",
   "generatedFrom": "C:\\Users\\azzma\\Downloads\\ml-32m.zip",
-  "movieCount": 222,
+  "movieCount": 302,
   "globalAverage": 3.5404,
   "defaultRecommendations": [
     318,
@@ -20952,6 +20952,3572 @@
           "score": 0.53
         }
       ]
+    },
+    {
+      "id": 10019404,
+      "title": "Непохищенная невеста",
+      "year": 1995,
+      "genres": [
+        "комедия",
+        "драма",
+        "мелодрама"
+      ],
+      "averageRating": 4.25,
+      "ratingCount": 4573,
+      "weightedScore": 4.1025,
+      "popularity": 0.3376,
+      "poster": "https://image.tmdb.org/t/p/w500/sctBFkLHYYqaHHNJj7r1jSOkfB9.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "family's daily life",
+        "family history",
+        "love-hate relationship",
+        "family drama",
+        "love affair",
+        "curious",
+        "casual"
+      ],
+      "description": "Двадцать лет тому назад Балдев Синг эмигрирует в Англию и оседает в Лондоне вместе с семьёй. Но даже после столь продолжительного проживания на чужбине он сохраняет приверженность национальным традициям и планирует выдать замуж старшую дочь Симран за сына старого друга, живущего в Пенджабе. Незадолго перед помолвкой Симран знакомится с весельчаком и балагуром Раджом.  Симран очень симпатичен Радж, но она далеко не сразу осознаёт, что под маской беззаботности скрывается преданная и любящая её душа. Когда молодые люди наконец-то понимают, что любят друг друга, уже поздно, приготовления к помолвке невозможно остановить. Единственная возможность избежать непоправимого — бежать, но Радж убежден, что им в жизни не будет счастья без благословения родителей Симран…",
+      "actors": [
+        "Kajol",
+        "Шахрух Хан",
+        "Амриш Пури",
+        "Farida Jalal",
+        "Anupam Kher",
+        "Pooja Ruparel"
+      ],
+      "director": "Aditya Chopra",
+      "tmdbId": 19404,
+      "imdbId": "0112870",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10014537,
+      "title": "Харакири",
+      "year": 1962,
+      "genres": [
+        "боевик",
+        "драма",
+        "история"
+      ],
+      "averageRating": 4.22,
+      "ratingCount": 1188,
+      "weightedScore": 3.8785,
+      "popularity": 0.3031,
+      "poster": "https://image.tmdb.org/t/p/w500/6Cw2LJzt6jRALHystjzWazeB4Pg.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "suicide",
+        "japan",
+        "samurai",
+        "asia",
+        "flashback",
+        "revenge",
+        "poverty",
+        "black and white",
+        "seppuku",
+        "ronin",
+        "jidaigeki",
+        "edo period"
+      ],
+      "description": "После распада своего клана, безработный самурай Хансиро Цугумо прибыл в поместье лорда Ию, с просьбой совершить харакири в его имении.  Члены клана Ию, полагая что отчаявшийся ронин просто уповает на милостыню, пытаются заставить его совершить харакири, но они его сильно недооценивают.",
+      "actors": [
+        "Тацуя Накадай",
+        "石濱朗",
+        "岩下志麻",
+        "Тэцуро Тамба",
+        "三島雅夫",
+        "中谷一郎"
+      ],
+      "director": "小林正樹",
+      "tmdbId": 14537,
+      "imdbId": "0056058",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10040096,
+      "title": "Сам о сострадании",
+      "year": 2000,
+      "genres": [
+        "комедия",
+        "драма",
+        "фэнтези",
+        "мелодрама"
+      ],
+      "averageRating": 4.21,
+      "ratingCount": 1212,
+      "weightedScore": 3.8769,
+      "popularity": 0.2233,
+      "poster": "https://image.tmdb.org/t/p/w500/imcOp1kJsCsAFCoOtY5OnPrFbAf.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "based on play or musical"
+      ],
+      "description": "Бойкий Жоао Грило и хитрый Чико - бедные парни, живущие в центральном районе, которые обманывают группу людей в небольшом северо-восточном бразильском городке. Но когда они умирают, им предстоит быть осуждеными Христом, Дьяволом и Девой Марией, прежде чем их допустят в рай.",
+      "actors": [
+        "Matheus Nachtergaele",
+        "Селтон Мелу",
+        "Фернанда Монтенегру",
+        "Rogério Cardoso",
+        "Denise Fraga",
+        "Diogo Vilela"
+      ],
+      "director": "Guel Arraes",
+      "tmdbId": 40096,
+      "imdbId": "0271383",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10378064,
+      "title": "Форма голоса",
+      "year": 2016,
+      "genres": [
+        "мультфильм",
+        "драма",
+        "мелодрама"
+      ],
+      "averageRating": 4.19,
+      "ratingCount": 4444,
+      "weightedScore": 4.0519,
+      "popularity": 0.3345,
+      "poster": "https://image.tmdb.org/t/p/w500/c0Gv8xTSEmIcQPxbhINKvkbJO8s.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "high school",
+        "friendship",
+        "suicide",
+        "suicide attempt",
+        "deaf",
+        "bullying",
+        "coming of age",
+        "school",
+        "based on manga",
+        "adult animation",
+        "teen suicide",
+        "woman director"
+      ],
+      "description": "Молодой человек Сёя Исида внезапно осознаёт, что в школе умудрился превратить жизнь одноклассницы Сёко в ад только потому, что та была глухая. И теперь, хоть и запоздало, парень понимает — чтобы сказать нечто важное тому, кто не может тебя услышать, вовсе не обязательно использовать голос.",
+      "actors": [
+        "Мию Ирино",
+        "Саори Хаями",
+        "Аой Юки",
+        "Кэнсё Оно",
+        "Юки Канэко",
+        "Юи Исикава"
+      ],
+      "director": "Наоко Ямада",
+      "tmdbId": 378064,
+      "imdbId": "5323662",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10696374,
+      "title": "Инферно Габриэля",
+      "year": 2020,
+      "genres": [
+        "мелодрама",
+        "драма"
+      ],
+      "averageRating": 4.2,
+      "ratingCount": 2453,
+      "weightedScore": 3.9833,
+      "popularity": 0.2324,
+      "poster": "https://image.tmdb.org/t/p/w500/db3t8EdVco9uWGjffTABpa16MIn.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [],
+      "description": "История побега одного человека из собственного ада в попытке получить невозможное — прощение и любовь.",
+      "actors": [
+        "Melanie Zanetti",
+        "Giulio Berruti",
+        "Kurt McKinney",
+        "Agnes Albright",
+        "Margaux Brooke",
+        "Ned Van Zandt"
+      ],
+      "director": "Tosca Musk",
+      "tmdbId": 696374,
+      "imdbId": "11316854",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10000311,
+      "title": "Однажды в Америке",
+      "year": 1984,
+      "genres": [
+        "драма",
+        "криминал"
+      ],
+      "averageRating": 4.19,
+      "ratingCount": 5990,
+      "weightedScore": 4.0816,
+      "popularity": 0.3382,
+      "poster": "https://image.tmdb.org/t/p/w500/b0p603iVs0HXsoZ8jlfaNiDYR34.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "new york city",
+        "regret",
+        "lovesickness",
+        "rape",
+        "life and death",
+        "sexual abuse",
+        "street gang",
+        "corruption",
+        "based on novel or book",
+        "prohibition era",
+        "gangster",
+        "sadistic"
+      ],
+      "description": "В бурные двадцатые годы, когда Америка веселилась под звуки джаза, и каждый бродяга мечтал стать миллионером, в трущобах Нью-Йорка встретились несколько отчаянных парней. Убирая с дороги конкурентов, безжалостно карая предателей и нагло проворачивая хитроумные аферы, они стали королями преступного мира золотой эры «сухого закона». Они поклялись отдать жизнь друг за друга, зная, что самое главное для них — это дружба, долг и справедливость — не утопить в реках крови и бездонном океане денег. Спустя много лет судьба жестоко обошлась с легендарными гангстерами, заставив их исполнить свою клятву. Это случилось однажды в Америке…",
+      "actors": [
+        "Роберт Де Ниро",
+        "Джеймс Вудс",
+        "Элизабет Макговерн",
+        "Трит Уильямс",
+        "Тьюсдей Уэлд",
+        "Джо Пеши"
+      ],
+      "director": "Sergio Leone",
+      "tmdbId": 311,
+      "imdbId": "0087843",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10724089,
+      "title": "Инферно Габриэля 2",
+      "year": 2020,
+      "genres": [
+        "мелодрама",
+        "драма"
+      ],
+      "averageRating": 4.2,
+      "ratingCount": 1543,
+      "weightedScore": 3.9114,
+      "popularity": 0.1877,
+      "poster": "https://image.tmdb.org/t/p/w500/68npXwbhb6gAjZJ8YeUljsrzSzo.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "based on novel or book"
+      ],
+      "description": "Профессор Габриэль Эмерсон, наконец, узнает правду о личности Джулии Митчелл, но его осознание приходит слишком поздно. Джулия закончила ждать, когда уважаемый специалист Данте вспомнит ее, и больше не хочет иметь с ним ничего общего. Может ли Габриэль вернуть себе сердце, прежде чем она найдет любовь в чужих руках?",
+      "actors": [
+        "Melanie Zanetti",
+        "Giulio Berruti",
+        "James Andrew Fraser",
+        "Margaux Brooke",
+        "Agnes Albright",
+        "Purva Bedi"
+      ],
+      "director": "Tosca Musk",
+      "tmdbId": 724089,
+      "imdbId": "13535454",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10012493,
+      "title": "Рай и ад",
+      "year": 1963,
+      "genres": [
+        "драма",
+        "криминал",
+        "триллер"
+      ],
+      "averageRating": 4.18,
+      "ratingCount": 1112,
+      "weightedScore": 3.848,
+      "popularity": 0.2779,
+      "poster": "https://image.tmdb.org/t/p/w500/hWsJ92ERvlaJSKBmUaN0TURQb98.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "chauffeur",
+        "police",
+        "ransom",
+        "manager",
+        "kidnapping",
+        "blackmail",
+        "heroin",
+        "film noir",
+        "black and white",
+        "shoe",
+        "criminal investigation",
+        "japanese noir"
+      ],
+      "description": "Преуспевающий бизнесмен, в решающий момент, должен решить для себя, заплатит ли он выкуп похитителям, которые по ошибке выкрали не его сына, а сынишку человека, работающего у него шофером.",
+      "actors": [
+        "Тосиро Мифунэ",
+        "Тацуя Накадай",
+        "香川京子",
+        "三橋達也",
+        "木村功",
+        "石山健二郎"
+      ],
+      "director": "Акира Куросава",
+      "tmdbId": 12493,
+      "imdbId": "0057565",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10761053,
+      "title": "Инферно Габриэля 3",
+      "year": 2020,
+      "genres": [
+        "мелодрама",
+        "драма"
+      ],
+      "averageRating": 4.18,
+      "ratingCount": 1078,
+      "weightedScore": 3.8431,
+      "popularity": 0.2531,
+      "poster": "https://image.tmdb.org/t/p/w500/phvXeo0lLzLNHtJATtc9CvFdFN5.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [],
+      "description": "Некто из прошлого Джулии возвращается с плохими намерениями. У Габриэля есть секреты, которыми он может поделиться, но он боится потерять все, если он это сделает. Выдержат ли их отношения испытание раскрытыми секретами?",
+      "actors": [
+        "Melanie Zanetti",
+        "Giulio Berruti",
+        "Rhett Wellington Ramirez",
+        "James Andrew Fraser",
+        "Margaux Brooke",
+        "Pat Asanti"
+      ],
+      "director": "Tosca Musk",
+      "tmdbId": 761053,
+      "imdbId": "13535456",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10569094,
+      "title": "Человек-паук: Паутина вселенных",
+      "year": 2023,
+      "genres": [
+        "мультфильм",
+        "боевик",
+        "приключения",
+        "фантастика"
+      ],
+      "averageRating": 4.15,
+      "ratingCount": 8479,
+      "weightedScore": 4.0744,
+      "popularity": 0.4215,
+      "poster": "https://image.tmdb.org/t/p/w500/hsGAxOqbH0UNpIJPMsVRA6dFf85.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "new york city",
+        "hero",
+        "double life",
+        "sacrifice",
+        "secret identity",
+        "superhero",
+        "villain",
+        "portal",
+        "based on comic",
+        "sequel",
+        "romance",
+        "alter ego"
+      ],
+      "description": "Майлз Моралес отправляется в приключение по мультивселенной вместе с Гвен Стейси и новой командой Людей-пауков, которым предстоит столкнуться с могущественным злодеем.",
+      "actors": [
+        "Шамик Мур",
+        "Хейли Стайнфелд",
+        "Брайан Тайри Генри",
+        "Луна Лорен Велес",
+        "Джейк Джонсон",
+        "Оскар Айзек"
+      ],
+      "director": "Kemp Powers",
+      "tmdbId": 569094,
+      "imdbId": "9362722",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 11184918,
+      "title": "Дикий робот",
+      "year": 2024,
+      "genres": [
+        "семейный",
+        "мультфильм",
+        "фантастика",
+        "приключения"
+      ],
+      "averageRating": 4.15,
+      "ratingCount": 5943,
+      "weightedScore": 4.0476,
+      "popularity": 0.4126,
+      "poster": "https://image.tmdb.org/t/p/w500/sDTumQBxhIyYbZ9acsTtoLfb5ZG.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "villain",
+        "robot",
+        "based on children's book",
+        "female villain",
+        "aftercreditsstinger",
+        "duringcreditsstinger",
+        "kids",
+        "adopted son",
+        "understated",
+        "audacious",
+        "awestruck",
+        "oscar nominee"
+      ],
+      "description": "После кораблекрушения, умный робот по имени Роз оказывается на необитаемом острове. Чтобы выжить в суровых условиях, Роз налаживает связь с животными острова и заботится об одиноком гусенке-сироте.",
+      "actors": [
+        "Лупита Нионго",
+        "Педро Паскаль",
+        "Кит Коннор",
+        "Билл Найи",
+        "Стефани Хсу",
+        "Мэтт Берри"
+      ],
+      "director": "Крис Сандерс",
+      "tmdbId": 1184918,
+      "imdbId": "29623480",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10010494,
+      "title": "Истинная грусть",
+      "year": 1998,
+      "genres": [
+        "мультфильм",
+        "триллер"
+      ],
+      "averageRating": 4.15,
+      "ratingCount": 3141,
+      "weightedScore": 3.9815,
+      "popularity": 0.321,
+      "poster": "https://image.tmdb.org/t/p/w500/d2FkkyKzihw9UbS1bCZorpZ0YSg.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "career",
+        "based on novel or book",
+        "paranoia",
+        "stalker",
+        "celebrity",
+        "singer",
+        "fame",
+        "female protagonist",
+        "psychological thriller",
+        "mental illness",
+        "madness",
+        "split personality"
+      ],
+      "description": "Молодая поп-певица Мима Киригоэ пытается перейти из мира музыки в индустрию ТВ-сериалов и прославиться как актриса, но, похоже, что не всем её поклонникам понравилось такое решение, и началось: странный телефонный звонок, факс, конверт со взрывчаткой... К тому же в интернете обнаружилась страничка с якобы её дневником.",
+      "actors": [
+        "Дзюнко Ивао",
+        "Рика Мацумото",
+        "Шихо Ниияма",
+        "Масааки Окура",
+        "Симпати Цудзи",
+        "Эмико Фурукава"
+      ],
+      "director": "Сатоши Кон",
+      "tmdbId": 10494,
+      "imdbId": "0156887",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10018491,
+      "title": "Конец Евангелиона",
+      "year": 1997,
+      "genres": [
+        "мультфильм",
+        "фантастика",
+        "драма",
+        "фэнтези"
+      ],
+      "averageRating": 4.15,
+      "ratingCount": 1834,
+      "weightedScore": 3.9089,
+      "popularity": 0.3048,
+      "poster": "https://image.tmdb.org/t/p/w500/nCAH4BjPSZhMtD7ddZ0hI2HZtrq.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "philosophy",
+        "insanity",
+        "post-apocalyptic future",
+        "futuristic",
+        "end of the world",
+        "mecha",
+        "avant-garde",
+        "meaningless existence",
+        "rebirth",
+        "anime",
+        "psychological terror",
+        "complex"
+      ],
+      "description": "Победив последнего Ангела, NERV сталкивается с более зловещей угрозой: пока Гэндо Икари начинает подготовку к Третьему удару, на их подземную штаб-квартиру нападают боевики Seele. Рэй сливается с Лилит, а Синдзи предстоит сделать выбор — продолжит человечество существование или нет.",
+      "actors": [
+        "Мэгуми Огата",
+        "Мэгуми Хаясибара",
+        "Котоно Мицуиси",
+        "Юко Миямура",
+        "Фумихико Татики",
+        "Мики Нагасава"
+      ],
+      "director": "Кадзуя Цурумаки",
+      "tmdbId": 18491,
+      "imdbId": "0169858",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10092321,
+      "title": "В лес, где мерцают светлячки",
+      "year": 2011,
+      "genres": [
+        "мелодрама",
+        "мультфильм",
+        "фэнтези"
+      ],
+      "averageRating": 4.13,
+      "ratingCount": 1207,
+      "weightedScore": 3.8361,
+      "popularity": 0.0009,
+      "poster": "https://image.tmdb.org/t/p/w500/pWSgfHJMLG5ce95HztUFqRYuX3D.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "supernatural",
+        "slice of life",
+        "based on manga",
+        "spirit",
+        "folklore",
+        "shoujo",
+        "japanese mythology",
+        "anime",
+        "loving"
+      ],
+      "description": "Маленькая девочка Хотару заблудилась в заколдованном лесу, населенном привидениями. Она встречает мальчика в маске по имени Гин, но считает его лесным духом, который может растаять от одного прикосновения. С помощью нового друга Хотару выбралась из леса, но она не может забыть Гина.",
+      "actors": [
+        "Идзуми Савада",
+        "Хаято Тайя",
+        "Аянэ Сакура",
+        "Коки Утияма",
+        "Симпати Цудзи",
+        "Канэхиро Ямамото"
+      ],
+      "director": "Такахиро Омори",
+      "tmdbId": 92321,
+      "imdbId": "2061702",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10008587,
+      "title": "Король Лев",
+      "year": 1994,
+      "genres": [
+        "мультфильм",
+        "семейный",
+        "драма"
+      ],
+      "averageRating": 4.13,
+      "ratingCount": 19589,
+      "weightedScore": 4.096,
+      "popularity": 0.3902,
+      "poster": "https://image.tmdb.org/t/p/w500/j8tdiuhbF9p5mnAeA1YOUvz82xY.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "father murder",
+        "loss of loved one",
+        "africa",
+        "lion",
+        "cartoon",
+        "manipulation",
+        "villain",
+        "redemption",
+        "musical",
+        "uncle",
+        "coming of age",
+        "murder"
+      ],
+      "description": "У величественного Короля-Льва Муфасы рождается наследник по имени Симба. Уже в детстве любознательный малыш становится жертвой интриг своего завистливого дяди Шрама, мечтающего о власти. Симба познаёт горе утраты, предательство и изгнание, но в конце концов обретает верных друзей и находит любимую. Закалённый испытаниями, он в нелёгкой борьбе отвоёвывает своё законное место в «Круге жизни», осознав, что значит быть настоящим Королём.",
+      "actors": [
+        "Мэттью Бродерик",
+        "Moira Kelly",
+        "Нэйтан Лейн",
+        "Ernie Sabella",
+        "Джеймс Эрл Джонс",
+        "Джереми Айронс"
+      ],
+      "director": "Роджер Аллерс",
+      "tmdbId": 8587,
+      "imdbId": "0110357",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10637920,
+      "title": "Чудо в камере № 7",
+      "year": 2019,
+      "genres": [
+        "драма"
+      ],
+      "averageRating": 4.13,
+      "ratingCount": 4543,
+      "weightedScore": 4.0068,
+      "popularity": 0.2601,
+      "poster": "https://image.tmdb.org/t/p/w500/rBox8iyaG6TZzGFJLha42aylkFt.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "parent child relationship",
+        "prison cell",
+        "remake",
+        "wrongful imprisonment",
+        "based on movie",
+        "mentally challenged"
+      ],
+      "description": "Мемо - взрослый мужчина с интеллектом семилетнего ребенка. Однако он сумел построить семью, у него появилась дочь Ова. Однажды проходя мимо парка, Мемо видит в озере девочку и пытается её спасти, но безуспешно - девочка погибает. Оказывается, она была дочерью полицейского начальника, и тот арестовывает мужчину и сажает в тюрьму.",
+      "actors": [
+        "Арас Булут Ийнемли",
+        "Nisa Sofiya Aksongur",
+        "İlker Aksum",
+        "Mesut Akusta",
+        "Yıldıray Şahinler",
+        "Yurdaer Okur"
+      ],
+      "director": "Mehmet Ada Öztekin",
+      "tmdbId": 637920,
+      "imdbId": "10431500",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10010376,
+      "title": "Легенда о пианисте",
+      "year": 1998,
+      "genres": [
+        "драма",
+        "музыка"
+      ],
+      "averageRating": 4.12,
+      "ratingCount": 2429,
+      "weightedScore": 3.9283,
+      "popularity": 0.2817,
+      "poster": "https://image.tmdb.org/t/p/w500/yCZzJilnmhWbHNoBcmXU6ZQn4Hc.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "ship",
+        "ocean",
+        "musical",
+        "ocean liner",
+        "child prodigy",
+        "pianist",
+        "foundling"
+      ],
+      "description": "В первый день XX века на пароходе «Вирджиния» в коробке из-под лимонов был найден младенец. Мальчик рос и проводил свою жизнь на громадном океанском лайнере, курсировавшем между Америкой и Европой, и он ни разу не сходил на берег. Загадочным образом научившись играть на рояле, Дэнни Будманн Т.Д. Лемон 1900-й стал настоящим виртуозом и развлекал публику, играя в ресторанном оркестре. С ним связаны удивительные истории, а его жизнь превратилась в легенду.",
+      "actors": [
+        "Тим Рот",
+        "Прюитт Тейлор Винс",
+        "Mélanie Thierry",
+        "Билл Нанн",
+        "Gabriele Lavia",
+        "Clarence Williams III"
+      ],
+      "director": "Джузеппе Торнаторе",
+      "tmdbId": 10376,
+      "imdbId": "0120731",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10630566,
+      "title": "Облака",
+      "year": 2020,
+      "genres": [
+        "музыка",
+        "драма",
+        "мелодрама"
+      ],
+      "averageRating": 4.1,
+      "ratingCount": 1047,
+      "weightedScore": 3.8011,
+      "popularity": 0.2214,
+      "poster": "https://image.tmdb.org/t/p/w500/4OLAtYFO23zGLzTrQhpuPDvLen5.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "life and death",
+        "based on true story",
+        "terminal illness",
+        "cancer",
+        "aspiring musician"
+      ],
+      "description": "17-летнему парню диагностируют редкий рак костей. За несколько месяцев до смерти он влюбляется в девушку Эми и, несмотря на окружающую его грусть, находит в себе силы написать песню, чтобы отблагодарить всех своих друзей и близких.",
+      "actors": [
+        "Fin Argus",
+        "Сабрина Карпентер",
+        "Мэдисон Айсмен",
+        "Нив Кэмпбелл",
+        "Том Эверетт Скотт",
+        "Лил Рел Ховери"
+      ],
+      "director": "Джастин Бальдони",
+      "tmdbId": 630566,
+      "imdbId": "6473066",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10299534,
+      "title": "Мстители: Финал",
+      "year": 2019,
+      "genres": [
+        "приключения",
+        "фантастика",
+        "боевик"
+      ],
+      "averageRating": 4.12,
+      "ratingCount": 27555,
+      "weightedScore": 4.0958,
+      "popularity": 0.4524,
+      "poster": "https://image.tmdb.org/t/p/w500/dynnf8NGGfHTNMz8Vd3CzFtYjec.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "superhero",
+        "time travel",
+        "space travel",
+        "time machine",
+        "based on comic",
+        "sequel",
+        "alien invasion",
+        "superhero team",
+        "marvel cinematic universe (mcu)",
+        "alternate timeline",
+        "father daughter relationship",
+        "sister sister relationship"
+      ],
+      "description": "После разрушительных событий в «Мстители: Войны бесконечности», вселенная лежит в руинах. Оставшиеся в живых участники команды Мстителей снова объединяются в попытке восстановить баланс во вселенной.",
+      "actors": [
+        "Роберт Дауни мл.",
+        "Крис Эванс",
+        "Марк Руффало",
+        "Крис Хемсворт",
+        "Скарлетт Йоханссон",
+        "Джереми Реннер"
+      ],
+      "director": "Энтони Руссо",
+      "tmdbId": 299534,
+      "imdbId": "4154796",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10299536,
+      "title": "Мстители: Война бесконечности",
+      "year": 2018,
+      "genres": [
+        "приключения",
+        "боевик",
+        "фантастика"
+      ],
+      "averageRating": 4.12,
+      "ratingCount": 31785,
+      "weightedScore": 4.0989,
+      "popularity": 0.4924,
+      "poster": "https://image.tmdb.org/t/p/w500/c6RSGB6O0RaaHG3JGLq8lnUJSBC.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "sacrifice",
+        "magic",
+        "superhero",
+        "based on comic",
+        "space",
+        "battlefield",
+        "genocide",
+        "magical object",
+        "super power",
+        "superhero team",
+        "aftercreditsstinger",
+        "marvel cinematic universe (mcu)"
+      ],
+      "description": "Пока Мстители и их союзники продолжают защищать мир от различных опасностей, с которыми не смог бы справиться один супергерой, новая угроза возникает из космоса: Танос. Межгалактический тиран преследует цель собрать все шесть Камней Бесконечности — артефакты невероятной силы, с помощью которых можно менять реальность по своему желанию. Всё, с чем Мстители сталкивались ранее, вело к этому моменту — судьба Земли никогда ещё не была столь неопределённой.",
+      "actors": [
+        "Роберт Дауни мл.",
+        "Крис Эванс",
+        "Крис Хемсворт",
+        "Джош Бролин",
+        "Марк Руффало",
+        "Скарлетт Йоханссон"
+      ],
+      "director": "Энтони Руссо",
+      "tmdbId": 299536,
+      "imdbId": "4154756",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10447362,
+      "title": "Жизнь за год",
+      "year": 2020,
+      "genres": [
+        "драма",
+        "мелодрама"
+      ],
+      "averageRating": 4.12,
+      "ratingCount": 1957,
+      "weightedScore": 3.8997,
+      "popularity": 0.1988,
+      "poster": "https://image.tmdb.org/t/p/w500/q6ZdZVrYerWjOa1DASzCmcN9Lyg.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [],
+      "description": "История 17-летнего Дэрина, который узнаёт, что его подруга смертельно больна. Он решает подарить девушке целую жизнь, уместив её в год, который ей остался.",
+      "actors": [
+        "Джейден Смит",
+        "Кара Делевинь",
+        "Кьюба Гудинг мл.",
+        "Chris D'Elia",
+        "JT Neal",
+        "Стоуни Блайден"
+      ],
+      "director": "Mitja Okorn",
+      "tmdbId": 447362,
+      "imdbId": "6598238",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10504253,
+      "title": "Хочу съесть твою поджелудочную железу",
+      "year": 2018,
+      "genres": [
+        "мультфильм",
+        "драма",
+        "мелодрама"
+      ],
+      "averageRating": 4.1,
+      "ratingCount": 1760,
+      "weightedScore": 3.8731,
+      "popularity": 0.2539,
+      "poster": "https://image.tmdb.org/t/p/w500/avj8X4mamOl9Co9rARHwivaP2Td.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "dying and death",
+        "diary",
+        "terminal illness",
+        "tragedy",
+        "hospital",
+        "high school student",
+        "shocking",
+        "anime",
+        "bucket list",
+        "japanese high school",
+        "based on web novel",
+        "romantic"
+      ],
+      "description": "Ученик старших классов узнает, что у его одноклассницы серьезное заболевание поджелудочной железы. Он старается проводить с девушкой больше времени, и ребята становятся очень близки.",
+      "actors": [
+        "Махиро Такасуги",
+        "Линн",
+        "Юкиё Фудзии",
+        "Юма Утида",
+        "Дзюн Фукусима",
+        "Ацуко Танака"
+      ],
+      "director": "Синъитиро Усидзима",
+      "tmdbId": 504253,
+      "imdbId": "7236034",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10490132,
+      "title": "Зелёная книга",
+      "year": 2018,
+      "genres": [
+        "драма",
+        "комедия",
+        "история"
+      ],
+      "averageRating": 4.11,
+      "ratingCount": 12778,
+      "weightedScore": 4.0611,
+      "popularity": 0.3329,
+      "poster": "https://image.tmdb.org/t/p/w500/aEeTnDzcnGRD5IjSFwVXjusKpu0.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "friendship",
+        "southern usa",
+        "based on true story",
+        "road trip",
+        "racism",
+        "pianist",
+        "driver",
+        "lgbt",
+        "road movie",
+        "music tour",
+        "1960s",
+        "roadtrip"
+      ],
+      "description": "1960-е годы. После закрытия нью-йоркского ночного клуба на ремонт вышибала Тони по прозвищу Болтун ищет подработку на пару месяцев. Как раз в это время Дон Ширли, утончённый светский лев, богатый и талантливый чернокожий музыкант, исполняющий классическую музыку, собирается в турне по южным штатам, где ещё сильны расистские убеждения и царит сегрегация. Он нанимает Тони в качестве водителя, телохранителя и человека, способного решать текущие проблемы. У этих двоих так мало общего, и эта поездка навсегда изменит жизнь обоих.",
+      "actors": [
+        "Вигго Мортенсен",
+        "Махершала Али",
+        "Линда Карделлини",
+        "Себастьян Манискалько",
+        "Димитар Маринов",
+        "Mike Hatton"
+      ],
+      "director": "Peter Farrelly",
+      "tmdbId": 490132,
+      "imdbId": "6966692",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10508965,
+      "title": "Клаус",
+      "year": 2019,
+      "genres": [
+        "мультфильм",
+        "семейный",
+        "комедия"
+      ],
+      "averageRating": 4.11,
+      "ratingCount": 4627,
+      "weightedScore": 3.9927,
+      "popularity": 0.2511,
+      "poster": "https://image.tmdb.org/t/p/w500/iQ4WqwaeYzL9Hiljji98AkwR8Ix.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "friendship",
+        "small town",
+        "island",
+        "holiday",
+        "santa claus",
+        "cartoon",
+        "letter",
+        "postman",
+        "reindeer",
+        "toy maker",
+        "christmas",
+        "19th century"
+      ],
+      "description": "Почтальон-эгоист и нелюдимый мастер-игрушечник заводят странную дружбу, принося чистую радость в тёмный и холодный город, которому не хватает надежды.",
+      "actors": [
+        "Джейсон Шварцман",
+        "Джей Кей Симмонс",
+        "Рашида Джонс",
+        "Джоан Кьюсак",
+        "Норм МакДональд",
+        "Уилл Сассо"
+      ],
+      "director": "Серджо Паблос",
+      "tmdbId": 508965,
+      "imdbId": "4729430",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10110420,
+      "title": "Волчьи дети Амэ и Юки",
+      "year": 2012,
+      "genres": [
+        "мультфильм",
+        "семейный",
+        "драма",
+        "фэнтези"
+      ],
+      "averageRating": 4.11,
+      "ratingCount": 2457,
+      "weightedScore": 3.9231,
+      "popularity": 0.2231,
+      "poster": "https://image.tmdb.org/t/p/w500/bbyO4bfE8rvLZbTbtEN03yBjIBL.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "wolf",
+        "forest",
+        "death of father",
+        "growing up",
+        "rural area",
+        "werewolf",
+        "single mother",
+        "adult animation",
+        "werewolf child",
+        "farming community",
+        "farming",
+        "anime"
+      ],
+      "description": "Юки и Амэ — только с виду обычные дети. Когда погибает их отец, последний представитель древнего рода оборотней, их мама решает спрятать малышей-волчат подальше от большого города. Здесь в деревенской глуши Юки и Амэ растут свободными, но вынуждены скрывать от людей свою истинную природу. Однако чем старше они становятся, тем сложнее это удается.",
+      "actors": [
+        "Аой Миядзаки",
+        "Такао Осава",
+        "Хару Куроки",
+        "Юкито Нишии",
+        "Момока Оно",
+        "Амон Кабэ"
+      ],
+      "director": "Мамору Хосода",
+      "tmdbId": 110420,
+      "imdbId": "2140203",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10527641,
+      "title": "В метре друг от друга",
+      "year": 2019,
+      "genres": [
+        "мелодрама",
+        "драма"
+      ],
+      "averageRating": 4.1,
+      "ratingCount": 5893,
+      "weightedScore": 4.0053,
+      "popularity": 0.2621,
+      "poster": "https://image.tmdb.org/t/p/w500/jkdiMtui1tg6oHad9gPZyYIH4aY.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "forbidden love",
+        "terminal illness",
+        "hospital",
+        "best friend",
+        "falling in love",
+        "cystic fibrosis",
+        "star crossed lovers",
+        "first date",
+        "true love",
+        "teenager",
+        "dramatic",
+        "sentimental"
+      ],
+      "description": "Пространство, в котором они существуют, диктует жестокое условие — влюбленные должны находиться не ближе метра друг от друга, им недоступно даже прикосновение. Но истинная любовь не знает границ, и чем сильнее чувства, тем больше соблазн нарушить правила…",
+      "actors": [
+        "Хейли Лу Ричардсон",
+        "Коул Спроус",
+        "Мойзес Ариас",
+        "Kimberly Hébert Gregory",
+        "Парминдер Награ",
+        "Клэр Форлани"
+      ],
+      "director": "Джастин Бальдони",
+      "tmdbId": 527641,
+      "imdbId": "6472976",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10025237,
+      "title": "Иди и смотри",
+      "year": 1985,
+      "genres": [
+        "драма",
+        "военный"
+      ],
+      "averageRating": 4.11,
+      "ratingCount": 1814,
+      "weightedScore": 3.8832,
+      "popularity": 0.2793,
+      "poster": "https://image.tmdb.org/t/p/w500/baK79h2An0J8mzTue13KThAeYC5.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "nazi",
+        "war crimes",
+        "insanity",
+        "world war ii",
+        "surrealism",
+        "wehrmacht",
+        "teenage girl",
+        "atrocity",
+        "genocide",
+        "russian army",
+        "mine field",
+        "horrors of war"
+      ],
+      "description": "1943 год, Великая Отечественная война. Подросток Флёра, откопав карабин среди обрывков колючей проволоки, ржавых пулемётных лент и простреленных касок, отправляется в лес к партизанам.",
+      "actors": [
+        "Алексей Кравченко",
+        "Ольга Миронова",
+        "Любомирас Лауцявичюс",
+        "Владас Багдонас",
+        "Юри Лумисте",
+        "Виктор Лоренц"
+      ],
+      "director": "Элем Климов",
+      "tmdbId": 25237,
+      "imdbId": "0091251",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10687163,
+      "title": "Проект «Конец света»",
+      "year": 2026,
+      "genres": [
+        "фантастика",
+        "приключения"
+      ],
+      "averageRating": 4.11,
+      "ratingCount": 1725,
+      "weightedScore": 3.8763,
+      "popularity": 0.6596,
+      "poster": "https://image.tmdb.org/t/p/w500/lGNWODvZnfiocvegYSw1bYnm6pt.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "based on novel or book",
+        "space travel",
+        "space mission",
+        "alien",
+        "space",
+        "shocking",
+        "science teacher",
+        "save the planet"
+      ],
+      "description": "Астронавт Райленд Грейс просыпается на космическом корабле, не помня ни себя, ни свою миссию. Постепенно мужчина приходит к выводу, что он — единственный выживший из экипажа, отправленного в звёздную систему Тау Кита в поисках спасения от катастрофы на Земле. Райленду предстоит положиться на свои обширные научные знания, изобретательность и силу воли, но, возможно, ему не придётся искать в одиночку.",
+      "actors": [
+        "Райан Гослинг",
+        "Сандра Хюллер",
+        "Джеймс Ортис",
+        "Лайонел Бойс",
+        "Милана Вайнтруб",
+        "Кен Люн"
+      ],
+      "director": "Фил Лорд",
+      "tmdbId": 687163,
+      "imdbId": "12042730",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10265177,
+      "title": "Мамочка",
+      "year": 2014,
+      "genres": [
+        "драма"
+      ],
+      "averageRating": 4.1,
+      "ratingCount": 2839,
+      "weightedScore": 3.9337,
+      "popularity": 0.2071,
+      "poster": "https://image.tmdb.org/t/p/w500/fpJyxOUM0Vd58MAC02oLMUZGZQt.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "canada",
+        "parent child relationship",
+        "karaoke",
+        "quebec",
+        "dysfunctional family",
+        "coming of age",
+        "single mother",
+        "juvenile delinquent",
+        "mental illness",
+        "dream sequence",
+        "institutionalization",
+        "oedipus complex"
+      ],
+      "description": "Яркая и взбалмошная вдова Диана забирает из интерната сына-подростка и полна решимости начать новую жизнь. Со Стивом они бы жили душа в душу, но вспышки гнева импульсивного сына то и дело подрывают шаткое равновесие в семье. На подмогу приходит скромная заикающаяся соседка Кайла, и в доме на время воцаряется идиллия, но как долго это продлится?",
+      "actors": [
+        "Anne Dorval",
+        "Suzanne Clément",
+        "Antoine Olivier Pilon",
+        "Патрик Юар",
+        "Alexandre Goyette",
+        "Michèle Lituac"
+      ],
+      "director": "Ксавье Долан",
+      "tmdbId": 265177,
+      "imdbId": "3612616",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10037257,
+      "title": "Свидетель обвинения",
+      "year": 1957,
+      "genres": [
+        "драма",
+        "детектив",
+        "криминал"
+      ],
+      "averageRating": 4.1,
+      "ratingCount": 1668,
+      "weightedScore": 3.8659,
+      "popularity": 0.2407,
+      "poster": "https://image.tmdb.org/t/p/w500/Ev6BqzK8pVslnjv47i5hjmCApT.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "based on novel or book",
+        "nurse",
+        "widow",
+        "cigarette",
+        "letter",
+        "trial",
+        "murder",
+        "lawyer",
+        "courtroom",
+        "murder mystery",
+        "tiki culture",
+        "anxious"
+      ],
+      "description": "Сэру Уилфриду Робэртсу, престарелому адвокату, бережно опекаемому медсестрой мисс Плимсолл, поступает предложение защищать интересы Леонарда Стивена Воула, которому инкриминируется убийство. В невиновности подопечного его убеждает искренность чувств красивой женщины - Кристин Воул, в девичестве Хелм, и многоопытный юрист берётся за дело.",
+      "actors": [
+        "Tyrone Power",
+        "Марлен Дитрих",
+        "Charles Laughton",
+        "Elsa Lanchester",
+        "John Williams",
+        "Henry Daniell"
+      ],
+      "director": "Billy Wilder",
+      "tmdbId": 37257,
+      "imdbId": "0051201",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10618344,
+      "title": "Тёмная Лига справедливости: Война Апокалипсиса",
+      "year": 2020,
+      "genres": [
+        "мультфильм",
+        "боевик",
+        "приключения",
+        "фэнтези"
+      ],
+      "averageRating": 4.1,
+      "ratingCount": 1563,
+      "weightedScore": 3.857,
+      "popularity": 0.2151,
+      "poster": "https://image.tmdb.org/t/p/w500/m19okK4LcbngHRQbWUOXxKnAzE1.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "superhero",
+        "based on comic",
+        "hopeless",
+        "depressing",
+        "bitter",
+        "disrespectful",
+        "dc animated movie universe (dcamu)"
+      ],
+      "description": "Мрачнейший и масштабнейший кроссовер, самый представительный в истории DC, в котором знаковые герои, включая Бэтмена, Супермена, Чудо-Женщину, Флэша, Киборга, Константина, Болотную Тварь и других, схлестнутся с могущественным Дарксайдом - дадут ему последний и решительный бой.",
+      "actors": [
+        "Matt Ryan",
+        "Джерри О'Коннелл",
+        "Таисса Фармига",
+        "Джейсон О'Мара",
+        "Розарио Доусон",
+        "Stuart Allan"
+      ],
+      "director": "Matt Peters",
+      "tmdbId": 618344,
+      "imdbId": "11079148",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10315162,
+      "title": "Кот в сапогах 2: Последнее желание",
+      "year": 2022,
+      "genres": [
+        "мультфильм",
+        "приключения",
+        "фэнтези",
+        "комедия",
+        "семейный"
+      ],
+      "averageRating": 4.1,
+      "ratingCount": 8753,
+      "weightedScore": 4.0325,
+      "popularity": 0.3563,
+      "poster": "https://image.tmdb.org/t/p/w500/z2gOE3Z4mNLAcw0dQ1BlGoWLrH7.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "fairy tale",
+        "sequel",
+        "talking dog",
+        "spin off",
+        "aftercreditsstinger",
+        "talking cat",
+        "fear of death",
+        "comforting"
+      ],
+      "description": "Рыцарь хвоста и шпаги, он же Кот в сапогах, героически побеждает грозного великана, но вместе с тем лишается восьмой из девяти своих жизней. Риск умереть окончательно и безвозвратно побуждает главного героя завязать с авантюрами и стать новой домашней кошкой Мамы Луны, где тот заводит дружбу с собакой-терапевтом Перро. Встретить тихую и спокойную старость не дает возобновившееся противостояние со своими заклятыми врагами — преступным кланом Златовласки и трёх медведей. Имея в запасе последнюю жизнь, которая становится бесценной, Кот в сапогах обращается за помощью к своей давней возлюбленной Кисе Мягколапке.",
+      "actors": [
+        "Антонио Бандерас",
+        "Сальма Хайек",
+        "Харви Гильен",
+        "Вагнер Моура",
+        "Флоренс Пью",
+        "Оливия Колман"
+      ],
+      "director": "Джоэль Кроуфорд",
+      "tmdbId": 315162,
+      "imdbId": "3915174",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10635302,
+      "title": "Истребитель демонов: Поезд «Бесконечный»",
+      "year": 2020,
+      "genres": [
+        "мультфильм",
+        "боевик",
+        "фэнтези"
+      ],
+      "averageRating": 4.1,
+      "ratingCount": 4455,
+      "weightedScore": 3.9813,
+      "popularity": 0.3162,
+      "poster": "https://image.tmdb.org/t/p/w500/sFXMvI0I5GEiXRCJDIuzBBXpkiZ.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "fight",
+        "magic",
+        "supernatural",
+        "psychology",
+        "gore",
+        "sequel",
+        "coming of age",
+        "survival",
+        "tragedy",
+        "based on manga",
+        "demon",
+        "historical"
+      ],
+      "description": "Тандзиро с друзьями из отряда уничтожителей демонов расследует серию загадочных исчезновений внутри мчащегося поезда. Но компания ещё не знает, что в составе находится один из двенадцати Лунных демонов, и он приготовил для них ловушку.",
+      "actors": [
+        "Нацуки Ханаэ",
+        "Акари Кито",
+        "Хиро Симоно",
+        "Ёсицугу Мацуока",
+        "Сатоши Хино",
+        "Такахиро Сакурай"
+      ],
+      "director": "Харуо Сотодзаки",
+      "tmdbId": 635302,
+      "imdbId": "11032374",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10050014,
+      "title": "Прислуга",
+      "year": 2011,
+      "genres": [
+        "драма"
+      ],
+      "averageRating": 4.1,
+      "ratingCount": 8961,
+      "weightedScore": 4.0339,
+      "popularity": 0.302,
+      "poster": "https://image.tmdb.org/t/p/w500/fRJ69DqMiZAk9HMRTTZNAYeIS0Y.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "based on novel or book",
+        "mississippi river",
+        "exploitation",
+        "racial segregation",
+        "racism",
+        "writer",
+        "maid",
+        "moral courage",
+        "ressentiment",
+        "southern belle",
+        "racial issues",
+        "1960s"
+      ],
+      "description": "Американский Юг, на дворе 1960-е годы. Скитер только-только закончила университет и возвращается домой, в сонный городок Джексон, где никогда ничего не происходит. Она мечтает стать писательницей, вырваться в большой мир. Но для приличной девушки с Юга не пристало тешиться столь глупыми иллюзиями, приличной девушке следует выйти замуж и хлопотать по дому.  Мудрая Эйбилин на тридцать лет старше Скитер, она прислуживает в домах белых всю свою жизнь, вынянчила семнадцать детей и давно уже ничего не ждёт от жизни, ибо сердце её разбито после смерти единственного сына.  Минни — самая лучшая стряпуха во всём Джексоне, а ещё она самая дерзкая служанка в городе. Двух чёрных служанок и белую неопытную девушку объединяет одно — обострённое чувство справедливости и желание хоть как-то изменить порядок вещей. Смогут ли эти трое противостоять целому миру? Сумеют ли они выжить в этой борьбе?",
+      "actors": [
+        "Эмма Стоун",
+        "Виола Дэвис",
+        "Брайс Даллас Ховард",
+        "Октавия Спенсер",
+        "Джессика Честейн",
+        "Ана О’Райли"
+      ],
+      "director": "Tate Taylor",
+      "tmdbId": 50014,
+      "imdbId": "1454029",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10441130,
+      "title": "Легенда о волках",
+      "year": 2020,
+      "genres": [
+        "мультфильм",
+        "семейный",
+        "приключения",
+        "фэнтези"
+      ],
+      "averageRating": 4.1,
+      "ratingCount": 1363,
+      "weightedScore": 3.838,
+      "popularity": 0.2317,
+      "poster": "https://image.tmdb.org/t/p/w500/kGAPa133hvlVZrmDEK2Qel9eS6s.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "friendship",
+        "wolf",
+        "magic",
+        "fairy tale",
+        "shapeshifting",
+        "wolf's lair",
+        "feral child",
+        "forest",
+        "woods",
+        "female protagonist",
+        "ireland",
+        "family"
+      ],
+      "description": "Юная охотница и её отец отправляются в Ирландию, чтобы истребить последнюю стаю волков. Но всё меняется после встречи с девушкой из загадочного племени, которое, по слухам, ночью превращается в волков.",
+      "actors": [
+        "Хонор Нифси",
+        "Eva Whittaker",
+        "Шон Бин",
+        "Саймон Макберни",
+        "Tommy Tiernan",
+        "Мария Дойл Кеннеди"
+      ],
+      "director": "Tomm Moore",
+      "tmdbId": 441130,
+      "imdbId": "5198068",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10324786,
+      "title": "По соображениям совести",
+      "year": 2016,
+      "genres": [
+        "драма",
+        "история",
+        "военный"
+      ],
+      "averageRating": 4.09,
+      "ratingCount": 14756,
+      "weightedScore": 4.0487,
+      "popularity": 0.386,
+      "poster": "https://image.tmdb.org/t/p/w500/A4Q3CdaQzbPwDI1gnE7WX5585rJ.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "japan",
+        "hero",
+        "world war ii",
+        "abusive father",
+        "pacifism",
+        "bible",
+        "gore",
+        "vegetarian",
+        "biography",
+        "based on true story",
+        "okinawa",
+        "conscientious objector"
+      ],
+      "description": "Медик американской армии времён Второй мировой войны Десмонд Досс, который служил во время битвы за Окинаву, отказывается убивать людей и становится первым идейным уклонистом в американской истории, удостоенным Медали Почёта.",
+      "actors": [
+        "Эндрю Гарфилд",
+        "Сэм Уортингтон",
+        "Винс Вон",
+        "Тереза Палмер",
+        "Люк Брейси",
+        "Хьюго Уивинг"
+      ],
+      "director": "Мел Гибсон",
+      "tmdbId": 324786,
+      "imdbId": "2119532",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10290098,
+      "title": "Служанка",
+      "year": 2016,
+      "genres": [
+        "триллер",
+        "драма",
+        "мелодрама"
+      ],
+      "averageRating": 4.09,
+      "ratingCount": 4269,
+      "weightedScore": 3.9694,
+      "popularity": 0.3605,
+      "poster": "https://image.tmdb.org/t/p/w500/ld4Gzpjd0dgduHLp3JEsZTLXCNH.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "jealousy",
+        "based on novel or book",
+        "library",
+        "pickpocket",
+        "eroticism",
+        "con man",
+        "swindler",
+        "lesbian relationship",
+        "mansion",
+        "lust",
+        "lgbt",
+        "noblewoman"
+      ],
+      "description": "30-е годы прошлого столетия. Корея, оккупированная японцами. Мошенник по прозвищу Граф предлагает бедной девушке Соке поучаствовать в деле, обещая солидный заработок. План афериста следующий. В огромном поместье, не общаясь с внешним миром, живет богатая японка Хидеко. Однако ее дядя, контролирующий каждый шаг девушки, изредка устраивает приемы для местных аристократов. Граф рассчитывает очаровать Хидеко, сбежать с ней в Японию, жениться, объявить ее сумасшедшей, упечь в дурдом и завладеть всем богатством. А Соке должна ему помочь, нанявшись в услужение к Хидеко. Что она и сделала. Но внезапно идеальный замысел Графа оказался под угрозой…",
+      "actors": [
+        "김민희",
+        "Ким Тхэ Ри",
+        "Ха Чон У",
+        "조진웅",
+        "Ким Хэ Сук",
+        "문소리"
+      ],
+      "director": "Пак Чхан Ук",
+      "tmdbId": 290098,
+      "imdbId": "4016934",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10522924,
+      "title": "Невероятный мир глазами Энцо",
+      "year": 2019,
+      "genres": [
+        "драма",
+        "мелодрама"
+      ],
+      "averageRating": 4.08,
+      "ratingCount": 1662,
+      "weightedScore": 3.8538,
+      "popularity": 0.204,
+      "poster": "https://image.tmdb.org/t/p/w500/wiSwJ3pi1DVFVsbtX9H7wIFCa1E.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "friendship",
+        "washington dc, usa",
+        "based on novel or book",
+        "car race",
+        "sports",
+        "reincarnation",
+        "race car driver",
+        "dog",
+        "animals",
+        "pets",
+        "father daughter relationship",
+        "animal narrator"
+      ],
+      "description": "Для собаки по кличке Энцо жизнь — это гонка. Не важно, как ты ее проходишь — за рулем автомобиля или на четырех лапах, все равно тебя ждут крутые виражи, ямы-западни, опасные взлеты и падения. Они выбивают с трека даже самых сильных — это начинающий гонщик Дэнни и его пес Энцо знают наверняка. Каждому из них предстоит своя гонка, но оба понимают: победить не значит обогнать соперников. Победить — значит вернуться после поражения на трассу и пройти ее до самого финиша, какой бы скользкой ни была дорога.",
+      "actors": [
+        "Кевин Костнер",
+        "Майло Вентимилья",
+        "Аманда Сайфред",
+        "Райан Кира Армстронг",
+        "Lily Dodsworth-Evans",
+        "Ian Lake"
+      ],
+      "director": "Саймон Кёртис",
+      "tmdbId": 522924,
+      "imdbId": "1478839",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10018148,
+      "title": "Токийская повесть",
+      "year": 1953,
+      "genres": [
+        "драма"
+      ],
+      "averageRating": 4.08,
+      "ratingCount": 1209,
+      "weightedScore": 3.8112,
+      "popularity": 0.2085,
+      "poster": "https://image.tmdb.org/t/p/w500/qcq69w02VC93Kc16CV5e4YY2Xgm.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "fish",
+        "beach",
+        "dreams",
+        "baby",
+        "coma",
+        "parent child relationship",
+        "peace",
+        "boat",
+        "cake",
+        "office",
+        "baseball",
+        "classroom"
+      ],
+      "description": "Пожилая супружеская пара едет из провинции в Токио навестить своих детей: сына, ставшего доктором, и дочь, открывшую салон красоты. Дети слишком заняты, чтобы заниматься с родителями, и отсылают их на курорт. После бессонной ночи на шумном курорте родители возвращаются в Токио. Перед тем как уехать, мать проводит ночь со вдовой другого сына, а отец встречается со своими старыми, пьющими дружками.  Выходит так, что только вдова сына оказывает старикам достойный прием с любовью и вниманием, которые им так нужны. У собственных детей скоро будет причина пожалеть о своем пренебрежении родителями, но к этому моменту эмоциональные связи уже будут обрезаны. Нет ничего удивительного в том, что они так легко возвращаются к жизни, в которой они поглощены только самими собой.",
+      "actors": [
+        "笠智衆",
+        "Тиэко Хигасияма",
+        "Сэцуко Хара",
+        "杉村春子",
+        "山村聰",
+        "三宅邦子"
+      ],
+      "director": "小津安二郎",
+      "tmdbId": 18148,
+      "imdbId": "0046438",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10000111,
+      "title": "Лицо со шрамом",
+      "year": 1983,
+      "genres": [
+        "боевик",
+        "криминал",
+        "драма"
+      ],
+      "averageRating": 4.08,
+      "ratingCount": 12922,
+      "weightedScore": 4.0341,
+      "popularity": 0.3586,
+      "poster": "https://image.tmdb.org/t/p/w500/9rGmgcmnnlrzB4K2SPIM8bgnNpw.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "corruption",
+        "sibling relationship",
+        "miami, florida",
+        "cuba",
+        "loss of loved one",
+        "gangster",
+        "cocaine",
+        "rise and fall",
+        "remake",
+        "tragedy",
+        "drug cartel",
+        "mafia"
+      ],
+      "description": "Получив грин-карту в обмен на убийство кубинского правительственного чиновника, Тони Монтана заявляет о своих правах на наркобизнесв Майами. Жестоко убивая всех, кто стоитна его пути, Тони в конечном итоге становится крупнейшим наркобароном в штате, контролируя почти все поставки кокаина, проходящие через Майами. Но усиливающееся давление со стороны полиции, войны с колумбийскими наркокартелями иего собственная паранойя, вызванная наркотиками, приводят к его окончательному падению.",
+      "actors": [
+        "Аль Пачино",
+        "Стивен Бауэр",
+        "Мишель Пфайффер",
+        "Мэри Элизабет Мастрантонио",
+        "Роберт Лоджиа",
+        "Мириам Колон"
+      ],
+      "director": "Брайан Де Пальма",
+      "tmdbId": 111,
+      "imdbId": "0086250",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10361743,
+      "title": "Топ Ган: Мэверик",
+      "year": 2022,
+      "genres": [
+        "боевик",
+        "драма"
+      ],
+      "averageRating": 4.08,
+      "ratingCount": 10794,
+      "weightedScore": 4.026,
+      "popularity": 0.4298,
+      "poster": "https://image.tmdb.org/t/p/w500/niNo4qTtIule2vvMFW05amvMtOB.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "fighter pilot",
+        "u.s. navy",
+        "sequel",
+        "nuclear weapons",
+        "military",
+        "aircraft carrier",
+        "naval aviation",
+        "war",
+        "admiring",
+        "audacious",
+        "earnest"
+      ],
+      "description": "Пит Митчелл по прозвищу Мэверик более 30 лет остается одним из лучших пилотов ВМФ: бесстрашный летчик-испытатель, он расширяет границы возможного и старательно избегает повышения в звании, которое заставило бы его приземлиться навсегда. Приступив к подготовке отряда выпускников «Топ Ган» для специальной миссии, Мэверик встречает лейтенанта Брэдли Брэдшоу - сына своего покойного друга, лейтенанта Ника Брэдшоу. Впереди — неопределенность, за спиной - призраки прошлого. Мэверик вынужден противостоять своим глубинным страхам, которые грозят ожить в рамках миссии, требующей исключительной самоотверженности от тех, кто будет назначен на вылет.",
+      "actors": [
+        "Том Круз",
+        "Майлз Теллер",
+        "Дженнифер Коннелли",
+        "Башир Салахуддин",
+        "Джон Хэмм",
+        "Чарльз Парнелл"
+      ],
+      "director": "Джозеф Косински",
+      "tmdbId": 361743,
+      "imdbId": "1745960",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10037165,
+      "title": "Шоу Трумана",
+      "year": 1998,
+      "genres": [
+        "комедия",
+        "драма"
+      ],
+      "averageRating": 4.08,
+      "ratingCount": 20064,
+      "weightedScore": 4.0495,
+      "popularity": 0.368,
+      "poster": "https://image.tmdb.org/t/p/w500/lYMMRbMZCyn12t6HLVYfmWfHrrq.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "escape",
+        "paranoia",
+        "dystopia",
+        "suspicion",
+        "video surveillance",
+        "deception",
+        "hidden camera",
+        "simulated reality ",
+        "television producer",
+        "tv show in film",
+        "make believe",
+        "actor"
+      ],
+      "description": "Страховой агент узнаёт, что вся его жизнь — реалити-шоу, созданное для развлечения миллионов людей. Теперь герою предстоит решить, что делать дальше.",
+      "actors": [
+        "Джим Керри",
+        "Лора Линни",
+        "Ноа Эммерих",
+        "Наташа Макэлхоун",
+        "Холланд Тейлор",
+        "Эд Харрис"
+      ],
+      "director": "Питер Уир",
+      "tmdbId": 37165,
+      "imdbId": "0120382",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10399106,
+      "title": "Песочник",
+      "year": 2016,
+      "genres": [
+        "семейный",
+        "мультфильм"
+      ],
+      "averageRating": 4.07,
+      "ratingCount": 1727,
+      "weightedScore": 3.8529,
+      "popularity": 0.1478,
+      "poster": "https://image.tmdb.org/t/p/w500/kOwLxPy0ZprpJOFcE0ORUy1Wvnp.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "fear",
+        "anxious",
+        "playful",
+        "short film",
+        "assertive",
+        "shorebird",
+        "fledgling"
+      ],
+      "description": "Стая представителей бекасовых охотится за едой у побережья, бросаясь клевать на песок, когда волна уходит, а когда наступает, они убегают. Одна маленькая представительца семейства бекасовых так воодушевлена своей мамой, что решается присоединиться к стае, но ей не удалось вовремя отступить, поэтому она полностью промокла от волны. Происшествие оставляет её запуганной водой; она отказывается покидать гнездышко, но скоро замечает группу раков-отшельников, закапывающихся в песок в поиске еды, оставаясь защищенными от волн. Копируя их поведение, птичка узрела красоту подводного мира и стала умелой в поиске еды для стаи.",
+      "actors": [],
+      "director": "Alan Barillaro",
+      "tmdbId": 399106,
+      "imdbId": "5613056",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10517814,
+      "title": "Капернаум",
+      "year": 2018,
+      "genres": [
+        "драма"
+      ],
+      "averageRating": 4.07,
+      "ratingCount": 1959,
+      "weightedScore": 3.8688,
+      "popularity": 0.2007,
+      "poster": "https://image.tmdb.org/t/p/w500/l6Ao4I5CTb2gLFXcBQk59lgyfE0.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "child abuse",
+        "slum",
+        "refugee",
+        "neglect",
+        "child bride",
+        "lawsuit",
+        "undocumented immigrant",
+        "poverty",
+        "life in the slums",
+        "slum dwellers"
+      ],
+      "description": "Двенадцатилетний Зейн не может точно ответить на вопрос, сколько у него братьев и сестёр, но уверен, что детей в его семье должно было быть меньше. Несмотря на юный возраст, Зейн нелегально работает, следит за младшими, помогает старшим, ищет деньги и документы на эмиграцию в Швецию. Он смотрит на мир с нескрываемой ненавистью. Ему есть что ненавидеть. Дети на улицах Бейрута попрошайничают, едят посыпанный сахаром лёд и чипсы, девочек как можно раньше продают замуж, сам он вынужден есть что попало, спать, где придётся, и самое главное — он только что получил пятилетний срок. В тюрьме Зейн подаёт в суд на родителей. За то, что они дали ему жизнь.",
+      "actors": [
+        "Зейн Эль Рафи",
+        "Yordanos Shifera",
+        "Boluwatife Treasure Bankole",
+        "Kawsar Al Haddad",
+        "Fadi Kamel Yousef",
+        "Cedra Izzam"
+      ],
+      "director": "Nadine Labaki",
+      "tmdbId": 517814,
+      "imdbId": "8267604",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10010098,
+      "title": "Малыш",
+      "year": 1921,
+      "genres": [
+        "комедия",
+        "драма"
+      ],
+      "averageRating": 4.07,
+      "ratingCount": 2355,
+      "weightedScore": 3.8912,
+      "popularity": 0.2217,
+      "poster": "https://image.tmdb.org/t/p/w500/aZaMpnftmOX6Ms4VM9buy4E2glv.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "angel",
+        "suicide attempt",
+        "fistfight",
+        "slapstick comedy",
+        "black and white",
+        "class differences",
+        "foundling",
+        "silent film",
+        "dream sequence",
+        "semi autobiographical",
+        "car theft",
+        "illegitimate child"
+      ],
+      "description": "Первый полнометражный фильм Чаплина как режиссёра — трогательная и пронзительная история о малыше, которого оставила мать сразу после рождения. Судьба сводит его с бедным, но добрым бродягой, который берёт ребёнка под своё крыло. Вместе они проходят через тяготы, делят радости и беды, постепенно становясь по-настоящему родными.",
+      "actors": [
+        "Чарли Чаплин",
+        "Jackie Coogan",
+        "Carl Miller",
+        "Эдна Первиэнс",
+        "Albert Austin",
+        "Beulah Bains"
+      ],
+      "director": "Чарли Чаплин",
+      "tmdbId": 10098,
+      "imdbId": "0012349",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10009702,
+      "title": "За кровь платят кровью",
+      "year": 1993,
+      "genres": [
+        "криминал",
+        "драма",
+        "триллер"
+      ],
+      "averageRating": 4.07,
+      "ratingCount": 1506,
+      "weightedScore": 3.8351,
+      "popularity": 0.2697,
+      "poster": "https://image.tmdb.org/t/p/w500/nxFaJxenu4LXk0auMACalUjfCbo.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "street gang",
+        "ghetto",
+        "juvenile prison",
+        "artist",
+        "tragedy",
+        "jail",
+        "east los angeles",
+        "youth gang",
+        "hood",
+        "gang",
+        "racism",
+        "drugs"
+      ],
+      "description": "Когда кровь на улицах льется как вода, и нет ничего дешевле, чем жизнь человека, надо уметь говорить на языке насилия. Иначе не выжить. Эту истину в латинском квартале Лос-Анджелеса познают с детства.  Связанные узами крови друзья Майкло, Пако и Круз выросли в этом мире поножовщины и гангстерских разборок, но выбрали разные судьбы. Майкло, пройдя тюремную школу, стал крутым бандитом. Круз подавал надежды как художник, однако увяз в наркотическом угаре. А Пако надел форму полицейского. Кажется, пути их разошлись навсегда.  Но однажды злые улицы снова сведут героев вместе — и кое-кто из бывших друзей встретятся злейшими врагами.",
+      "actors": [
+        "Дэмиан Чапа",
+        "Jesse Borrego",
+        "Бенджамин Брэтт",
+        "Энрике Кастильо",
+        "Виктор Риверс",
+        "Делрой Линдо"
+      ],
+      "director": "Taylor Hackford",
+      "tmdbId": 9702,
+      "imdbId": "0106469",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10592350,
+      "title": "Моя геройская академия: Восхождение героев",
+      "year": 2019,
+      "genres": [
+        "мультфильм",
+        "боевик",
+        "фэнтези",
+        "приключения"
+      ],
+      "averageRating": 4.07,
+      "ratingCount": 1266,
+      "weightedScore": 3.8123,
+      "popularity": 0.2289,
+      "poster": "https://image.tmdb.org/t/p/w500/bbAlQRWEPOsk58TrfCCCYxAAZTX.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "japan",
+        "hero",
+        "superhero",
+        "fighting",
+        "super power",
+        "shounen",
+        "anime"
+      ],
+      "description": "На очередном задании защитники преследовали грузовик с опасным преступником. Операция завершилась успешно, но в машине ребята не обнаружили ничего подозрительного. Вскоре голове отряда защитников удалось узнать о том, что существует наркотик, который может не только пробудить сверхсилу, но и отнять её у героев. Для лучших супергероев появилась нелёгкая задачка, но Мидория не собирается стоять в стороне. Волею судьбы смышлёный парень познакомился с девчонкой, которой известна секретная информация о новом наркотике. Изуку решает не только помочь новоиспечённой подруге с её проблемами, но и узнать, кто отвечает за производство загадочного наркотика. Что же ждёт напористого паренька без могущественных способностей впереди?",
+      "actors": [
+        "Даики Ямасита",
+        "Нобухико Окамото",
+        "Йошио Иноуэ",
+        "Мио Имада",
+        "Юка Тэрасаки",
+        "Томоё Куросава"
+      ],
+      "director": "Кэндзи Нагасаки",
+      "tmdbId": 592350,
+      "imdbId": "11107074",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10000797,
+      "title": "Персона",
+      "year": 1966,
+      "genres": [
+        "драма"
+      ],
+      "averageRating": 4.05,
+      "ratingCount": 2390,
+      "weightedScore": 3.8797,
+      "popularity": 0.2069,
+      "poster": "https://image.tmdb.org/t/p/w500/e5De8pPmWc0wDzagbmpxDIvTypt.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "dreams",
+        "nurse",
+        "confession",
+        "identity crisis",
+        "mental breakdown",
+        "betrayal",
+        "mute",
+        "black and white",
+        "patient",
+        "psychiatry",
+        "submerged",
+        "mysterious"
+      ],
+      "description": "Психологическая драма, в которой раскрывается одна из важнейших проблем современного мира, когда, несмотря на казалось бы нормальное течение профессиональной и личной жизни, человек вдруг ощущает одиночество и бессмысленность своего существования. Будучи знаменитой актрисой, госпожа Фоглер внезапно замолкает прямо во время спектакля и с тех пор перестает разговаривать со всеми. Пребывание в больнице показывает, что психически она здорова. Медсестра Альма должна вывести ее из этого состояния, и они отправляются вдвоем к морю, где им предстоит нелегкие дни общения.",
+      "actors": [
+        "Биби Андерссон",
+        "Лив Ульман",
+        "Margaretha Krook",
+        "Gunnar Björnstrand",
+        "Jörgen Lindström"
+      ],
+      "director": "Ингмар Бергман",
+      "tmdbId": 797,
+      "imdbId": "0060827",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10000666,
+      "title": "Центральный вокзал",
+      "year": 1998,
+      "genres": [
+        "драма"
+      ],
+      "averageRating": 4.07,
+      "ratingCount": 1042,
+      "weightedScore": 3.7865,
+      "popularity": 0.1576,
+      "poster": "https://image.tmdb.org/t/p/w500/uq6Cs6q02bIqvKMQ78r8EE99W9p.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "rio de janeiro",
+        "letter",
+        "wilderness",
+        "teacher",
+        "orphan",
+        "railroad",
+        "alcoholic",
+        "missing parent",
+        "long lost relative",
+        "realism",
+        "child trafficking",
+        "death of parent"
+      ],
+      "description": "Бывшая учительница — Дора зарабатывает тем, что пишет письма для неграмотных людей, приезжающих на Центральный вокзал Рио-де-Жанейро. Безразличная к своим клиентам, она берет по доллару за письмо, и еще доллар, если просят его отправить. А отправляет она не все письма.\r 9-летний Жозуэ и его мать тоже пользуются услугами Доры. Они пишут отцу. Отца Жозуэ никогда не видел, но мечтает встретиться с ним.\r А однажды, когда погибает его мать, мальчик остается совсем один в огромном городе. У наблюдающей за бедным мальчиком Доры появляется мысль о возможной выгоде. И она решает найти его отца…",
+      "actors": [
+        "Фернанда Монтенегру",
+        "Vinícius de Oliveira",
+        "Марилия Пера",
+        "Отон Бастос",
+        "Otávio Augusto",
+        "Matheus Nachtergaele"
+      ],
+      "director": "Вальтер Саллес",
+      "tmdbId": 666,
+      "imdbId": "0140888",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10606856,
+      "title": "Того",
+      "year": 2019,
+      "genres": [
+        "приключения",
+        "семейный"
+      ],
+      "averageRating": 4.06,
+      "ratingCount": 2239,
+      "weightedScore": 3.8787,
+      "popularity": 0.2402,
+      "poster": "https://image.tmdb.org/t/p/w500/aa58MGZc5oP6ZwMWTuAWqL7XPwc.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "snowstorm",
+        "husky",
+        "based on true story",
+        "puppy",
+        "alaska",
+        "snow",
+        "historical",
+        "dog",
+        "sled dogs",
+        "1920s",
+        "pets"
+      ],
+      "description": "Пёс по кличке Того в 1928 году помог предотвратить эпидемию дифтерии в городе Ном, Аляска. В упряжке с другими ездовыми собаками Того, несмотря на страшные погодные условия, смог доставить в город посылку с антитоксином, остановившим распространение болезни.",
+      "actors": [
+        "Уиллем Дефо",
+        "Джулианна Николсон",
+        "Кристофер Хейердал",
+        "Richard Dormer",
+        "Эдриан Дорваль",
+        "Madeline Wickins"
+      ],
+      "director": "Ericson Core",
+      "tmdbId": 606856,
+      "imdbId": "5116302",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10693134,
+      "title": "Дюна: Часть вторая",
+      "year": 2024,
+      "genres": [
+        "фантастика",
+        "приключения"
+      ],
+      "averageRating": 4.06,
+      "ratingCount": 7817,
+      "weightedScore": 3.9909,
+      "popularity": 0.3916,
+      "poster": "https://image.tmdb.org/t/p/w500/3aLghRkuJc9cs770fxo4a6YWht3.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "based on novel or book",
+        "sandstorm",
+        "chosen one",
+        "distant future",
+        "creature",
+        "planet",
+        "desert",
+        "destiny",
+        "giant worm",
+        "space opera",
+        "sand dune",
+        "allegorical"
+      ],
+      "description": "Герцог Пол Атрейдес присоединяется к фременам, чтобы стать Муад Дибом, одновременно пытаясь остановить наступление войны.",
+      "actors": [
+        "Тимоти Шаламе",
+        "Зендея",
+        "Ребекка Фергюсон",
+        "Хавьер Бардем",
+        "Джош Бролин",
+        "Остин Батлер"
+      ],
+      "director": "Дени Вильнёв",
+      "tmdbId": 693134,
+      "imdbId": "15239678",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10475557,
+      "title": "Джокер",
+      "year": 2019,
+      "genres": [
+        "криминал",
+        "триллер",
+        "драма"
+      ],
+      "averageRating": 4.06,
+      "ratingCount": 27573,
+      "weightedScore": 4.0383,
+      "popularity": 0.3655,
+      "poster": "https://image.tmdb.org/t/p/w500/5itx9nz3gXWgoD2I1UdaqOrphYm.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "society",
+        "based on comic",
+        "social commentary",
+        "psychological thriller",
+        "criminal mastermind",
+        "mental illness",
+        "anarchy",
+        "character study",
+        "clown makeup",
+        "outsider",
+        "prophetic",
+        "social realism"
+      ],
+      "description": "Готэм, начало 1980-х годов. Комик Артур Флек живет с больной матерью, которая с детства учит его «ходить с улыбкой». Пытаясь нести в мир хорошее и дарить людям радость, Артур сталкивается с человеческой жестокостью и постепенно приходит к выводу, что этот мир получит от него не добрую улыбку, а ухмылку злодея Джокера.",
+      "actors": [
+        "Хоакин Феникс",
+        "Роберт Де Ниро",
+        "Зази Битц",
+        "Фрэнсис Конрой",
+        "Бретт Каллен",
+        "Шей Уигэм"
+      ],
+      "director": "Тодд Филлипс",
+      "tmdbId": 475557,
+      "imdbId": "7286456",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10458220,
+      "title": "Палмер",
+      "year": 2021,
+      "genres": [
+        "драма"
+      ],
+      "averageRating": 4.06,
+      "ratingCount": 1889,
+      "weightedScore": 3.8581,
+      "popularity": 0.2452,
+      "poster": "https://image.tmdb.org/t/p/w500/gqdE35MzZHLZYBGlwUc3D6gSCNh.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "small town",
+        "homophobia",
+        "young boy",
+        "ex-con",
+        "house trailer",
+        "bullied",
+        "irresponsible parent",
+        "adult child friendship",
+        "guardianship",
+        "drug addict"
+      ],
+      "description": "После 12 лет тюрьмы бывшая звезда школьного футбола возвращается в родной город и начинает все с нуля. Он находит родственную душу в мальчике из проблемной семьи, но прошлое угрожает его новой жизни.",
+      "actors": [
+        "Джастин Тимберлейк",
+        "Ryder Allen",
+        "Джуно Темпл",
+        "Алиша Вейнрайт",
+        "Джун Скуибб",
+        "Дин Уинтерс"
+      ],
+      "director": "Фишер Стивенс",
+      "tmdbId": 458220,
+      "imdbId": "6857376",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10810693,
+      "title": "Магическая битва 0. Фильм",
+      "year": 2021,
+      "genres": [
+        "мультфильм",
+        "боевик",
+        "фэнтези"
+      ],
+      "averageRating": 4.05,
+      "ratingCount": 1709,
+      "weightedScore": 3.8398,
+      "popularity": 0.3184,
+      "poster": "https://image.tmdb.org/t/p/w500/rzi4VAYuT3bQDDUtomXQsxE71db.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "supernatural",
+        "exorcism",
+        "paranormal",
+        "prequel",
+        "tragedy",
+        "curse",
+        "based on manga",
+        "spirit",
+        "demon",
+        "school life",
+        "shounen",
+        "anime"
+      ],
+      "description": "Юту Оккоцу преследует призрак его подруги детства, которая погибла в ДТП. Однако она вовсе не та милая девушка, какой была Рика до смерти, а чудовищное и могущественное существо. Не в силах контролировать агрессивное поведение Рики, Юта бессилен остановить кровопролитие, которое следует за ее жестокой местью. Поэтому, когда его хватают маги, владеющие джиу-джицу, Юта только рад, что больше никто не пострадает. Задержавший его мастер Сатору Годзё заставляет юношу поступить в старшую школу джиу-джицу, чтобы научиться управлять Рикой и помогать людям. Однако вскоре Юта узнает, что злые духи — не самое опасное, что есть в мире.",
+      "actors": [
+        "Мэгуми Огата",
+        "Кана Ханадзава",
+        "Юити Накамура",
+        "Такахиро Сакурай",
+        "Микако Комацу",
+        "Коки Утияма"
+      ],
+      "director": "Пак Сон Ху",
+      "tmdbId": 810693,
+      "imdbId": "14331144",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10406997,
+      "title": "Чудо",
+      "year": 2017,
+      "genres": [
+        "семейный",
+        "драма"
+      ],
+      "averageRating": 4.05,
+      "ratingCount": 8225,
+      "weightedScore": 3.9851,
+      "popularity": 0.2927,
+      "poster": "https://image.tmdb.org/t/p/w500/hRClAuV3PVW2ybSaM8AsOMK77pI.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "exclusion",
+        "bullying",
+        "coney island",
+        "prejudice",
+        "school",
+        "based on children's book",
+        "family",
+        "physical disability",
+        "treacher collins syndrome",
+        "relaxed",
+        "melodramatic"
+      ],
+      "description": "С одной стороны мальчик Август Пулман такой же как и другие мальчишки его возраста — любит ходить на дни рождения к друзьям, играть в компьютерные игры, фанатеет от «Звездных войн», играет со своей собакой, ссорится и мирится со старшей сестрой. А с другой — он совсем не такой как другие мальчишки его возраста. Во-первых, Август никогда не ходил в обычную школу — с первого класса с ним дома занималась мама. Во-вторых, Август перенес 27 операций. Из-за очень редкой, но иногда встречающейся генетической ошибки у Августа нет лица. И вот такой мальчик должен пойти в школу. В первый раз. К обычным детям.",
+      "actors": [
+        "Джейкоб Трамбле",
+        "Джулия Робертс",
+        "Оуэн Уилсон",
+        "Izabela Vidovic",
+        "Ноа Джуп",
+        "Millie Davis"
+      ],
+      "director": "Стивен Чбоски",
+      "tmdbId": 406997,
+      "imdbId": "2543472",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10046738,
+      "title": "Пожары",
+      "year": 2010,
+      "genres": [
+        "драма",
+        "военный",
+        "детектив"
+      ],
+      "averageRating": 4.05,
+      "ratingCount": 3237,
+      "weightedScore": 3.9122,
+      "popularity": 0.2605,
+      "poster": "https://image.tmdb.org/t/p/w500/dwKEmNblXg3ql7Fuk7KhBBBKhp8.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "middle east",
+        "militia",
+        "orphanage",
+        "family secrets",
+        "massacre",
+        "twins",
+        "will",
+        "dark secret",
+        "domineering",
+        "search for truth",
+        "lebanese civil war",
+        "dark history"
+      ],
+      "description": "Когда брат и сестра Марван ознакомились с завещанием матери, их удивлению не было предела. Её последней волей было разыскать отца, которого близнецы считали умершим, и брата, о существовании которого они даже не подозревали. Жанна и Симон узнают, что мать тщательно скрывала от них многие обстоятельства своей трагической судьбы.",
+      "actors": [
+        "Любна Азабаль",
+        "Mélissa Désormeaux-Poulin",
+        "Maxim Gaudette",
+        "Rémy Girard",
+        "Allen Altman",
+        "Abdelghafour Elaaziz"
+      ],
+      "director": "Дени Вильнёв",
+      "tmdbId": 46738,
+      "imdbId": "1255953",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10000422,
+      "title": "8 с половиной",
+      "year": 1963,
+      "genres": [
+        "драма"
+      ],
+      "averageRating": 4.05,
+      "ratingCount": 2515,
+      "weightedScore": 3.8854,
+      "popularity": 0.21,
+      "poster": "https://image.tmdb.org/t/p/w500/nmzlfOLsRZeEmELcxj4cVEoCmvQ.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "dying and death",
+        "adultery",
+        "depression",
+        "individual",
+        "unsociability",
+        "screenplay",
+        "suicide attempt",
+        "missile",
+        "scapegoat",
+        "movie business",
+        "allegory",
+        "difficult childhood"
+      ],
+      "description": "Измотанный режиссёр погружается в водоворот воспоминаний и фантазий, где невозможно отличить вымысел от реальности.",
+      "actors": [
+        "Марчелло Мастроянни",
+        "Claudia Cardinale",
+        "Анук Эме",
+        "Sandra Milo",
+        "Rossella Falk",
+        "Barbara Steele"
+      ],
+      "director": "Федерико Феллини",
+      "tmdbId": 422,
+      "imdbId": "0056801",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10600354,
+      "title": "Отец",
+      "year": 2020,
+      "genres": [
+        "драма"
+      ],
+      "averageRating": 4.05,
+      "ratingCount": 3600,
+      "weightedScore": 3.9226,
+      "popularity": 0.254,
+      "poster": "https://image.tmdb.org/t/p/w500/xL2A41uKed4nepCCb0621kAxUiL.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "london, england",
+        "loss of sense of reality",
+        "flat",
+        "dementia",
+        "mistaken identity",
+        "alzheimer's disease",
+        "based on play or musical",
+        "old man",
+        "memory loss",
+        "elderly man",
+        "caregiving",
+        "father daughter relationship"
+      ],
+      "description": "Энтони уже далеко не молод и живет один в лондонской квартире. Он считает, что прекрасно справляется со всем сам, и помощь ему не нужна, но вот его дочь Энн противоположного мнения. Она собралась переезжать в Париж и хочет найти отцу сиделку. Энтони упирается всеми возможными способами, но в его квартире начинают происходить странности — в гостиной оказывается посторонний мужчина, дочь вдруг меняет внешность, и куда-то постоянно пропадают любимые часы.",
+      "actors": [
+        "Энтони Хопкинс",
+        "Оливия Колман",
+        "Марк Гэтисс",
+        "Оливия Уильямс",
+        "Имоджен Путс",
+        "Руфус Сьюэлл"
+      ],
+      "director": "Флориан Зеллер",
+      "tmdbId": 600354,
+      "imdbId": "10272386",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10149871,
+      "title": "Сказание о принцессе Кагуя",
+      "year": 2013,
+      "genres": [
+        "мультфильм",
+        "драма",
+        "фэнтези"
+      ],
+      "averageRating": 4.05,
+      "ratingCount": 1966,
+      "weightedScore": 3.8568,
+      "popularity": 0.2354,
+      "poster": "https://image.tmdb.org/t/p/w500/h8yDi70ReXkeEUPBzr2mvfHECtv.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "princess",
+        "historical",
+        "japanese woman",
+        "based on fairy tale",
+        "japanese folklore",
+        "anime",
+        "fantasy",
+        "cruel"
+      ],
+      "description": "Старик, зарабатывающий на жизнь продажей бамбука, как-то раз находит в бамбуковом лесу маленькую девочку размером с палец, которая оказывается принцессой по имени Кагуя.",
+      "actors": [
+        "Аки Асакура",
+        "Такэо Тии",
+        "Нобуко Миямото",
+        "Кэнго Кора",
+        "Ацуко Такахата",
+        "Томоко Табата"
+      ],
+      "director": "Исао Такахата",
+      "tmdbId": 149871,
+      "imdbId": "2576852",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10531428,
+      "title": "Портрет девушки в огне",
+      "year": 2019,
+      "genres": [
+        "драма",
+        "мелодрама"
+      ],
+      "averageRating": 4.05,
+      "ratingCount": 2901,
+      "weightedScore": 3.9009,
+      "popularity": 0.2696,
+      "poster": "https://image.tmdb.org/t/p/w500/5WH4ZujDLl9Rdc2Yw8LjaDRcoaQ.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "island",
+        "fire",
+        "beach",
+        "arranged marriage",
+        "classical music",
+        "painting",
+        "painter",
+        "greek mythology",
+        "lesbian relationship",
+        "person on fire",
+        "period drama",
+        "lesbian sex"
+      ],
+      "description": "Бретань, 1770. Художница Марианна приезжает в имение на побережье Франции, чтобы написать портрет дочери его владелицы — Элоизы. Картина нужна, чтобы отправить потенциальному жениху Элоизы в Милан. В знак протеста против замужества девушка отказалась позировать, и гостью представляют как компаньонку для прогулок. Проводя всё больше времени вместе, девушки начинают чувствовать взаимное притяжение…",
+      "actors": [
+        "Ноэми Мерлан",
+        "Адель Энель",
+        "Luàna Bajrami",
+        "Валерия Голино",
+        "Christel Baras",
+        "Armande Boulanger"
+      ],
+      "director": "Céline Sciamma",
+      "tmdbId": 531428,
+      "imdbId": "8613070",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10000655,
+      "title": "Париж, Техас",
+      "year": 1984,
+      "genres": [
+        "драма"
+      ],
+      "averageRating": 4.05,
+      "ratingCount": 2193,
+      "weightedScore": 3.8698,
+      "popularity": 0.2318,
+      "poster": "https://image.tmdb.org/t/p/w500/jSHs9jD0QzurajxcZUQj2phMzQA.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "van",
+        "regret",
+        "amnesia",
+        "sibling relationship",
+        "texas",
+        "peep show",
+        "redemption",
+        "road trip",
+        "mute",
+        "los angeles, california",
+        "on the road",
+        "desert"
+      ],
+      "description": "Бесцельный бродяга Трэвис Хендерсон выходит из пустыни. Он помнит, что где-то его ждёт семья — любимая женщина и маленький сын. Но Трэвис не помнит, что с момента его исчезновения прошло целых 4 года. Теперь все, кого он любит, считают его пропавшим без вести.",
+      "actors": [
+        "Гарри Дин Стэнтон",
+        "Настасья Кински",
+        "Дин Стоквелл",
+        "Hunter Carson",
+        "Аврора Клеман",
+        "Бернхард Викки"
+      ],
+      "director": "Вим Вендерс",
+      "tmdbId": 655,
+      "imdbId": "0087884",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10508442,
+      "title": "Душа",
+      "year": 2020,
+      "genres": [
+        "мультфильм",
+        "семейный",
+        "драма",
+        "музыка",
+        "фэнтези"
+      ],
+      "averageRating": 4.05,
+      "ratingCount": 11336,
+      "weightedScore": 4.0012,
+      "popularity": 0.2992,
+      "poster": "https://image.tmdb.org/t/p/w500/jZkksyMZdTYw7fIVKyA95nFEPnt.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "new york city",
+        "jazz",
+        "musician",
+        "cat",
+        "self-discovery",
+        "jazz singer or musician",
+        "teacher",
+        "aftercreditsstinger",
+        "duringcreditsstinger",
+        "life after death",
+        "cheerful"
+      ],
+      "description": "Уже немолодой школьный учитель музыки Джо Гарднер всю жизнь мечтал выступать на сцене в составе джазового ансамбля. Однажды он успешно проходит прослушивание у известной клубной певицы и, возвращаясь домой вне себя от счастья, падает в люк и умирает. Теперь у Джо одна дорога — в Великое После, но он сбегает с идущего в вечность эскалатора и случайно попадает в Великое До. Тут новенькие души обретают себя, и у будущих людей зарождаются увлечения, мечты и интересы. Джо становится наставником упрямой души 22, которая уже много веков не может найти свою искру и отправиться на Землю.",
+      "actors": [
+        "Джейми Фокс",
+        "Тина Фей",
+        "Graham Norton",
+        "Рэйчел Хаус",
+        "Алиси Брага",
+        "Ричард Айоади"
+      ],
+      "director": "Пит Доктер",
+      "tmdbId": 508442,
+      "imdbId": "2948372",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10398818,
+      "title": "Назови меня своим именем",
+      "year": 2017,
+      "genres": [
+        "мелодрама",
+        "драма"
+      ],
+      "averageRating": 4.05,
+      "ratingCount": 12697,
+      "weightedScore": 4.006,
+      "popularity": 0.3134,
+      "poster": "https://image.tmdb.org/t/p/w500/a9cZC9mutwtS9F9uvIDqeoO8gSJ.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "based on novel or book",
+        "upper class",
+        "italy",
+        "swimming pool",
+        "coming of age",
+        "love",
+        "breaking the fourth wall",
+        "summer",
+        "teenage boy",
+        "masturbation",
+        "first love",
+        "lgbt"
+      ],
+      "description": "История внезапного и сильного романа, возникшего между подростком и летним гостем, посетившим особняк его родителей на итальянской Ривьере. В течение нескольких беспокойных недель неумолимый, но обречённый поток навязчивой идеи, восхищения и желания, неизбежно усиливает их страсть, доводя до порога отчаяния и сопутствующего страха перед невозможностью только одного: полной близости.",
+      "actors": [
+        "Арми Хаммер",
+        "Тимоти Шаламе",
+        "Майкл Сталберг",
+        "Амира Казар",
+        "Esther Garrel",
+        "Victoire du Bois"
+      ],
+      "director": "Лука Гуаданьино",
+      "tmdbId": 398818,
+      "imdbId": "5726616",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10791373,
+      "title": "Лига справедливости Зака Снайдера",
+      "year": 2021,
+      "genres": [
+        "боевик",
+        "приключения",
+        "фэнтези"
+      ],
+      "averageRating": 4.04,
+      "ratingCount": 10742,
+      "weightedScore": 3.9898,
+      "popularity": 0.3218,
+      "poster": "https://image.tmdb.org/t/p/w500/tpPWUv258JrMSIdkVVV1NDp3aoT.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "saving the world",
+        "superhero",
+        "resurrection",
+        "based on comic",
+        "superhero team",
+        "planet invasion",
+        "action hero",
+        "dc extended universe (dceu)",
+        "superhero teamup"
+      ],
+      "description": "Вдохновившись самопожертвованием Супермена, Брюс Уэйн вновь обретает веру в человечество. Он заручается поддержкой новой союзницы Дианы Принс, чтобы сразиться с ещё более могущественным противником. Бэтмен и Чудо-женщина набирают команду сверхлюдей для борьбы с пробудившейся угрозой.",
+      "actors": [
+        "Бен Аффлек",
+        "Генри Кавилл",
+        "Галь Гадот",
+        "Рэй Фишер",
+        "Джейсон Момоа",
+        "Эзра Миллер"
+      ],
+      "director": "Зак Снайдер",
+      "tmdbId": 791373,
+      "imdbId": "12361974",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10664767,
+      "title": "Легенды «Смертельной битвы»: Месть Скорпиона",
+      "year": 2020,
+      "genres": [
+        "мультфильм",
+        "боевик",
+        "фэнтези"
+      ],
+      "averageRating": 4.04,
+      "ratingCount": 1449,
+      "weightedScore": 3.8137,
+      "popularity": 0.2507,
+      "poster": "https://image.tmdb.org/t/p/w500/t4blfxA4rIqUD49gyU6txgeaRT9.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "magic",
+        "ninja fighter",
+        "revenge",
+        "sorcerer",
+        "tournament",
+        "shaolin monk",
+        "fighting",
+        "based on video game",
+        "adult animation",
+        "god of thunder"
+      ],
+      "description": "Чернокнижник Шан Цзун устраивает межпространственный турнир по боевым искусствам, где победитель бросит ему вызов за судьбу их родного мира. В нем решает принять участие жаждущий отомстить за смерть семьи и клана Скорпион.",
+      "actors": [
+        "Патрик Сайц",
+        "Джордан Родригез",
+        "Дженнифер Карпентер",
+        "Джоэл Макхейл",
+        "Ike Amadi",
+        "Стивен Блум"
+      ],
+      "director": "Итан Сполдинг",
+      "tmdbId": 664767,
+      "imdbId": "9580138",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10000019,
+      "title": "Метрополис",
+      "year": 1927,
+      "genres": [
+        "драма",
+        "фантастика"
+      ],
+      "averageRating": 4.04,
+      "ratingCount": 3074,
+      "weightedScore": 3.8997,
+      "popularity": 0.215,
+      "poster": "https://image.tmdb.org/t/p/w500/8P4bz6mEi9SaeeIGsAzjbMa56CJ.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "future",
+        "metropolis",
+        "class society",
+        "man vs machine",
+        "underground world",
+        "tower of babel",
+        "based on novel or book",
+        "inventor",
+        "dystopia",
+        "delirium",
+        "mad scientist",
+        "prophet"
+      ],
+      "description": "Метрополис — город будущего, разделен на две части. Под землей находятся жилища рабочих, над ними цеха с машинами. В верхнем городе расположены офисы, богатые кварталы и сады развлечений. Вся власть в городе принадлежит магнату Иогану Фендерсону. Его сын — Фредер догадывается о несправедливости, царящей в метрополисе. Спустившись в машинную зону, Фредер приходит в ужас: он видит страшного Молоха, пожирающего людей. Не в силах смириться с увиденным, он начинает борьбу со злом.",
+      "actors": [
+        "Gustav Fröhlich",
+        "Brigitte Helm",
+        "Alfred Abel",
+        "Рудольф Кляйн-Рогге",
+        "Theodor Loos",
+        "Fritz Rasp"
+      ],
+      "director": "Fritz Lang",
+      "tmdbId": 19,
+      "imdbId": "0017136",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10755812,
+      "title": "Леди Баг и Супер-Кот: Нью-Йорк. Союз героев",
+      "year": 2020,
+      "genres": [
+        "мультфильм",
+        "семейный",
+        "телевизионный фильм",
+        "боевик",
+        "приключения"
+      ],
+      "averageRating": 4.04,
+      "ratingCount": 1123,
+      "weightedScore": 3.7819,
+      "popularity": 0.1849,
+      "poster": "https://image.tmdb.org/t/p/w500/2vtDf3mQ7d8cUJx6bRhKiRtF0sh.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "new york city",
+        "paris, france",
+        "superhero",
+        "الدعسوقة"
+      ],
+      "description": "В честь недели дружбы между Францией и США класс Маринет готовится к поездке в Нью-Йорк. Эдриан тоже хочет поехать, но поначалу его не отпускает отец, к тому же Леди Баг просит Супер-Кота последить за Парижем в ее отсутствие. Когда Габриель все-таки разрешает сыну полететь в Нью-Йорк, Эдриан оказывается перед сложным выбором. Желание посетить Нью-Йорк пересиливает, и он отправляется в долгожданное путешествие. Леди Баг и Супер-Кот не подозревают, что Бражник тоже собирается в город небоскребов, и что им предстоит объединить силы с американскими супергероями, чтобы дать отпор врагу.",
+      "actors": [
+        "Анук Отбуа",
+        "Бенжамен Боллен",
+        "Antoine Tomé",
+        "Fily Keita",
+        "Céline Melloul",
+        "Alan Aubert-Carlin"
+      ],
+      "director": "Томас Астрюк",
+      "tmdbId": 755812,
+      "imdbId": "12816348",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10823219,
+      "title": "Поток",
+      "year": 2024,
+      "genres": [
+        "мультфильм",
+        "приключения",
+        "фэнтези",
+        "семейный"
+      ],
+      "averageRating": 4.04,
+      "ratingCount": 2760,
+      "weightedScore": 3.8886,
+      "popularity": 0.3675,
+      "poster": "https://image.tmdb.org/t/p/w500/aaYXE9KZ8yea47OxZeFHvHU6Cqg.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "ocean",
+        "cat",
+        "boat",
+        "dystopia",
+        "dog",
+        "ruins",
+        "flood",
+        "lemur",
+        "kids",
+        "bird",
+        "3d animation",
+        "no dialogue"
+      ],
+      "description": "Кот просыпается в мире, погруженном в воду, где не осталось людей. Ему удается найти убежище на лодке вместе с другими животными, однако ужиться с ними оказывается ещё сложнее, чем преодолеть свой страх воды. Но каждому предстоит научиться жить с теми, кто отличается от них, и адаптироваться к новому дивному миру.",
+      "actors": [],
+      "director": "Гинц Зибалодис",
+      "tmdbId": 823219,
+      "imdbId": "4772188",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10000406,
+      "title": "Ненависть",
+      "year": 1995,
+      "genres": [
+        "драма"
+      ],
+      "averageRating": 4.04,
+      "ratingCount": 4512,
+      "weightedScore": 3.935,
+      "popularity": 0.2269,
+      "poster": "https://image.tmdb.org/t/p/w500/p7VJHNgZM12cSAlAnOEhjdUrFKu.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "police brutality",
+        "hip-hop",
+        "paris, france",
+        "socially deprived family",
+        "breakdance",
+        "ghetto",
+        "male friendship",
+        "street riots",
+        "racism",
+        "black and white",
+        "rebellious youth",
+        "xenophobia"
+      ],
+      "description": "Середина 90-х, Париж охвачен беспорядками. Из-за жёстких действий полиции арабский подросток Абдель оказывается в больнице. Его друг Винс находит на улице полицейский револьвер и вместе с товарищами Юбером и Саидом отправляется мстить. Друзья проводят один долгий день между Парижем и его пригородами, рэпом и боксом, мелким хулиганством и произволом властей. В истории «общества, которое падает вниз», ненависть неизменно порождает ненависть.",
+      "actors": [
+        "Венсан Кассель",
+        "Hubert Koundé",
+        "Саид Тагмауи",
+        "Abdel Ahmed Ghili",
+        "Solo",
+        "Joseph Momo"
+      ],
+      "director": "Матьё Кассовиц",
+      "tmdbId": 406,
+      "imdbId": "0113247",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10470044,
+      "title": "Чужая ненависть",
+      "year": 2018,
+      "genres": [
+        "криминал",
+        "драма"
+      ],
+      "averageRating": 4.05,
+      "ratingCount": 2212,
+      "weightedScore": 3.8708,
+      "popularity": 0.2064,
+      "poster": "https://image.tmdb.org/t/p/w500/uc8OqydER0xDcRrkA4zTCtxSrga.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "high school",
+        "based on novel or book",
+        "trauma",
+        "protest",
+        "riot",
+        "teenage girl",
+        "racism",
+        "police officer",
+        "blunt",
+        "preparatory school",
+        "racial profiling",
+        "generation z"
+      ],
+      "description": "Жизнь 16-летней девочки Старр разделена между двумя мирами. Ей приходится метаться между неблагополучным районом и респектабельной школой. Ситуацию только осложняет убийство ее друга полицейским…",
+      "actors": [
+        "Амандла Стенберг",
+        "Реджина Холл",
+        "Russell Hornsby",
+        "Кей Джей Апа",
+        "Коммон",
+        "Энтони Маки"
+      ],
+      "director": "George Tillman Jr.",
+      "tmdbId": 470044,
+      "imdbId": "5580266",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10411088,
+      "title": "Невидимый гость",
+      "year": 2017,
+      "genres": [
+        "драма",
+        "детектив",
+        "триллер"
+      ],
+      "averageRating": 4.04,
+      "ratingCount": 4937,
+      "weightedScore": 3.9423,
+      "popularity": 0.2488,
+      "poster": "https://image.tmdb.org/t/p/w500/51pl9F6V5Bqga8QoEfun8PmjCJl.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "barcelona, spain",
+        "businessman",
+        "falsely accused",
+        "manipulative lover",
+        "unreliable narrator",
+        "hidden truth",
+        "grieving father",
+        "accused of murder",
+        "mountain resort",
+        "locked room mystery",
+        "defense lawyer",
+        "psychological tension"
+      ],
+      "description": "Молодого бизнесмена Адриана Дориа обвиняют в убийстве любовницы, и он решает воспользоваться услугами Вирджинии Гудман, лучшего в стране специалиста по выходу из самых сложных ситуаций. Адриан содержится под домашним арестом, а завтра состоится судебное заседание, поэтому вечером к нему приходит Вирджиния, чтобы придумать наилучшую стратегию защиты. Для неё это последнее дело, и она не собирается его проигрывать.",
+      "actors": [
+        "Марио Касас",
+        "Ана Вахенер",
+        "Jose Coronado",
+        "Bárbara Lennie",
+        "Francesc Orella",
+        "Paco Tous"
+      ],
+      "director": "Ориол Пауло",
+      "tmdbId": 411088,
+      "imdbId": "4857264",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10012445,
+      "title": "Гарри Поттер и Дары Смерти: Часть II",
+      "year": 2011,
+      "genres": [
+        "приключения",
+        "фэнтези"
+      ],
+      "averageRating": 4.04,
+      "ratingCount": 21870,
+      "weightedScore": 4.014,
+      "popularity": 0.3795,
+      "poster": "https://image.tmdb.org/t/p/w500/cSxvq15AOeJ2jNdVRXJvAoZU8T6.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "witch",
+        "dying and death",
+        "saving the world",
+        "self sacrifice",
+        "magic",
+        "school of witchcraft",
+        "sorcerer",
+        "school",
+        "battle",
+        "ghost",
+        "wizard",
+        "teenage hero"
+      ],
+      "description": "В грандиозной последней главе битва между добрыми и злыми силами мира волшебников перерастает во всеобщую войну. Ставки ещё никогда не были так высоки, а поиск убежища — столь сложен. И быть может именно Гарри Поттеру придётся пожертвовать всем в финальном сражении с Волан-де-Мортом. Способен ли наш герой спасти мир? И всё закончится здесь.",
+      "actors": [
+        "Дэниел Рэдклифф",
+        "Эмма Уотсон",
+        "Руперт Гринт",
+        "Рэйф Файнс",
+        "Алан Рикман",
+        "Майкл Гембон"
+      ],
+      "director": "Дэвид Йейтс",
+      "tmdbId": 12445,
+      "imdbId": "1201607",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10000614,
+      "title": "Земляничная поляна",
+      "year": 1957,
+      "genres": [
+        "драма"
+      ],
+      "averageRating": 4.04,
+      "ratingCount": 1794,
+      "weightedScore": 3.8398,
+      "popularity": 0.1696,
+      "poster": "https://image.tmdb.org/t/p/w500/hUYDrMMFy7To9H6pkMKM0E3u9zU.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "adultery",
+        "dreams",
+        "nightmare",
+        "faith",
+        "identity",
+        "professor",
+        "journey in the past",
+        "aging",
+        "road trip",
+        "kids",
+        "acceptance"
+      ],
+      "description": "78-летний профессор из Стокгольма вспоминает и пересматривает разочарования своей долгой жизни. Вместе с женой сына он едет на машине на вручение почетной докторской степени, посещая по пути места, где был молод, встречая разных людей и старых знакомых, вспоминая сны и былое.",
+      "actors": [
+        "Victor Sjöström",
+        "Биби Андерссон",
+        "Ingrid Thulin",
+        "Gunnar Björnstrand",
+        "Jullan Kindahl",
+        "Folke Sundquist"
+      ],
+      "director": "Ингмар Бергман",
+      "tmdbId": 614,
+      "imdbId": "0050986",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10001091,
+      "title": "Нечто",
+      "year": 1982,
+      "genres": [
+        "ужасы",
+        "детектив",
+        "фантастика"
+      ],
+      "averageRating": 4.04,
+      "ratingCount": 7848,
+      "weightedScore": 3.9737,
+      "popularity": 0.3221,
+      "poster": "https://image.tmdb.org/t/p/w500/cxywW6Dl0IJfpywo8o9cqc4EApE.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "spacecraft",
+        "helicopter",
+        "space marine",
+        "based on novel or book",
+        "isolation",
+        "mutation",
+        "paranoia",
+        "grave",
+        "snowstorm",
+        "research station",
+        "alien life-form",
+        "alien"
+      ],
+      "description": "Команде ученых американской исследовательской станции в Антарктике предстоит столкнуться с необъяснимым кошмаром. Отрезанные от остального мира полярники вступают в схватку с инопланетной тварью, способной принимать обличье земных существ.",
+      "actors": [
+        "Курт Рассел",
+        "Уилфорд Бримли",
+        "Т. К. Картер",
+        "Дэвид Кленнон",
+        "Кит Дэвид",
+        "Ричард А. Дайсарт"
+      ],
+      "director": "Джон Карпентер",
+      "tmdbId": 1091,
+      "imdbId": "0084787",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10414419,
+      "title": "Убить Билла: Кровавое дело целиком",
+      "year": 2011,
+      "genres": [
+        "боевик",
+        "криминал"
+      ],
+      "averageRating": 4.03,
+      "ratingCount": 1222,
+      "weightedScore": 3.7874,
+      "popularity": 0.2858,
+      "poster": "https://image.tmdb.org/t/p/w500/wvdqLbFAR2m5NhC6pOArYaCVUmS.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "martial arts",
+        "kung fu",
+        "assassin",
+        "mass murder",
+        "yakuza",
+        "feminism",
+        "secret society",
+        "buried alive",
+        "okinawa",
+        "revenge",
+        "vigilante",
+        "female protagonist"
+      ],
+      "description": "Режиссёрская версия культового фильма \"Убить Билла\".  Квентин Тарантино был вынужден разделить фильм на две части, чтобы они попали в прокат, ведь продолжительность полной версии картины более четырех часов",
+      "actors": [
+        "Ума Турман",
+        "Люси Лью",
+        "Вивика А. Фокс",
+        "Майкл Медсен",
+        "Дэрил Ханна",
+        "Дэвид Кэррадайн"
+      ],
+      "director": "Квентин Тарантино",
+      "tmdbId": 414419,
+      "imdbId": "6019206",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10011423,
+      "title": "Воспоминания об убийстве",
+      "year": 2003,
+      "genres": [
+        "криминал",
+        "драма",
+        "триллер"
+      ],
+      "averageRating": 4.03,
+      "ratingCount": 4530,
+      "weightedScore": 3.9275,
+      "popularity": 0.3017,
+      "poster": "https://image.tmdb.org/t/p/w500/xt3oXWUF9tcOyjToVLoPfLW7lMz.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "assassin",
+        "police brutality",
+        "rape",
+        "corruption",
+        "police",
+        "detective",
+        "investigation",
+        "victim",
+        "based on true story",
+        "based on play or musical",
+        "murder",
+        "serial killer"
+      ],
+      "description": "В 1986 году, в корейской глубинке, две местных женщины были убиты одним и тем же извращённым способом. Детектив Ду Ман Пак и его помощник Ён Гу Чжу, доброволец, вызвавшийся помогать в расследовании этого ужасного дела, со всевозможным рвением пытаются распутать таинственные обстоятельства происшедшего.  Но скоро становится очевидно, что они не имеют ни навыков, ни характера для подобного рода оперативной работы. После неудачной попытки обвинить в совершении убийства невиновного человека, дело предаётся гласности и полицейские неохотно принимают помощь полицейского Тхэ Ён Со, который прибыл им на помощь из Сеула…",
+      "actors": [
+        "Сон Кан Хо",
+        "김상경",
+        "김뢰하",
+        "송재호",
+        "변희봉",
+        "Ко Со Хи"
+      ],
+      "director": "Пон Джун Хо",
+      "tmdbId": 11423,
+      "imdbId": "0353969",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10007347,
+      "title": "Элитный отряд",
+      "year": 2007,
+      "genres": [
+        "драма",
+        "боевик",
+        "криминал"
+      ],
+      "averageRating": 4.03,
+      "ratingCount": 2686,
+      "weightedScore": 3.8788,
+      "popularity": 0.2147,
+      "poster": "https://image.tmdb.org/t/p/w500/8wps9Km34FOOps0tpDe3Jh36Rsc.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "drug dealer",
+        "police brutality",
+        "slum",
+        "war on drugs",
+        "drug trafficking",
+        "rio de janeiro",
+        "torturing police",
+        "special forces",
+        "law enforcement",
+        "favelas",
+        "rookie officers",
+        "corrupt officers"
+      ],
+      "description": "В 1997 году, перед визитом Папы Римского в Рио де-Жанейро, капитан Насцименто из БОПО (Батальона особых полицейских операций) получает задание устранить опасность, исходящую от наркоторговцев, действующих в опасных трущобах поблизости от резиденции Папы. Капитан Насцименто ищет человека, способного заменить его, так как жена капитана беременна, и он собирается оставить БОПО и стать наставником новобранцев. Тем временем, два друга-идеалиста Нето и Матиас начинают службу в военной полиции, рассчитывая стать честными полицейскими и бороться с криминалом. Однако они сталкиваются в военной полиции с коррупцией, недостатком профессионализма и бюрократическим идиотизмом. После серьёзного инцидента в Моро да Бабилония они решают вступить в ряды БОПО.",
+      "actors": [
+        "Вагнер Моура",
+        "André Ramiro",
+        "Caio Junqueira",
+        "Milhem Cortaz",
+        "Fernanda Machado",
+        "Maria Ribeiro"
+      ],
+      "director": "José Padilha",
+      "tmdbId": 7347,
+      "imdbId": "0861739",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10522518,
+      "title": "Собачья жизнь 2",
+      "year": 2019,
+      "genres": [
+        "семейный",
+        "приключения",
+        "драма"
+      ],
+      "averageRating": 4.03,
+      "ratingCount": 1611,
+      "weightedScore": 3.821,
+      "popularity": 0.2193,
+      "poster": "https://image.tmdb.org/t/p/w500/nTIYb1c3JcqFRo9V1RIzflsJTmj.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "reincarnation",
+        "sequel",
+        "growing up",
+        "dog",
+        "animal shelter",
+        "pets"
+      ],
+      "description": "Старый пес Бадди прожил несколько жизней, прежде чем воссоединиться со своим первым хозяином. Но на этом цепь его перерождений не оборвалась. Он возвращается в теле щенка, получает кличку Молли и выполняет новую миссию – принести счастье проблемной девочке-подростку СиДжей.",
+      "actors": [
+        "Марж Хелгенбергер",
+        "Бетти Гилпин",
+        "헨리",
+        "Кэтрин Прескотт",
+        "Деннис Куэйд",
+        "Джош Гэд"
+      ],
+      "director": "Гейл Манкусо",
+      "tmdbId": 522518,
+      "imdbId": "8385474",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10004348,
+      "title": "Гордость и предубеждение",
+      "year": 2005,
+      "genres": [
+        "драма",
+        "мелодрама"
+      ],
+      "averageRating": 4.02,
+      "ratingCount": 8707,
+      "weightedScore": 3.9619,
+      "popularity": 0.3541,
+      "poster": "https://image.tmdb.org/t/p/w500/5j0JrcBCuGceNrwjyHMEoI6v5fQ.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "based on novel or book",
+        "england",
+        "bachelor",
+        "family relationships",
+        "suitor",
+        "prejudice",
+        "period drama",
+        "pride",
+        "18th century",
+        "opposites attract",
+        "gentleman",
+        "georgian or regency era"
+      ],
+      "description": "Англия, конец XVIII века. Родители пятерых сестер Беннет озабочены тем, чтобы удачно выдать дочерей замуж. И потому размеренная жизнь солидного семейства переворачивается вверх дном, когда по соседству появляется молодой джентльмен - мистер Бингли...\r Само собой, среди друзей нового соседа оказывается немало утонченных аристократов, которые не прочь поухаживать за очаровательными сестрами. Однако, все не так просто. Своевольная Элизабет знакомится с другом Бингли - красивым и высокомерным мистером Дарси, и между ними разгорается нешуточное противостояние, результатом которого может стать как любовь, так и ненависть...",
+      "actors": [
+        "Кира Найтли",
+        "Мэттью Макфэдьен",
+        "Бренда Блетин",
+        "Розамунд Пайк",
+        "Кэри Маллиган",
+        "Джена Мэлоун"
+      ],
+      "director": "Джо Райт",
+      "tmdbId": 4348,
+      "imdbId": "0414387",
+      "similar": [],
+      "source": "tmdb"
+    },
+    {
+      "id": 10001955,
+      "title": "Человек-слон",
+      "year": 1980,
+      "genres": [
+        "драма",
+        "история"
+      ],
+      "averageRating": 4.02,
+      "ratingCount": 3896,
+      "weightedScore": 3.9071,
+      "popularity": 0.2303,
+      "poster": "https://image.tmdb.org/t/p/w500/rHdnESHHxhfyv4E8e52BQy5pjEF.jpg",
+      "palette": [
+        "#64748b",
+        "#111827"
+      ],
+      "tags": [
+        "friendship",
+        "london, england",
+        "escape",
+        "nurse",
+        "exploitation",
+        "biography",
+        "based on true story",
+        "tragedy",
+        "hospital",
+        "black and white",
+        "period drama",
+        "social injustice"
+      ],
+      "description": "Доктор Тривз находит Джона Меррика в шоу уродцев. Внешность его настолько ужасающая, что ему приходится носить просторное одеяние, чтобы никто не увидел его пугающих наростов по всему телу. Забрав Меррика в больницу после очередного избиения хозяином, Тривз с удивлением обнаруживает в нем человека интеллектуально развитого и духовного.",
+      "actors": [
+        "Энтони Хопкинс",
+        "Джон Хёрт",
+        "Anne Bancroft",
+        "Джон Гилгуд",
+        "Уэнди Хиллер",
+        "Фредди Джонс"
+      ],
+      "director": "Дэвид Линч",
+      "tmdbId": 1955,
+      "imdbId": "0080678",
+      "similar": [],
+      "source": "tmdb"
     }
   ]
 }

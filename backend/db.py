@@ -121,8 +121,6 @@ def import_movies(connection):
         return
 
     connection.execute("DELETE FROM movie_similarities")
-    connection.execute("DELETE FROM movie_metadata")
-    connection.execute("DELETE FROM movies")
 
     for movie in data["movies"]:
         connection.execute(
@@ -132,6 +130,16 @@ def import_movies(connection):
                 weighted_score, popularity, tmdb_id, imdb_id
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(id)
+            DO UPDATE SET title = excluded.title,
+                          year = excluded.year,
+                          genres = excluded.genres,
+                          average_rating = excluded.average_rating,
+                          rating_count = excluded.rating_count,
+                          weighted_score = excluded.weighted_score,
+                          popularity = excluded.popularity,
+                          tmdb_id = excluded.tmdb_id,
+                          imdb_id = excluded.imdb_id
             """,
             (
                 movie["id"],
@@ -150,6 +158,15 @@ def import_movies(connection):
             """
             INSERT INTO movie_metadata (movie_id, poster, palette, tags, description, actors, director, source)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(movie_id)
+            DO UPDATE SET poster = excluded.poster,
+                          palette = excluded.palette,
+                          tags = excluded.tags,
+                          description = excluded.description,
+                          actors = excluded.actors,
+                          director = excluded.director,
+                          source = excluded.source,
+                          updated_at = CURRENT_TIMESTAMP
             """,
             (
                 movie["id"],
@@ -162,6 +179,9 @@ def import_movies(connection):
                 "tmdb" if movie.get("poster") or movie.get("actors") or movie.get("director") else "movielens",
             ),
         )
+    if imported_ids:
+        placeholders = ",".join("?" for _ in imported_ids)
+        connection.execute(f"DELETE FROM movies WHERE id NOT IN ({placeholders})", tuple(imported_ids))
     for movie in data["movies"]:
         for similar in movie.get("similar", []):
             if similar["id"] not in imported_ids:

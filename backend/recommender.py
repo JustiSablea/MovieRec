@@ -415,6 +415,21 @@ class HybridRecommender:
             movie = self.movie_by_id.get(similar_id)
             if movie:
                 result.append({**movie, "similarity": round(score, 4)})
+        if result:
+            return result
+        vector = self.content_vectors.get(movie_id, {})
+        content_neighbors = sorted(
+            (
+                (self._cosine(vector, other_vector), other_id)
+                for other_id, other_vector in self.content_vectors.items()
+                if other_id != movie_id
+            ),
+            reverse=True,
+        )[:limit]
+        for score, similar_id in content_neighbors:
+            movie = self.movie_by_id.get(similar_id)
+            if movie:
+                result.append({**movie, "similarity": round(score, 4)})
         return result
 
     def _save_recommendations(self, user_id, recommendations):
