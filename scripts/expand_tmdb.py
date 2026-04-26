@@ -124,9 +124,20 @@ def build_movie(details, genre_names, global_avg):
     }
 
 
-def endpoint_pages(endpoint, pages, language):
+def endpoint_pages(endpoint, pages, language, min_votes):
     for page in range(1, pages + 1):
-        payload = tmdb_get(endpoint, language=language, page=page, region="US")
+        if endpoint == "/discover/movie":
+            payload = tmdb_get(
+                endpoint,
+                language=language,
+                page=page,
+                sort_by="vote_count.desc",
+                include_adult="false",
+                vote_count_gte=min_votes,
+                with_original_language="",
+            )
+        else:
+            payload = tmdb_get(endpoint, language=language, page=page, region="US")
         for item in payload.get("results", []):
             yield item
         time.sleep(0.08)
@@ -142,7 +153,7 @@ def expand(max_new, pages, language, endpoint, min_votes):
     global_avg = data.get("globalAverage") or 3.5
     added = []
 
-    for item in endpoint_pages(endpoint, pages, language):
+    for item in endpoint_pages(endpoint, pages, language, min_votes):
         tmdb_id = item.get("id")
         if not tmdb_id or tmdb_id in existing_tmdb:
             continue
@@ -182,7 +193,7 @@ def main():
     parser.add_argument("--pages", type=int, default=5)
     parser.add_argument("--language", default="ru-RU")
     parser.add_argument("--min-votes", type=int, default=500)
-    parser.add_argument("--endpoint", default="/movie/popular", choices=["/movie/popular", "/movie/top_rated", "/movie/now_playing"])
+    parser.add_argument("--endpoint", default="/movie/popular", choices=["/movie/popular", "/movie/top_rated", "/movie/now_playing", "/discover/movie"])
     args = parser.parse_args()
     added = expand(args.max_new, args.pages, args.language, args.endpoint, args.min_votes)
     print(json.dumps({"added": len(added), "movieCount": len(json.loads(MOVIES_JSON.read_text(encoding="utf-8"))["movies"])}, ensure_ascii=False))

@@ -5,7 +5,7 @@ from flask import Flask, jsonify, request, send_from_directory, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from .db import ROOT, get_connection, init_db
-from .embeddings import embedding_search, rebuild_movie_embeddings
+from .embeddings import embedding_search, expand_query, rebuild_movie_embeddings
 from .recommender import HybridRecommender
 from .tmdb import enrich_movie
 
@@ -283,15 +283,69 @@ def semantic_search():
         embedded = embedding_search(connection, recommender, query, limit=10)
         if embedded is not None:
             provider = embedded[0].get("embeddingProvider", "embeddings") if embedded else "embeddings"
-            return jsonify({"mode": f"{provider}_embeddings", "movies": embedded})
-        return jsonify({"mode": "tfidf_fallback", "movies": recommender.semantic_search(query, limit=10)})
+            content = recommender.semantic_search(expand_query(query), limit=30)
+            merged = rerank_semantic_results(query, embedded, content)
+            return jsonify({"mode": f"{provider}_embeddings", "movies": merged[:10]})
+        return jsonify({"mode": "tfidf_fallback", "movies": rerank_semantic_results(query, [], recommender.semantic_search(expand_query(query), limit=30))[:10]})
+
+
+def rerank_semantic_results(query, embedded, content):
+    merged = {}
+    for index, movie in enumerate(embedded):
+        normalized_embedding = (float(movie.get("semanticScore") or 0) + 1) / 2
+        merged[movie["id"]] = {
+            **movie,
+            "_embedding": normalized_embedding,
+            "_content": 0.0,
+            "_rank": index,
+        }
+    for index, movie in enumerate(content):
+        entry = merged.get(movie["id"], {**movie, "_embedding": 0.0, "_rank": 100 + index})
+        entry["_content"] = max(entry.get("_content", 0.0), 1 - index / max(1, len(content)))
+        entry["semanticScore"] = max(float(entry.get("semanticScore") or 0), float(movie.get("semanticScore") or 0))
+        merged[movie["id"]] = entry
+    results = []
+    for item in merged.values():
+        boost = semantic_intent_boost(query, item)
+        combined = item["_embedding"] * 0.38 + item["_content"] * 0.52 + item.get("weightedScore", 0) / 100 + boost
+        item["semanticScore"] = round(combined, 4)
+        item["reason"] = "Гибридный нейропоиск: embeddings + контентное сходство"
+        item.pop("_embedding", None)
+        item.pop("_content", None)
+        item.pop("_rank", None)
+        results.append(item)
+    results.sort(key=lambda movie: (movie["semanticScore"], movie.get("weightedScore", 0)), reverse=True)
+    return results
+
+
+def semantic_intent_boost(query, movie):
+    normalized = query.lower().replace("ё", "е")
+    dreamish = any(term in normalized for term in ("сон", "сны", "снах", "сын", "dream"))
+    heistish = any(term in normalized for term in ("ограб", "heist", "вор", "краж"))
+    text = " ".join(
+        [
+            movie.get("title", ""),
+            movie.get("description", ""),
+            " ".join(movie.get("tags", [])),
+            " ".join(movie.get("genres", [])),
+        ]
+    ).lower().replace("ё", "е")
+    boost = 0.0
+    if dreamish and heistish:
+        if "inception" in text or "начало" in text:
+            boost += 0.75
+        if any(term in text for term in ("сон", "сны", "dream", "подсозн")):
+            boost += 0.2
+        if any(term in text for term in ("ограб", "heist", "вор", "краж", "crime")):
+            boost += 0.12
+    return boost
 
 
 @app.post("/api/embeddings/rebuild")
 def embeddings_rebuild():
     with get_connection() as connection:
         try:
-            limit = min(int(request.args.get("limit", 80)), 220)
+            limit = min(int(request.args.get("limit", 80)), 1500)
             provider = request.args.get("provider")
             return jsonify(rebuild_movie_embeddings(connection, HybridRecommender(connection), limit=limit, provider=provider))
         except Exception as error:

@@ -49,7 +49,7 @@ cd "C:\Users\azzma\Documents\New project"
 Расширить выборку новыми фильмами из TMDb:
 
 ```powershell
-& "C:\Users\azzma\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" scripts\expand_tmdb.py --endpoint /movie/top_rated --pages 12 --max-new 80 --min-votes 1000 --language ru-RU
+& "C:\Users\azzma\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" scripts\expand_tmdb.py --endpoint /discover/movie --pages 50 --max-new 750 --min-votes 700 --language ru-RU
 ```
 
 Новые TMDb-only фильмы участвуют в каталоге, нейропоиске и content-based рекомендациях. Коллаборативная часть MovieLens для них появится только если фильм есть в MovieLens.
@@ -61,7 +61,7 @@ OpenAI:
 ```powershell
 $env:EMBEDDING_PROVIDER="openai"
 $env:OPENAI_API_KEY="ваш_ключ"
-Invoke-RestMethod -Method Post "http://localhost:8000/api/embeddings/rebuild?provider=openai&limit=120"
+Invoke-RestMethod -Method Post "http://localhost:8000/api/embeddings/rebuild?provider=openai&limit=1200"
 ```
 
 Локальная модель без OpenAI API:
@@ -69,7 +69,7 @@ Invoke-RestMethod -Method Post "http://localhost:8000/api/embeddings/rebuild?pro
 ```powershell
 & "C:\Users\azzma\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" -m pip install sentence-transformers
 $env:EMBEDDING_PROVIDER="local"
-Invoke-RestMethod -Method Post "http://localhost:8000/api/embeddings/rebuild?provider=local&limit=120"
+Invoke-RestMethod -Method Post "http://localhost:8000/api/embeddings/rebuild?provider=local&limit=1200"
 ```
 
 Без построенных embeddings сайт использует TF-IDF fallback.

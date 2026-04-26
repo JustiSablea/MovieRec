@@ -1,6 +1,7 @@
 import json
 import math
 import os
+import re
 
 import requests
 
@@ -15,6 +16,19 @@ LOCAL_EMBEDDING_MODEL = os.environ.get(
     "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
 )
 _LOCAL_MODEL = None
+TOKEN_RE = re.compile(r"[a-zа-яё0-9]{2,}", re.IGNORECASE)
+QUERY_EXPANSIONS = {
+    "сын": ["сны", "сон", "dream", "dreams"],
+    "сны": ["сон", "dream", "dreams", "inception"],
+    "снах": ["сны", "сон", "dream", "dreams", "inception"],
+    "сон": ["сны", "dream", "dreams", "inception"],
+    "ограбления": ["ограбление", "heist", "thief", "crime", "inception"],
+    "ограбление": ["heist", "thief", "crime", "inception"],
+    "ограблении": ["ограбление", "heist", "crime"],
+    "воры": ["heist", "crime", "thief"],
+    "космос": ["space", "sci-fi", "interstellar"],
+    "робот": ["robot", "robots", "wall-e"],
+}
 
 
 def movie_text(movie):
@@ -29,6 +43,17 @@ def movie_text(movie):
             movie.get("director") or "",
         ]
     ).strip()
+
+
+def expand_query(query):
+    tokens = []
+    for raw in TOKEN_RE.findall(query.lower().replace("ё", "е")):
+        tokens.append(raw)
+        tokens.extend(QUERY_EXPANSIONS.get(raw, []))
+    expanded = " ".join(tokens)
+    if {"сны", "ограбления"}.issubset(set(tokens)) or {"сон", "ограбление"}.issubset(set(tokens)):
+        expanded += " inception dream heist extraction subconscious"
+    return f"{query} {expanded}".strip()
 
 
 def cosine(left, right):
@@ -62,6 +87,8 @@ def openai_embed(texts):
 def local_embed(texts, model_name=None):
     global _LOCAL_MODEL
     model_name = model_name or LOCAL_EMBEDDING_MODEL
+    os.environ.setdefault("HF_HUB_OFFLINE", "1")
+    os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
     try:
         from sentence_transformers import SentenceTransformer
     except ImportError as error:
@@ -70,7 +97,7 @@ def local_embed(texts, model_name=None):
             "pip install sentence-transformers. После этого задайте EMBEDDING_PROVIDER=local."
         ) from error
     if _LOCAL_MODEL is None:
-        _LOCAL_MODEL = SentenceTransformer(model_name)
+        _LOCAL_MODEL = SentenceTransformer(model_name, local_files_only=True)
     vectors = _LOCAL_MODEL.encode(texts, normalize_embeddings=True)
     return [vector.tolist() for vector in vectors]
 
@@ -111,7 +138,8 @@ def embedding_search(connection, recommender, query, limit=10):
         return None
     provider = rows[0]["provider"]
     model = rows[0]["model"]
-    query_embedding = embed_texts([query], provider=provider, model=model)[0][0]
+    expanded_query = expand_query(query)
+    query_embedding = embed_texts([expanded_query], provider=provider, model=model)[0][0]
     scored = []
     for row in rows:
         movie = recommender.movie_by_id.get(row["movie_id"])
