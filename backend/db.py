@@ -148,8 +148,8 @@ def import_movies(connection):
         )
         connection.execute(
             """
-            INSERT INTO movie_metadata (movie_id, poster, palette, tags, description)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO movie_metadata (movie_id, poster, palette, tags, description, actors, director, source)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 movie["id"],
@@ -157,6 +157,9 @@ def import_movies(connection):
                 json.dumps(movie.get("palette", []), ensure_ascii=False),
                 json.dumps(movie.get("tags", []), ensure_ascii=False),
                 movie.get("description") or "",
+                json.dumps(movie.get("actors", []), ensure_ascii=False),
+                movie.get("director"),
+                "tmdb" if movie.get("poster") or movie.get("actors") or movie.get("director") else "movielens",
             ),
         )
     for movie in data["movies"]:
