@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MovieRec</title>
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%23151517"/><path d="M17 18h30v28H17zM17 26h30M26 18v8M38 18v8M28 32l10 6-10 6z" fill="none" stroke="%23d33ed5" stroke-width="4" stroke-linejoin="round"/></svg>' />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="popup-head">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path d="M4 5.6A2.6 2.6 0 0 1 6.6 3h10.8A2.6 2.6 0 0 1 20 5.6v12.8a2.6 2.6 0 0 1-2.6 2.6H6.6A2.6 2.6 0 0 1 4 18.4V5.6Z" fill="none" stroke="currentColor" stroke-width="1.8" />
+          <path d="M4 8h16M8 3v5M14 3v5M9 13l4 2.6L9 18.2V13Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div>
+        <h1>MovieRec</h1>
+        <p>Гибридные рекомендации</p>
+      </div>
+    </header>
+
+    <main>
+      <label class="search-label" for="movieSearch">Фильм</label>
+      <div class="search-row">
+        <input id="movieSearch" type="search" placeholder="Matrix, Inception..." autocomplete="off" />
+        <select id="ratingValue" aria-label="Оценка">
+          <option value="5">5.0</option>
+          <option value="4.5">4.5</option>
+          <option value="4">4.0</option>
+          <option value="3.5">3.5</option>
+          <option value="3">3.0</option>
+        </select>
+        <button id="addMovie" type="button" aria-label="Добавить">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+          </svg>
+        </button>
+      </div>
+      <div id="suggestions" class="suggestions"></div>
+
+      <section class="profile-section">
+        <div class="section-title">
+          <span>Профиль</span>
+          <button id="clearProfile" type="button">Сброс</button>
+        </div>
+        <div id="profileList" class="profile-list"></div>
+      </section>
+
+      <section class="recommend-section">
+        <div class="section-title">
+          <span>Рекомендации</span>
+          <small id="modelLabel">CF 70%</small>
+        </div>
+        <div id="recommendations" class="recommendations"></div>
+      </section>
+
+      <button id="openSite" class="site-button" type="button">Открыть сайт</button>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

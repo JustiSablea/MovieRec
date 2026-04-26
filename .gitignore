@@ -1,0 +1,16 @@
+.env
+*.pyc
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+data/*.sqlite3
+data/*.sqlite3-*
+*.db
+
+ml-32m.zip
+*.log
+node_modules/
+.DS_Store
+Thumbs.db

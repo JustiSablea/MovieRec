@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MovieRec</title>
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%23151517"/><path d="M17 18h30v28H17zM17 26h30M26 18v8M38 18v8M28 32l10 6-10 6z" fill="none" stroke="%23d33ed5" stroke-width="4" stroke-linejoin="round"/></svg>' />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Основная навигация">
+        <a class="brand" href="#recommendations" data-route="recommendations" aria-label="MovieRec">
+          <span class="brand-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="25" height="25">
+              <path d="M4 5.6A2.6 2.6 0 0 1 6.6 3h10.8A2.6 2.6 0 0 1 20 5.6v12.8a2.6 2.6 0 0 1-2.6 2.6H6.6A2.6 2.6 0 0 1 4 18.4V5.6Z" fill="none" stroke="currentColor" stroke-width="1.8" />
+              <path d="M4 8h16M8 3v5M14 3v5M9 13l4 2.6L9 18.2V13Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <span>MovieRec</span>
+        </a>
+
+        <nav class="nav-list">
+          <button class="nav-link" data-route="home" type="button">Главная</button>
+          <button class="nav-link is-active" data-route="recommendations" type="button">Рекомендации</button>
+          <button class="nav-link" data-route="catalog" type="button">Каталог</button>
+          <button class="nav-link" data-route="semantic" type="button">Нейропоиск</button>
+          <button class="nav-link" data-route="about" type="button">О нас</button>
+          <button class="nav-link" data-route="report" type="button">Метрики</button>
+          <button class="nav-link" data-route="contacts" type="button">Контакты</button>
+        </nav>
+
+        <div class="sidebar-line"></div>
+        <p class="sidebar-note">MovieLens ml-32m</p>
+        <p class="copyright">© 2025 MovieRec</p>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div class="search-box">
+            <svg class="search-icon" viewBox="0 0 24 24" width="27" height="27" aria-hidden="true">
+              <path d="m21 21-4.3-4.3M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" />
+            </svg>
+            <input id="movieSearch" type="search" placeholder="Поиск фильмов..." autocomplete="off" />
+            <div id="searchResults" class="search-results" role="listbox" aria-label="Результаты поиска"></div>
+          </div>
+
+          <div class="auth-actions">
+            <button class="ghost-button" id="loginButton" type="button">Войти</button>
+            <button class="primary-button" id="registerButton" type="button">
+              <span>Регистрация</span>
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path d="M13 7h4v4M17 7l-7 7M10 5H7a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <section class="screen" id="homeScreen" data-screen="home" aria-labelledby="homeTitle">
+          <div class="content-narrow">
+            <div class="section-kicker">Персональный профиль</div>
+            <h1 id="homeTitle">Выберите любимые фильмы</h1>
+            <p class="home-lead">
+              Добавьте 3-5 фильмов и поставьте оценки. Система сравнит их с оценками пользователей MovieLens,
+              жанрами и тегами, а затем соберет персональную подборку.
+            </p>
+            <div class="workflow-strip" aria-label="Как получить рекомендации">
+              <div>
+                <span>1</span>
+                <strong>Найдите фильм</strong>
+                <p>Начните вводить название и выберите вариант из базы.</p>
+              </div>
+              <div>
+                <span>2</span>
+                <strong>Поставьте оценку</strong>
+                <p>Оценки 4-5 считаются сильным сигналом вкуса.</p>
+              </div>
+              <div>
+                <span>3</span>
+                <strong>Получите рекомендации</strong>
+                <p>CF и content score объединяются в гибридный рейтинг.</p>
+              </div>
+            </div>
+            <div class="profile-grid">
+              <form class="preference-panel" id="preferenceForm">
+                <label class="field-label" for="preferenceSearch">Фильм</label>
+                <div class="inline-picker">
+                  <input id="preferenceSearch" type="text" placeholder="Например, Matrix" autocomplete="off" />
+                  <select id="ratingSelect" aria-label="Оценка">
+                    <option value="5">5.0</option>
+                    <option value="4.5">4.5</option>
+                    <option value="4">4.0</option>
+                    <option value="3.5">3.5</option>
+                    <option value="3">3.0</option>
+                  </select>
+                  <button class="icon-button add-button" type="submit" aria-label="Добавить фильм">
+                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                      <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" />
+                    </svg>
+                  </button>
+                </div>
+                <div id="preferenceSuggestions" class="suggestions"></div>
+
+                <div class="alpha-row">
+                  <div>
+                    <span>Вес CF</span>
+                    <strong id="alphaValue">0.70</strong>
+                  </div>
+                  <input id="alphaSlider" type="range" min="0.35" max="0.75" step="0.05" value="0.65" aria-label="Вес коллаборативной фильтрации" />
+                </div>
+
+                <div class="starter-row">
+                  <span>Быстрый старт</span>
+                  <div id="starterMovies" class="starter-movies"></div>
+                </div>
+
+                <div class="profile-actions">
+                  <button class="primary-button wide" id="buildRecommendations" type="button">Получить рекомендации</button>
+                  <button class="ghost-button wide" id="resetProfile" type="button">Сбросить</button>
+                </div>
+              </form>
+
+              <div class="rated-panel">
+                <div class="panel-heading">
+                  <h2>Ваши оценки</h2>
+                  <span id="ratedCount">0</span>
+                </div>
+                <div id="ratedList" class="rated-list"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen is-active" id="recommendationsScreen" data-screen="recommendations" aria-labelledby="recommendationsTitle">
+          <div class="recommendation-head">
+            <h1 id="recommendationsTitle">Рекомендуемые фильмы для вас</h1>
+            <p>Ниже представлены фильмы, подобранные по вашим предпочтениям</p>
+          </div>
+
+          <div class="recommendation-toolbar">
+            <div class="model-status">
+              <span class="status-dot"></span>
+              <span id="modelStatus">Гибридная модель: CF 70% · Content 30%</span>
+            </div>
+            <button class="outline-button" id="tuneProfile" type="button">Настроить профиль</button>
+          </div>
+
+          <div class="movie-grid" id="recommendationsGrid" aria-live="polite"></div>
+        </section>
+
+        <section class="screen" id="catalogScreen" data-screen="catalog" aria-labelledby="catalogTitle">
+          <div class="content-narrow">
+            <div class="section-kicker">База фильмов</div>
+            <h1 id="catalogTitle">Поиск и фильтры</h1>
+            <div class="catalog-filters">
+              <input id="catalogQuery" type="search" placeholder="Название фильма" autocomplete="off" />
+              <select id="catalogGenre" aria-label="Жанр">
+                <option value="">Все жанры</option>
+              </select>
+              <input id="catalogYearFrom" type="number" min="1888" max="2035" placeholder="Год от" />
+              <input id="catalogYearTo" type="number" min="1888" max="2035" placeholder="Год до" />
+              <select id="catalogMinRating" aria-label="Минимальная оценка">
+                <option value="">Любая оценка</option>
+                <option value="4.3">4.3+</option>
+                <option value="4.0">4.0+</option>
+                <option value="3.5">3.5+</option>
+              </select>
+              <select id="catalogSort" aria-label="Сортировка">
+                <option value="weighted">Лучшие</option>
+                <option value="rating">По оценке</option>
+                <option value="popular">Популярные</option>
+                <option value="year">Новые</option>
+              </select>
+              <label class="check-filter"><input id="catalogHasPoster" type="checkbox" /> С постером</label>
+            </div>
+            <div id="catalogGrid" class="movie-grid catalog-grid"></div>
+          </div>
+        </section>
+
+        <section class="screen" id="semanticScreen" data-screen="semantic" aria-labelledby="semanticTitle">
+          <div class="content-narrow">
+            <div class="section-kicker">Нейропоиск</div>
+            <h1 id="semanticTitle">Найти фильм по описанию</h1>
+            <div class="semantic-panel semantic-page-panel">
+              <div class="semantic-row">
+                <input id="semanticInput" type="text" placeholder="Фильм про сны и ограбление" autocomplete="off" />
+                <button class="outline-button" id="semanticSearchButton" type="button">Найти</button>
+              </div>
+              <div id="semanticResults" class="compact-grid semantic-results"></div>
+            </div>
+            <form id="movieRequestForm" class="request-panel">
+              <h2>Фильма нет в выборке</h2>
+              <div class="request-grid">
+                <input id="requestTitle" type="text" maxlength="120" placeholder="Название фильма" required />
+                <input id="requestYear" type="number" min="1888" max="2035" placeholder="Год" />
+              </div>
+              <textarea id="requestNote" maxlength="500" placeholder="Комментарий: ссылка, страна, актеры или почему нужен этот фильм"></textarea>
+              <button class="primary-button" type="submit">Отправить заявку</button>
+            </form>
+          </div>
+        </section>
+
+        <section class="screen" id="aboutScreen" data-screen="about" aria-labelledby="aboutTitle">
+          <div class="content-narrow text-page">
+            <div class="section-kicker">Курсовая работа</div>
+            <h1 id="aboutTitle">Гибридная система рекомендаций фильмов</h1>
+            <div class="info-grid">
+              <article>
+                <h2>Коллаборативная часть</h2>
+                <p>Item-based сходство рассчитано по оценкам MovieLens. Для фильмов-кандидатов учитывается близость к тем картинам, которые пользователь оценил высоко.</p>
+              </article>
+              <article>
+                <h2>Контентная часть</h2>
+                <p>Профиль строится по жанрам выбранных фильмов. Чем сильнее совпадает жанровый вектор, тем выше content score.</p>
+              </article>
+              <article>
+                <h2>Гибридизация</h2>
+                <p>Итоговый score собирается линейной комбинацией с alpha = 0.7 и небольшой поправкой на качество MovieLens.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="contactsScreen" data-screen="contacts" aria-labelledby="contactsTitle">
+          <div class="content-narrow text-page">
+            <div class="section-kicker">Связь</div>
+            <h1 id="contactsTitle">MovieRec</h1>
+            <div class="contact-card">
+              <p>Проект: Прилепин М.А., ВГУ, 2025</p>
+              <p>Научный руководитель: Шишко Ю.В.</p>
+              <p>Данные: MovieLens ml-32m, GroupLens Research</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="detailsScreen" data-screen="details" aria-labelledby="detailsTitle">
+          <div class="detail-page">
+            <button class="outline-button" id="backToRecommendations" type="button">К рекомендациям</button>
+            <div class="detail-layout">
+              <div id="detailPoster" class="detail-poster"></div>
+              <article class="detail-info">
+                <div class="rating-pill" id="detailRating">4.7</div>
+                <h1 id="detailsTitle">Фильм</h1>
+                <p id="detailMeta"></p>
+                <p id="detailDescription"></p>
+                <div class="detail-actions">
+                  <select id="detailRatingSelect" aria-label="Оценка фильма">
+                    <option value="5">5.0</option>
+                    <option value="4.5">4.5</option>
+                    <option value="4">4.0</option>
+                    <option value="3.5">3.5</option>
+                    <option value="3">3.0</option>
+                    <option value="2">2.0</option>
+                    <option value="1">1.0</option>
+                  </select>
+                  <button class="primary-button" id="detailSaveRating" type="button">Оценить</button>
+                  <button class="outline-button" id="openExplain" type="button">Как выбрала модель</button>
+                </div>
+              </article>
+            </div>
+            <h2 class="subhead">Похожие фильмы</h2>
+            <div id="similarMovies" class="compact-grid"></div>
+          </div>
+        </section>
+
+        <section class="screen" id="explainScreen" data-screen="explain" aria-labelledby="explainTitle">
+          <div class="content-narrow">
+            <button class="outline-button" id="backToDetails" type="button">К фильму</button>
+            <h1 id="explainTitle">Как модель выбрала фильм</h1>
+            <div id="explainSummary" class="explain-summary"></div>
+            <div class="explain-grid">
+              <article>
+                <h2>Формула</h2>
+                <p id="explainFormula"></p>
+              </article>
+              <article>
+                <h2>Ближайшие оценки</h2>
+                <div id="explainNeighbors" class="neighbor-list"></div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="reportScreen" data-screen="report" aria-labelledby="reportTitle">
+          <div class="content-narrow">
+            <div class="section-kicker">Оффлайн-тестирование</div>
+            <h1 id="reportTitle">Метрики модели</h1>
+            <div id="metricsGrid" class="metrics-grid"></div>
+            <p id="metricsNote" class="home-lead"></p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal-backdrop" id="movieModal" hidden>
+      <article class="movie-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <button class="modal-close" id="closeMovieModal" type="button" aria-label="Закрыть">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+          </svg>
+        </button>
+        <div id="modalPoster" class="modal-poster"></div>
+        <div class="modal-content">
+          <div class="rating-pill" id="modalRating">4.7</div>
+          <h2 id="modalTitle">Название фильма</h2>
+          <p id="modalMeta">Жанры</p>
+          <p id="modalDescription"></p>
+          <div class="score-bars">
+            <div>
+              <span>CF</span>
+              <div class="bar"><i id="cfBar"></i></div>
+            </div>
+            <div>
+              <span>Content</span>
+              <div class="bar"><i id="contentBar"></i></div>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button class="primary-button" id="modalAddMovie" type="button">Добавить в профиль</button>
+            <a class="outline-link" id="modalImdb" href="#" target="_blank" rel="noreferrer">IMDb</a>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="modal-backdrop" id="authModal" hidden>
+      <article class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+        <button class="modal-close" id="closeAuthModal" type="button" aria-label="Закрыть">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+          </svg>
+        </button>
+        <h2 id="authTitle">Вход в MovieRec</h2>
+        <p id="authSubtitle">Войдите, чтобы сохранить оценки и получать отдельные рекомендации.</p>
+        <form id="authForm" class="auth-form">
+          <label>
+            <span>Логин</span>
+            <input id="authName" type="text" placeholder="Например, maxim" autocomplete="username" required />
+          </label>
+          <label>
+            <span>Пароль</span>
+            <input id="authPassword" type="password" placeholder="Минимум 4 символа" autocomplete="current-password" required />
+          </label>
+          <button class="primary-button wide" id="saveAuth" type="submit">Войти</button>
+        </form>
+        <button class="auth-switch" id="switchAuthMode" type="button">Создать новый аккаунт</button>
+      </article>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="app.js"></script>
+  </body>
+</html>

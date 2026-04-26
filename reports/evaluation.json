@@ -1,0 +1,30 @@
+{
+  "sampleUsers": 160,
+  "testUsers": 160,
+  "alpha": 0.7,
+  "rmse": 1.2236,
+  "precisionAt5": 0.0375,
+  "recallAt5": 0.1875,
+  "f1At5": 0.0625,
+  "models": {
+    "cf": {
+      "rmse": 0.6569,
+      "precisionAt5": 0.0025,
+      "recallAt5": 0.0125,
+      "f1At5": 0.0042
+    },
+    "content": {
+      "rmse": 2.9139,
+      "precisionAt5": 0.0375,
+      "recallAt5": 0.1875,
+      "f1At5": 0.0625
+    },
+    "hybrid": {
+      "rmse": 1.2236,
+      "precisionAt5": 0.0375,
+      "recallAt5": 0.1875,
+      "f1At5": 0.0625
+    }
+  },
+  "note": "Метрики посчитаны на компактной выборке фильмов сайта и holdout-разбиении по одному фильму на пользователя."
+}
