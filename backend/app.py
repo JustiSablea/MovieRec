@@ -15,6 +15,55 @@ app.secret_key = "movierec-dev-secret-change-before-production"
 
 MOVIE_REQUEST_LIMITS = {}
 TITLE_RE = re.compile(r"^[\w\s:;,.!?&'’()\-а-яА-ЯёЁ0-9]+$", re.UNICODE)
+GENRE_LABELS = {
+    "Action": "боевик",
+    "Adventure": "приключения",
+    "Animation": "мультфильм",
+    "Children": "семейный",
+    "Comedy": "комедия",
+    "Crime": "криминал",
+    "Documentary": "документальный",
+    "Drama": "драма",
+    "Fantasy": "фэнтези",
+    "Film-Noir": "нуар",
+    "Horror": "ужасы",
+    "IMAX": "IMAX",
+    "Musical": "мюзикл",
+    "Mystery": "детектив",
+    "Romance": "мелодрама",
+    "Science Fiction": "фантастика",
+    "Sci-Fi": "фантастика",
+    "Thriller": "триллер",
+    "Family": "семейный",
+    "History": "история",
+    "Music": "музыка",
+    "TV Movie": "телефильм",
+    "War": "военный",
+    "Western": "вестерн",
+}
+GENRE_ALIASES = {}
+for raw_genre, label in GENRE_LABELS.items():
+    GENRE_ALIASES.setdefault(label.lower(), set()).update({raw_genre, label})
+    GENRE_ALIASES.setdefault(raw_genre.lower(), set()).update({raw_genre, label})
+
+SEMANTIC_CONCEPTS = {
+    "dream": {
+        "query": ("сон", "сны", "снах", "сын", "dream", "dreams"),
+        "movie": ("сон", "сны", "dream", "dreams", "подсозн", "разум"),
+    },
+    "heist": {
+        "query": ("ограб", "heist", "вор", "краж", "преступ"),
+        "movie": ("ограб", "heist", "вор", "краж", "преступ", "крадет", "крадёт", "crime"),
+    },
+    "space": {
+        "query": ("космос", "space", "планет", "галактик"),
+        "movie": ("космос", "space", "планет", "галактик", "sci-fi"),
+    },
+    "robot": {
+        "query": ("робот", "android", "андроид", "искусственный интеллект"),
+        "movie": ("робот", "robot", "android", "андроид", "искусственный интеллект"),
+    },
+}
 
 
 def current_user_id():
@@ -42,6 +91,14 @@ def limited_request(bucket, max_events=5, window_seconds=600):
     events.append(now)
     MOVIE_REQUEST_LIMITS[bucket] = events
     return False
+
+
+def genre_label(genre):
+    return GENRE_LABELS.get(genre, genre)
+
+
+def genre_variants(genre):
+    return sorted(GENRE_ALIASES.get(genre.lower(), {genre}))
 
 
 @app.before_request
@@ -129,7 +186,8 @@ def movies():
         if query:
             found = recommender.search_movies(query, 60)
             if genre:
-                found = [movie for movie in found if genre in movie.get("genres", [])]
+                variants = set(genre_variants(genre))
+                found = [movie for movie in found if variants.intersection(movie.get("genres", []))]
             if year_from:
                 found = [movie for movie in found if movie.get("year") and movie["year"] >= year_from]
             if year_to:
@@ -138,12 +196,13 @@ def movies():
                 found = [movie for movie in found if movie.get("averageRating", 0) >= min_rating]
             if has_poster:
                 found = [movie for movie in found if movie.get("poster")]
-            return jsonify({"movies": found[:limit]})
+            return jsonify({"movies": found[:limit], "total": len(found)})
         clauses = []
         params = []
         if genre:
-            clauses.append("m.genres LIKE ?")
-            params.append(f"%{genre}%")
+            variants = genre_variants(genre)
+            clauses.append("(" + " OR ".join("m.genres LIKE ?" for _ in variants) + ")")
+            params.extend(f"%{variant}%" for variant in variants)
         if year_from:
             clauses.append("m.year >= ?")
             params.append(year_from)
@@ -172,16 +231,25 @@ def movies():
             """,
             (*params, limit),
         ).fetchall()
+        total = connection.execute(
+            f"""
+            SELECT COUNT(*)
+            FROM movies m
+            JOIN movie_metadata mm ON mm.movie_id = m.id
+            {where}
+            """,
+            tuple(params),
+        ).fetchone()[0]
         from .db import rows_to_movies
 
-        return jsonify({"movies": rows_to_movies(rows)})
+        return jsonify({"movies": rows_to_movies(rows), "total": total})
 
 
 @app.get("/api/genres")
 def genres():
     with get_connection() as connection:
         rows = connection.execute("SELECT genres FROM movies").fetchall()
-    values = sorted({genre for row in rows for genre in __import__("json").loads(row["genres"] or "[]")})
+    values = sorted({genre_label(genre) for row in rows for genre in __import__("json").loads(row["genres"] or "[]")})
     return jsonify({"genres": values})
 
 
@@ -280,7 +348,7 @@ def semantic_search():
         return jsonify({"movies": []})
     with get_connection() as connection:
         recommender = HybridRecommender(connection)
-        embedded = embedding_search(connection, recommender, query, limit=10)
+        embedded = embedding_search(connection, recommender, query, limit=30)
         if embedded is not None:
             provider = embedded[0].get("embeddingProvider", "embeddings") if embedded else "embeddings"
             content = recommender.semantic_search(expand_query(query), limit=30)
@@ -320,8 +388,6 @@ def rerank_semantic_results(query, embedded, content):
 
 def semantic_intent_boost(query, movie):
     normalized = query.lower().replace("ё", "е")
-    dreamish = any(term in normalized for term in ("сон", "сны", "снах", "сын", "dream"))
-    heistish = any(term in normalized for term in ("ограб", "heist", "вор", "краж"))
     text = " ".join(
         [
             movie.get("title", ""),
@@ -331,13 +397,16 @@ def semantic_intent_boost(query, movie):
         ]
     ).lower().replace("ё", "е")
     boost = 0.0
-    if dreamish and heistish:
-        if "inception" in text or "начало" in text:
-            boost += 0.75
-        if any(term in text for term in ("сон", "сны", "dream", "подсозн")):
-            boost += 0.2
-        if any(term in text for term in ("ограб", "heist", "вор", "краж", "crime")):
-            boost += 0.12
+    matched_concepts = []
+    for concept in SEMANTIC_CONCEPTS.values():
+        query_match = any(term in normalized for term in concept["query"])
+        movie_match = any(term in text for term in concept["movie"])
+        if query_match and movie_match:
+            matched_concepts.append(concept)
+    if matched_concepts:
+        boost += min(0.42, 0.16 * len(matched_concepts))
+    if len(matched_concepts) >= 2:
+        boost += 0.18
     return boost
 
 

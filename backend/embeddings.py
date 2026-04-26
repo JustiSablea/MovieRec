@@ -19,11 +19,11 @@ _LOCAL_MODEL = None
 TOKEN_RE = re.compile(r"[a-zа-яё0-9]{2,}", re.IGNORECASE)
 QUERY_EXPANSIONS = {
     "сын": ["сны", "сон", "dream", "dreams"],
-    "сны": ["сон", "dream", "dreams", "inception"],
-    "снах": ["сны", "сон", "dream", "dreams", "inception"],
-    "сон": ["сны", "dream", "dreams", "inception"],
-    "ограбления": ["ограбление", "heist", "thief", "crime", "inception"],
-    "ограбление": ["heist", "thief", "crime", "inception"],
+    "сны": ["сон", "dream", "dreams", "подсознание", "разум"],
+    "снах": ["сны", "сон", "dream", "dreams", "подсознание", "разум"],
+    "сон": ["сны", "dream", "dreams", "подсознание", "разум"],
+    "ограбления": ["ограбление", "heist", "thief", "crime", "кража", "преступление"],
+    "ограбление": ["heist", "thief", "crime", "кража", "преступление"],
     "ограблении": ["ограбление", "heist", "crime"],
     "воры": ["heist", "crime", "thief"],
     "космос": ["space", "sci-fi", "interstellar"],
@@ -50,10 +50,7 @@ def expand_query(query):
     for raw in TOKEN_RE.findall(query.lower().replace("ё", "е")):
         tokens.append(raw)
         tokens.extend(QUERY_EXPANSIONS.get(raw, []))
-    expanded = " ".join(tokens)
-    if {"сны", "ограбления"}.issubset(set(tokens)) or {"сон", "ограбление"}.issubset(set(tokens)):
-        expanded += " inception dream heist extraction subconscious"
-    return f"{query} {expanded}".strip()
+    return f"{query} {' '.join(tokens)}".strip()
 
 
 def cosine(left, right):

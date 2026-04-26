@@ -12,6 +12,32 @@ const API = {
 };
 
 const ALPHA_KEY = "movierec.alpha";
+const GENRE_LABELS = {
+  Action: "боевик",
+  Adventure: "приключения",
+  Animation: "мультфильм",
+  Children: "семейный",
+  Comedy: "комедия",
+  Crime: "криминал",
+  Documentary: "документальный",
+  Drama: "драма",
+  Fantasy: "фэнтези",
+  "Film-Noir": "нуар",
+  Horror: "ужасы",
+  IMAX: "IMAX",
+  Musical: "мюзикл",
+  Mystery: "детектив",
+  Romance: "мелодрама",
+  "Science Fiction": "фантастика",
+  "Sci-Fi": "фантастика",
+  Thriller: "триллер",
+  Family: "семейный",
+  History: "история",
+  Music: "музыка",
+  "TV Movie": "телефильм",
+  War: "военный",
+  Western: "вестерн",
+};
 
 const state = {
   user: null,
@@ -63,6 +89,7 @@ function cacheElements() {
   els.catalogMinRating = document.querySelector("#catalogMinRating");
   els.catalogSort = document.querySelector("#catalogSort");
   els.catalogHasPoster = document.querySelector("#catalogHasPoster");
+  els.catalogStatus = document.querySelector("#catalogStatus");
   els.catalogGrid = document.querySelector("#catalogGrid");
   els.semanticInput = document.querySelector("#semanticInput");
   els.semanticSearchButton = document.querySelector("#semanticSearchButton");
@@ -361,7 +388,7 @@ async function renderRecommendations() {
 }
 
 function renderMovieCard(movie) {
-  const genres = movie.genres.slice(0, 2).join(", ");
+  const genres = formatGenres(movie.genres);
   return `
     <article class="movie-card" data-movie-id="${movie.id}" tabindex="0" style="${posterVars(movie)}">
       <div class="card-poster">
@@ -391,7 +418,7 @@ function renderMovieOptions(movies, container, onPick) {
           ${posterThumb(movie)}
           <span>
             <span class="option-title">${escapeHtml(formatMovieTitle(movie))}</span>
-            <span class="option-meta">${escapeHtml(movie.genres.slice(0, 2).join(", "))}</span>
+            <span class="option-meta">${escapeHtml(formatGenres(movie.genres))}</span>
           </span>
           <span class="option-score">${movie.averageRating.toFixed(1)}</span>
         </button>
@@ -432,8 +459,14 @@ async function renderCatalog() {
   if (els.catalogYearTo.value) params.set("yearTo", els.catalogYearTo.value);
   if (els.catalogMinRating.value) params.set("minRating", els.catalogMinRating.value);
   if (els.catalogHasPoster.checked) params.set("hasPoster", "1");
+  if (els.catalogStatus) els.catalogStatus.textContent = "Применяем фильтры...";
   const payload = await api(`${API.movies}?${params}`);
-  els.catalogGrid.innerHTML = (payload.movies || []).map(renderMovieCard).join("") || '<div class="empty-state">Фильмы не найдены</div>';
+  const movies = payload.movies || [];
+  const total = Number.isFinite(payload.total) ? payload.total : movies.length;
+  if (els.catalogStatus) {
+    els.catalogStatus.textContent = `Найдено: ${total.toLocaleString("ru-RU")}. Показано: ${movies.length}.`;
+  }
+  els.catalogGrid.innerHTML = movies.map(renderMovieCard).join("") || '<div class="empty-state">Фильмы не найдены</div>';
 }
 
 async function getMovie(movieId) {
@@ -475,7 +508,7 @@ async function openMovie(movieId) {
   const names = [movie.director ? `Режиссер: ${movie.director}` : "", movie.actors?.length ? `Актеры: ${movie.actors.slice(0, 3).join(", ")}` : ""]
     .filter(Boolean)
     .join(" · ");
-  els.modalMeta.textContent = `Жанры: ${movie.genres.join(", ")} · ${movie.ratingCount.toLocaleString("ru-RU")} оценок${names ? ` · ${names}` : ""}`;
+  els.modalMeta.textContent = `Жанры: ${formatGenres(movie.genres, 8)} · ${movie.ratingCount.toLocaleString("ru-RU")} оценок${names ? ` · ${names}` : ""}`;
   els.modalDescription.textContent = movie.description;
   els.cfBar.style.width = `${Math.round(Math.min(1, score.cfSignal ?? score.cfScore ?? 0) * 100)}%`;
   els.contentBar.style.width = `${Math.round(Math.min(1, score.contentScore || 0) * 100)}%`;
@@ -493,7 +526,7 @@ async function openMoviePage(movieId) {
   const people = [movie.director ? `Режиссер: ${movie.director}` : "", movie.actors?.length ? `Актеры: ${movie.actors.slice(0, 5).join(", ")}` : ""]
     .filter(Boolean)
     .join(" · ");
-  els.detailMeta.textContent = `Жанры: ${movie.genres.join(", ")} · ${movie.ratingCount.toLocaleString("ru-RU")} оценок${people ? ` · ${people}` : ""}`;
+  els.detailMeta.textContent = `Жанры: ${formatGenres(movie.genres, 8)} · ${movie.ratingCount.toLocaleString("ru-RU")} оценок${people ? ` · ${people}` : ""}`;
   els.detailDescription.textContent = movie.description;
   if (movie.userRating) els.detailRatingSelect.value = String(movie.userRating);
   els.similarMovies.innerHTML = (movie.similarMovies || [])
@@ -502,7 +535,7 @@ async function openMoviePage(movieId) {
         <button class="compact-card" type="button" data-movie-id="${similar.id}">
           <strong>${escapeHtml(formatMovieTitle(similar))}</strong>
           <span>Сходство MovieLens: ${Math.round((similar.similarity || 0) * 100)}%</span>
-          <span>${escapeHtml(similar.genres.slice(0, 2).join(", "))}</span>
+          <span>${escapeHtml(formatGenres(similar.genres))}</span>
         </button>
       `,
     )
@@ -589,8 +622,8 @@ async function renderSemanticSearch() {
   const movies = (payload.movies || []).slice(0, 6);
   const modeLabels = {
     openai_embeddings: "OpenAI embeddings",
-    local_embeddings: "Local sentence-transformers",
-    tfidf_fallback: "TF-IDF fallback",
+    local_embeddings: "Локальная нейромодель",
+    tfidf_fallback: "TF-IDF резерв",
   };
   const mode = modeLabels[payload.mode] || "Embeddings";
   els.semanticResults.innerHTML = movies.length
@@ -599,7 +632,7 @@ async function renderSemanticSearch() {
           (movie) => `
             <button class="compact-card" type="button" data-movie-id="${movie.id}">
               <strong>${escapeHtml(formatMovieTitle(movie))}</strong>
-              <span>${escapeHtml(movie.genres.slice(0, 2).join(", "))}</span>
+              <span>${escapeHtml(formatGenres(movie.genres))}</span>
               <span>${mode}${movie.semanticScore ? ` · ${Number(movie.semanticScore).toFixed(3)}` : ""}</span>
             </button>
           `,
@@ -724,6 +757,14 @@ function showToast(message) {
 
 function formatMovieTitle(movie) {
   return `${movie.title}${movie.year ? ` (${movie.year})` : ""}`;
+}
+
+function genreLabel(genre) {
+  return GENRE_LABELS[genre] || genre;
+}
+
+function formatGenres(genres = [], limit = 2) {
+  return genres.slice(0, limit).map(genreLabel).join(", ");
 }
 
 function formatRatingTitle(entry) {

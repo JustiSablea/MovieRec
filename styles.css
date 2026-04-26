@@ -471,6 +471,14 @@ button {
   align-items: center;
 }
 
+.catalog-status {
+  min-height: 18px;
+  margin: 12px 0 0;
+  color: var(--muted-strong);
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .catalog-filters input,
 .catalog-filters select,
 .request-panel input,
