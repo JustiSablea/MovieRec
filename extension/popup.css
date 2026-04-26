@@ -16,8 +16,8 @@
 }
 
 body {
-  width: 370px;
-  min-height: 520px;
+  width: 390px;
+  min-height: 560px;
   margin: 0;
   background: var(--bg);
   color: var(--text);
@@ -157,8 +157,13 @@ button {
 }
 
 .profile-section,
-.recommend-section {
+.recommend-section,
+.detected-section {
   margin-top: 18px;
+}
+
+.detected-section {
+  margin-top: 0;
 }
 
 .section-title {
@@ -192,13 +197,72 @@ button {
 }
 
 .profile-pill,
-.movie-row {
+.movie-row,
+.detected-card {
   display: grid;
   gap: 5px;
   padding: 10px 11px;
   border: 1px solid var(--line);
   border-radius: 11px;
   background: var(--panel);
+}
+
+.detected-card {
+  min-height: 72px;
+}
+
+.detected-card.is-empty {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.detected-title {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: start;
+}
+
+.detected-title strong {
+  overflow: hidden;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detected-title small {
+  display: inline-grid;
+  min-width: 34px;
+  min-height: 26px;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(211, 62, 213, 0.16);
+  color: #f8d7ff;
+  font-weight: 900;
+}
+
+.detected-meta {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.detected-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 7px;
+  margin-top: 7px;
+}
+
+.detected-actions button {
+  min-height: 31px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.detected-actions button.primary {
+  background: linear-gradient(92deg, var(--pink), var(--red));
 }
 
 .profile-pill {

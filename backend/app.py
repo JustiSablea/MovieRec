@@ -1,6 +1,10 @@
+import json
+import math
+import os
 import re
 from time import time
 
+import requests
 from flask import Flask, jsonify, request, send_from_directory, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -12,6 +16,7 @@ from .tmdb import enrich_movie
 
 app = Flask(__name__, static_folder=None)
 app.secret_key = "movierec-dev-secret-change-before-production"
+APP_VERSION = "2026-04-27-semantic-extension"
 
 MOVIE_REQUEST_LIMITS = {}
 TITLE_RE = re.compile(r"^[\w\s:;,.!?&'’()\-а-яА-ЯёЁ0-9]+$", re.UNICODE)
@@ -48,20 +53,34 @@ for raw_genre, label in GENRE_LABELS.items():
 
 SEMANTIC_CONCEPTS = {
     "dream": {
+        "label": "сны и подсознание",
         "query": ("сон", "сны", "снах", "сын", "dream", "dreams"),
         "movie": ("сон", "сны", "dream", "dreams", "подсозн", "разум"),
     },
     "heist": {
+        "label": "ограбление и кража",
         "query": ("ограб", "heist", "вор", "краж", "преступ"),
         "movie": ("ограб", "heist", "вор", "краж", "преступ", "крадет", "крадёт", "crime"),
     },
     "space": {
+        "label": "космос",
         "query": ("космос", "space", "планет", "галактик"),
         "movie": ("космос", "space", "планет", "галактик", "sci-fi"),
     },
     "robot": {
+        "label": "роботы и ИИ",
         "query": ("робот", "android", "андроид", "искусственный интеллект"),
         "movie": ("робот", "robot", "android", "андроид", "искусственный интеллект"),
+    },
+    "detective": {
+        "label": "тайна и расследование",
+        "query": ("детектив", "тайна", "расслед", "убийств", "mystery"),
+        "movie": ("детектив", "тайна", "расслед", "убийств", "mystery", "noir"),
+    },
+    "love": {
+        "label": "романтика",
+        "query": ("любов", "роман", "relationship", "romance"),
+        "movie": ("любов", "роман", "relationship", "romance", "мелодрама"),
     },
 }
 
@@ -99,6 +118,20 @@ def genre_label(genre):
 
 def genre_variants(genre):
     return sorted(GENRE_ALIASES.get(genre.lower(), {genre}))
+
+
+def pagination_meta(total, limit, offset):
+    pages = max(1, math.ceil(total / limit)) if limit else 1
+    page = min(pages, offset // limit + 1) if limit else 1
+    return {
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+        "page": page,
+        "pages": pages,
+        "hasPrev": page > 1,
+        "hasNext": page < pages,
+    }
 
 
 @app.before_request
@@ -171,10 +204,17 @@ def session_info():
         return jsonify({"user": public_user(user), "ratings": ratings})
 
 
+@app.get("/api/version")
+def version():
+    return jsonify({"version": APP_VERSION, "module": __name__, "root": str(ROOT)})
+
+
 @app.get("/api/movies")
 def movies():
     query = request.args.get("q", "")
-    limit = min(int(request.args.get("limit", 12)), 30)
+    limit = max(1, min(int(request.args.get("limit", 12)), 30))
+    page = max(1, int(request.args.get("page", 1)))
+    offset = max(0, int(request.args.get("offset", (page - 1) * limit)))
     genre = (request.args.get("genre") or "").strip()
     year_from = request.args.get("yearFrom", type=int)
     year_to = request.args.get("yearTo", type=int)
@@ -184,7 +224,7 @@ def movies():
     with get_connection() as connection:
         recommender = HybridRecommender(connection)
         if query:
-            found = recommender.search_movies(query, 60)
+            found = recommender.search_movies(query, 500)
             if genre:
                 variants = set(genre_variants(genre))
                 found = [movie for movie in found if variants.intersection(movie.get("genres", []))]
@@ -196,7 +236,8 @@ def movies():
                 found = [movie for movie in found if movie.get("averageRating", 0) >= min_rating]
             if has_poster:
                 found = [movie for movie in found if movie.get("poster")]
-            return jsonify({"movies": found[:limit], "total": len(found)})
+            total = len(found)
+            return jsonify({"movies": found[offset : offset + limit], **pagination_meta(total, limit, offset)})
         clauses = []
         params = []
         if genre:
@@ -228,8 +269,9 @@ def movies():
             {where}
             ORDER BY {order_by}
             LIMIT ?
+            OFFSET ?
             """,
-            (*params, limit),
+            (*params, limit, offset),
         ).fetchall()
         total = connection.execute(
             f"""
@@ -242,7 +284,7 @@ def movies():
         ).fetchone()[0]
         from .db import rows_to_movies
 
-        return jsonify({"movies": rows_to_movies(rows), "total": total})
+        return jsonify({"movies": rows_to_movies(rows), **pagination_meta(total, limit, offset)})
 
 
 @app.get("/api/genres")
@@ -353,8 +395,25 @@ def semantic_search():
             provider = embedded[0].get("embeddingProvider", "embeddings") if embedded else "embeddings"
             content = recommender.semantic_search(expand_query(query), limit=30)
             merged = rerank_semantic_results(query, embedded, content)
-            return jsonify({"mode": f"{provider}_embeddings", "movies": merged[:10]})
-        return jsonify({"mode": "tfidf_fallback", "movies": rerank_semantic_results(query, [], recommender.semantic_search(expand_query(query), limit=30))[:10]})
+            reranked, rerank_mode = maybe_gpt_rerank(query, merged[:14])
+            return jsonify(
+                {
+                    "mode": f"{provider}_embeddings",
+                    "rerankMode": rerank_mode,
+                    "expandedQuery": expand_query(query),
+                    "movies": reranked[:10],
+                }
+            )
+        fallback = rerank_semantic_results(query, [], recommender.semantic_search(expand_query(query), limit=30))
+        reranked, rerank_mode = maybe_gpt_rerank(query, fallback[:14])
+        return jsonify(
+            {
+                "mode": "tfidf_fallback",
+                "rerankMode": rerank_mode,
+                "expandedQuery": expand_query(query),
+                "movies": reranked[:10],
+            }
+        )
 
 
 def rerank_semantic_results(query, embedded, content):
@@ -374,10 +433,12 @@ def rerank_semantic_results(query, embedded, content):
         merged[movie["id"]] = entry
     results = []
     for item in merged.values():
-        boost = semantic_intent_boost(query, item)
+        concept_matches = semantic_concept_matches(query, item)
+        boost = semantic_intent_boost(concept_matches)
         combined = item["_embedding"] * 0.38 + item["_content"] * 0.52 + item.get("weightedScore", 0) / 100 + boost
         item["semanticScore"] = round(combined, 4)
-        item["reason"] = "Гибридный нейропоиск: embeddings + контентное сходство"
+        item["matchedConcepts"] = [concept["label"] for concept in concept_matches]
+        item["reason"] = semantic_reason(item, concept_matches)
         item.pop("_embedding", None)
         item.pop("_content", None)
         item.pop("_rank", None)
@@ -386,7 +447,7 @@ def rerank_semantic_results(query, embedded, content):
     return results
 
 
-def semantic_intent_boost(query, movie):
+def semantic_concept_matches(query, movie):
     normalized = query.lower().replace("ё", "е")
     text = " ".join(
         [
@@ -396,18 +457,90 @@ def semantic_intent_boost(query, movie):
             " ".join(movie.get("genres", [])),
         ]
     ).lower().replace("ё", "е")
-    boost = 0.0
+    matches = []
     matched_concepts = []
     for concept in SEMANTIC_CONCEPTS.values():
         query_match = any(term in normalized for term in concept["query"])
         movie_match = any(term in text for term in concept["movie"])
         if query_match and movie_match:
             matched_concepts.append(concept)
+            matches.append(concept)
+    return matches
+
+
+def semantic_intent_boost(matched_concepts):
+    boost = 0.0
     if matched_concepts:
         boost += min(0.42, 0.16 * len(matched_concepts))
     if len(matched_concepts) >= 2:
         boost += 0.18
     return boost
+
+
+def semantic_reason(movie, concept_matches):
+    if concept_matches:
+        labels = ", ".join(concept["label"] for concept in concept_matches[:3])
+        return f"Совпало по смыслу: {labels}"
+    if movie.get("semanticScore", 0) > 0:
+        return "Похоже по embeddings и описанию"
+    return "Похоже по жанрам, тегам и популярности"
+
+
+def maybe_gpt_rerank(query, movies):
+    if os.environ.get("SEMANTIC_RERANK_PROVIDER", "").lower() not in {"gpt", "openai"}:
+        return movies, "local"
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key or not movies:
+        return movies, "local"
+    try:
+        payload = {
+            "model": os.environ.get("OPENAI_RERANK_MODEL", "gpt-4o-mini"),
+            "messages": [
+                {
+                    "role": "system",
+                    "content": "Ты ранжируешь фильмы по смыслу пользовательского описания. Верни JSON: {\"ids\":[movie_id...]} без пояснений.",
+                },
+                {
+                    "role": "user",
+                    "content": json.dumps(
+                        {
+                            "query": query,
+                            "movies": [
+                                {
+                                    "id": movie["id"],
+                                    "title": movie["title"],
+                                    "year": movie.get("year"),
+                                    "genres": movie.get("genres", []),
+                                    "description": (movie.get("description") or "")[:600],
+                                    "matchedConcepts": movie.get("matchedConcepts", []),
+                                }
+                                for movie in movies
+                            ],
+                        },
+                        ensure_ascii=False,
+                    ),
+                },
+            ],
+            "temperature": 0,
+            "response_format": {"type": "json_object"},
+        }
+        response = requests.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json=payload,
+            timeout=25,
+        )
+        response.raise_for_status()
+        content = response.json()["choices"][0]["message"]["content"]
+        order = json.loads(content).get("ids", [])
+        by_id = {movie["id"]: movie for movie in movies}
+        reranked = [by_id[movie_id] for movie_id in order if movie_id in by_id]
+        reranked.extend(movie for movie in movies if movie["id"] not in set(order))
+        for index, movie in enumerate(reranked):
+            movie["gptRank"] = index + 1
+        return reranked, "gpt"
+    except Exception:
+        return movies, "local"
 
 
 @app.post("/api/embeddings/rebuild")
@@ -512,4 +645,5 @@ def evaluation():
 
 if __name__ == "__main__":
     init_db()
-    app.run(host="127.0.0.1", port=8000, debug=False)
+    port = int(os.environ.get("MOVIEREC_PORT", "8000"))
+    app.run(host="127.0.0.1", port=port, debug=False)

@@ -12,6 +12,7 @@ const API = {
 };
 
 const ALPHA_KEY = "movierec.alpha";
+const CATALOG_PAGE_SIZE = 18;
 const GENRE_LABELS = {
   Action: "боевик",
   Adventure: "приключения",
@@ -38,6 +39,16 @@ const GENRE_LABELS = {
   War: "военный",
   Western: "вестерн",
 };
+const CATALOG_CATEGORIES = [
+  { id: "all", label: "Все фильмы", filters: { genre: "", yearFrom: "", yearTo: "", minRating: "", sort: "weighted", hasPoster: false } },
+  { id: "popular", label: "Популярные", filters: { genre: "", yearFrom: "", yearTo: "", minRating: "", sort: "popular", hasPoster: false } },
+  { id: "new", label: "Новинки", filters: { genre: "", yearFrom: "2020", yearTo: "", minRating: "", sort: "year", hasPoster: false } },
+  { id: "sci-fi", label: "Фантастика", filters: { genre: "фантастика", yearFrom: "", yearTo: "", minRating: "", sort: "weighted", hasPoster: false } },
+  { id: "crime", label: "Криминал", filters: { genre: "криминал", yearFrom: "", yearTo: "", minRating: "", sort: "weighted", hasPoster: false } },
+  { id: "drama", label: "Драма", filters: { genre: "драма", yearFrom: "", yearTo: "", minRating: "", sort: "weighted", hasPoster: false } },
+  { id: "comedy", label: "Комедия", filters: { genre: "комедия", yearFrom: "", yearTo: "", minRating: "", sort: "weighted", hasPoster: false } },
+  { id: "poster", label: "С постерами", filters: { genre: "", yearFrom: "", yearTo: "", minRating: "", sort: "weighted", hasPoster: true } },
+];
 
 const state = {
   user: null,
@@ -47,6 +58,8 @@ const state = {
   selectedPreferenceMovie: null,
   activeMovie: null,
   authMode: "login",
+  catalogPage: 1,
+  catalogCategory: "all",
 };
 
 const els = {};
@@ -89,8 +102,11 @@ function cacheElements() {
   els.catalogMinRating = document.querySelector("#catalogMinRating");
   els.catalogSort = document.querySelector("#catalogSort");
   els.catalogHasPoster = document.querySelector("#catalogHasPoster");
+  els.catalogCategories = document.querySelector("#catalogCategories");
   els.catalogStatus = document.querySelector("#catalogStatus");
   els.catalogGrid = document.querySelector("#catalogGrid");
+  els.catalogPaginationTop = document.querySelector("#catalogPaginationTop");
+  els.catalogPagination = document.querySelector("#catalogPagination");
   els.semanticInput = document.querySelector("#semanticInput");
   els.semanticSearchButton = document.querySelector("#semanticSearchButton");
   els.semanticResults = document.querySelector("#semanticResults");
@@ -189,10 +205,31 @@ function wireEvents() {
     showScreen("recommendations");
   });
   els.tuneProfile.addEventListener("click", () => showScreen("home"));
+  const renderCatalogFromFirstPage = debounce(async () => {
+    state.catalogPage = 1;
+    state.catalogCategory = "custom";
+    renderCatalogCategories();
+    await renderCatalog();
+  }, 180);
   [els.catalogQuery, els.catalogGenre, els.catalogYearFrom, els.catalogYearTo, els.catalogMinRating, els.catalogSort, els.catalogHasPoster].forEach((control) => {
-    control.addEventListener("input", debounce(renderCatalog, 180));
-    control.addEventListener("change", renderCatalog);
+    control.addEventListener("input", renderCatalogFromFirstPage);
+    control.addEventListener("change", renderCatalogFromFirstPage);
   });
+  els.catalogCategories.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-category-id]");
+    if (!button) return;
+    applyCatalogCategory(button.dataset.categoryId);
+    state.catalogPage = 1;
+    renderCatalogCategories();
+    await renderCatalog();
+  });
+  [els.catalogPaginationTop, els.catalogPagination].forEach((container) => container.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-page]");
+    if (!button || button.disabled) return;
+    state.catalogPage = Number(button.dataset.page);
+    await renderCatalog();
+    document.querySelector("#catalogTitle")?.scrollIntoView({ block: "start" });
+  }));
   els.catalogGrid.addEventListener("click", async (event) => {
     const card = event.target.closest("[data-movie-id]");
     if (card) await openMoviePage(Number(card.dataset.movieId));
@@ -316,6 +353,7 @@ async function loadSession() {
 
 async function renderAll() {
   renderAuthState();
+  renderCatalogCategories();
   await renderGenres();
   await renderCatalog();
   await renderStarterMovies();
@@ -332,6 +370,16 @@ function renderAuthState() {
   }
   els.loginButton.textContent = "Войти";
   els.registerButton.querySelector("span").textContent = "Регистрация";
+}
+
+function renderCatalogCategories() {
+  els.catalogCategories.innerHTML = CATALOG_CATEGORIES.map(
+    (category) => `
+      <button class="category-chip${state.catalogCategory === category.id ? " is-active" : ""}" type="button" data-category-id="${category.id}">
+        ${escapeHtml(category.label)}
+      </button>
+    `,
+  ).join("");
 }
 
 async function renderStarterMovies() {
@@ -447,10 +495,23 @@ async function renderGenres() {
     .join("");
 }
 
+function applyCatalogCategory(categoryId) {
+  const category = CATALOG_CATEGORIES.find((item) => item.id === categoryId) || CATALOG_CATEGORIES[0];
+  state.catalogCategory = category.id;
+  const filters = category.filters;
+  els.catalogGenre.value = filters.genre;
+  els.catalogYearFrom.value = filters.yearFrom;
+  els.catalogYearTo.value = filters.yearTo;
+  els.catalogMinRating.value = filters.minRating;
+  els.catalogSort.value = filters.sort;
+  els.catalogHasPoster.checked = filters.hasPoster;
+}
+
 async function renderCatalog() {
   const query = els.catalogQuery.value.trim();
   const params = new URLSearchParams({
-    limit: "18",
+    limit: String(CATALOG_PAGE_SIZE),
+    page: String(state.catalogPage),
     sort: els.catalogSort.value,
   });
   if (query) params.set("q", query);
@@ -462,11 +523,57 @@ async function renderCatalog() {
   if (els.catalogStatus) els.catalogStatus.textContent = "Применяем фильтры...";
   const payload = await api(`${API.movies}?${params}`);
   const movies = payload.movies || [];
-  const total = Number.isFinite(payload.total) ? payload.total : movies.length;
+  const backendHasPagination = Number.isFinite(payload.total);
+  const total = backendHasPagination ? payload.total : movies.length;
+  const page = payload.page || state.catalogPage;
+  const pages = payload.pages || Math.max(1, Math.ceil(total / CATALOG_PAGE_SIZE));
+  state.catalogPage = page;
   if (els.catalogStatus) {
-    els.catalogStatus.textContent = `Найдено: ${total.toLocaleString("ru-RU")}. Показано: ${movies.length}.`;
+    const shownFrom = total ? (page - 1) * CATALOG_PAGE_SIZE + 1 : 0;
+    const shownTo = Math.min(total, (page - 1) * CATALOG_PAGE_SIZE + movies.length);
+    els.catalogStatus.textContent = backendHasPagination
+      ? `Найдено: ${total.toLocaleString("ru-RU")}. Показано: ${shownFrom}-${shownTo}. Страница ${page} из ${pages}.`
+      : "Backend отвечает старым форматом. Остановите сервер Ctrl+C и запустите start_server.ps1 заново.";
   }
   els.catalogGrid.innerHTML = movies.map(renderMovieCard).join("") || '<div class="empty-state">Фильмы не найдены</div>';
+  renderCatalogPagination(backendHasPagination ? total : 0, page, pages);
+}
+
+function renderCatalogPagination(total, page, pages) {
+  const containers = [els.catalogPaginationTop, els.catalogPagination].filter(Boolean);
+  if (!containers.length) return;
+  if (!total || pages <= 1) {
+    containers.forEach((container) => {
+      container.innerHTML = "";
+    });
+    return;
+  }
+  const numbers = pageNumbers(page, pages);
+  const markup = `
+    <button type="button" data-page="${page - 1}" ${page <= 1 ? "disabled" : ""}>Назад</button>
+    ${numbers
+      .map((number) =>
+        number === "gap"
+          ? '<span class="page-gap">...</span>'
+          : `<button class="${number === page ? "is-active" : ""}" type="button" data-page="${number}">${number}</button>`,
+      )
+      .join("")}
+    <button type="button" data-page="${page + 1}" ${page >= pages ? "disabled" : ""}>Вперед</button>
+  `;
+  containers.forEach((container) => {
+    container.innerHTML = markup;
+  });
+}
+
+function pageNumbers(page, pages) {
+  const values = new Set([1, pages, page - 1, page, page + 1]);
+  const sorted = [...values].filter((value) => value >= 1 && value <= pages).sort((left, right) => left - right);
+  const result = [];
+  for (const value of sorted) {
+    if (result.length && value - result[result.length - 1] > 1) result.push("gap");
+    result.push(value);
+  }
+  return result;
 }
 
 async function getMovie(movieId) {
@@ -625,7 +732,7 @@ async function renderSemanticSearch() {
     local_embeddings: "Локальная нейромодель",
     tfidf_fallback: "TF-IDF резерв",
   };
-  const mode = modeLabels[payload.mode] || "Embeddings";
+  const mode = payload.rerankMode === "gpt" ? "GPT rerank" : modeLabels[payload.mode] || "Embeddings";
   els.semanticResults.innerHTML = movies.length
     ? movies
         .map(
@@ -633,6 +740,7 @@ async function renderSemanticSearch() {
             <button class="compact-card" type="button" data-movie-id="${movie.id}">
               <strong>${escapeHtml(formatMovieTitle(movie))}</strong>
               <span>${escapeHtml(formatGenres(movie.genres))}</span>
+              <span>${escapeHtml(movie.reason || "Похоже по смыслу")}</span>
               <span>${mode}${movie.semanticScore ? ` · ${Number(movie.semanticScore).toFixed(3)}` : ""}</span>
             </button>
           `,

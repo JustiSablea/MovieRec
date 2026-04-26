@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "MovieRec Assistant",
-  "version": "0.1.0",
-  "description": "Быстрые рекомендации фильмов на базе MovieLens и профиля MovieRec.",
+  "version": "0.2.0",
+  "description": "Помощник MovieRec: распознает фильм на странице, показывает похожие фильмы и отправляет оценки в профиль.",
   "action": {
     "default_popup": "popup.html",
     "default_title": "MovieRec"

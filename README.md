@@ -24,6 +24,17 @@ cd "C:\Users\azzma\Documents\New project"
 
 После запуска откройте `http://localhost:8000`.
 
+### Перезапуск сервера
+
+Если после изменений сайт показывает старую выдачу, остановите сервер в PowerShell сочетанием `Ctrl+C`, затем запустите снова:
+
+```powershell
+cd "C:\Users\azzma\Documents\New project"
+powershell -ExecutionPolicy Bypass -File ".\start_server.ps1"
+```
+
+После перезапуска обновите вкладку браузера через `Ctrl+F5`. Обычное обновление иногда оставляет старый `app.js` в кэше.
+
 ## API
 
 - `POST /api/register` — регистрация пользователя.
@@ -74,9 +85,25 @@ Invoke-RestMethod -Method Post "http://localhost:8000/api/embeddings/rebuild?pro
 
 Без построенных embeddings сайт использует TF-IDF fallback.
 
+Опциональный GPT rerank для нейропоиска:
+
+```powershell
+$env:SEMANTIC_RERANK_PROVIDER="gpt"
+$env:OPENAI_API_KEY="ваш_ключ"
+```
+
+В этом режиме MovieRec сначала находит кандидатов через embeddings/TF-IDF, а затем GPT переупорядочивает верхние результаты по смыслу запроса. Без этих переменных система продолжает работать локально.
+
 ## Расширение
 
 1. Откройте `edge://extensions` или `chrome://extensions`.
 2. Включите режим разработчика.
 3. Выберите `Load unpacked` / `Загрузить распакованное`.
 4. Укажите папку `C:\Users\azzma\Documents\New project\extension`.
+
+Расширение умеет:
+
+- определять фильм по заголовку, выделенному тексту, `h1` и meta-описанию текущей страницы;
+- показывать найденную карточку MovieRec;
+- отправлять оценку в профиль пользователя;
+- открывать карточку фильма и похожие фильмы на сайте.

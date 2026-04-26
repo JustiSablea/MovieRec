@@ -1,6 +1,6 @@
 (() => {
   const ROOT_ID = "movierec-extension-root";
-  const API_BASE = "http://localhost:8000";
+  let apiBase = "http://127.0.0.1:8000";
   let panelOpen = false;
 
   if (document.getElementById(ROOT_ID)) return;
@@ -35,6 +35,14 @@
   const list = root.querySelector("#mrec-list");
   const context = root.querySelector("#mrec-context");
 
+  if (typeof chrome !== "undefined" && chrome.runtime?.onMessage) {
+    chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+      if (message?.type !== "MOVIEREC_PAGE_CONTEXT") return false;
+      sendResponse(extractPageContext());
+      return true;
+    });
+  }
+
   fab.addEventListener("click", () => {
     panelOpen = !panelOpen;
     panel.classList.toggle("is-open", panelOpen);
@@ -43,18 +51,18 @@
   });
 
   root.querySelector("#mrec-open-site").addEventListener("click", () => {
-    window.open(`${API_BASE}/#recommendations`, "_blank", "noopener,noreferrer");
+    window.open(`${apiBase}/#recommendations`, "_blank", "noopener,noreferrer");
   });
   root.querySelector("#mrec-refresh").addEventListener("click", renderPanel);
   list.addEventListener("click", (event) => {
     const item = event.target.closest("[data-mrec-id]");
-    if (item) window.open(`${API_BASE}/#movie/${item.dataset.mrecId}`, "_blank", "noopener,noreferrer");
+    if (item) window.open(`${apiBase}/#movie/${item.dataset.mrecId}`, "_blank", "noopener,noreferrer");
   });
 
   async function renderPanel() {
-    const sourceText = `${document.title} ${window.getSelection()?.toString() || ""} ${
-      document.querySelector('meta[name="description"]')?.content || ""
-    }`;
+    await resolveApiBase();
+    const pageContext = extractPageContext();
+    const sourceText = [pageContext.selection, ...pageContext.candidates, pageContext.description].filter(Boolean).join(" ");
     const matched = await findMatchedMovie(sourceText);
     const recs = matched
       ? (await fetchJson(`/api/movies/${matched.id}`)).movie.similarMovies
@@ -81,8 +89,65 @@
   }
 
   async function fetchJson(path) {
-    const response = await fetch(`${API_BASE}${path}`, { credentials: "include" });
+    const response = await fetch(`${apiBase}${path}`, { credentials: "include" });
     return response.json();
+  }
+
+  async function resolveApiBase() {
+    for (const base of ["http://127.0.0.1:8000", "http://localhost:8000", "http://127.0.0.1:8001"]) {
+      try {
+        const response = await fetch(`${base}/api/version`, { credentials: "include" });
+        if (response.ok) {
+          apiBase = base;
+          return;
+        }
+      } catch {
+        // Try next local server.
+      }
+    }
+  }
+
+  function extractPageContext() {
+    const selection = String(window.getSelection?.() || "").trim();
+    const title = document.title || "";
+    const description =
+      document.querySelector('meta[property="og:description"]')?.content ||
+      document.querySelector('meta[name="description"]')?.content ||
+      "";
+    const headings = [...document.querySelectorAll("h1")]
+      .map((node) => node.textContent.trim())
+      .filter(Boolean)
+      .slice(0, 3);
+    const ogTitle =
+      document.querySelector('meta[property="og:title"]')?.content ||
+      document.querySelector('meta[name="twitter:title"]')?.content ||
+      "";
+    const candidates = cleanTitleCandidates([selection, ogTitle, ...headings, title]);
+    return {
+      title,
+      description,
+      selection,
+      url: location.href,
+      host: location.host,
+      candidates,
+    };
+  }
+
+  function cleanTitleCandidates(values) {
+    const ignored = /\b(imdb|tmdb|кинопоиск|youtube|google|wikipedia|википедия|official trailer|трейлер)\b/gi;
+    return [
+      ...new Set(
+        values
+          .map((value) =>
+            String(value || "")
+              .replace(ignored, "")
+              .replace(/\s*[-|—]\s*$/g, "")
+              .replace(/\(\d{4}\)/g, "")
+              .trim(),
+          )
+          .filter((value) => value.length >= 2 && value.length <= 90),
+      ),
+    ];
   }
 
   function formatTitle(movie) {
