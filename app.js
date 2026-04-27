@@ -241,6 +241,8 @@ function wireEvents() {
   els.semanticResults.addEventListener("click", async (event) => {
     const card = event.target.closest("[data-movie-id]");
     if (card) await openMoviePage(Number(card.dataset.movieId));
+    const tmdbCard = event.target.closest("[data-tmdb-id]");
+    if (tmdbCard) window.open(`https://www.themoviedb.org/movie/${tmdbCard.dataset.tmdbId}`, "_blank", "noopener");
   });
   els.movieRequestForm.addEventListener("submit", handleMovieRequest);
   els.resetProfile.addEventListener("click", async () => {
@@ -727,6 +729,7 @@ async function renderSemanticSearch() {
   }
   const payload = await api(`${API.semantic}?q=${encodeURIComponent(query)}`);
   const movies = (payload.movies || []).slice(0, 6);
+  const externalCandidates = (payload.externalCandidates || []).slice(0, 4);
   const modeLabels = {
     openai_embeddings: "OpenAI embeddings",
     local_embeddings: "Локальная нейромодель",
@@ -735,8 +738,9 @@ async function renderSemanticSearch() {
   const llmLabels = { gpt: "GPT rerank", ollama: "Qwen/Ollama rerank" };
   const mode = llmLabels[payload.rerankMode] || modeLabels[payload.mode] || "Embeddings";
   const notice = payload.rerankError ? `<div class="semantic-note">${escapeHtml(payload.rerankError)}</div>` : "";
-  els.semanticResults.innerHTML = movies.length
-    ? notice + movies
+  const analysis = renderQueryAnalysis(payload.queryAnalysis);
+  const localResults = movies.length
+    ? movies
         .map(
           (movie) => `
             <button class="semantic-card" type="button" data-movie-id="${movie.id}" style="${posterVars(movie)}">
@@ -755,6 +759,44 @@ async function renderSemanticSearch() {
         )
         .join("")
     : '<div class="empty-state">По этому описанию пока ничего не найдено</div>';
+  const externalResults = externalCandidates.length
+    ? `
+      <div class="semantic-section-title">Возможные совпадения в TMDb</div>
+      ${externalCandidates
+        .map(
+          (movie) => `
+            <button class="semantic-card semantic-card-external" type="button" data-tmdb-id="${movie.tmdbId}">
+              <span class="semantic-card-poster" style="--poster-a: #f59e0b; --poster-b: #111827;">
+                ${movie.poster ? `<img src="${movie.poster}" alt="Постер ${escapeHtml(movie.title)}" loading="lazy" />` : `<span class="poster-fallback">${escapeHtml(movie.title.split(/\s+/).slice(0, 2).join(" "))}</span>`}
+              </span>
+              <span class="semantic-card-body">
+                <strong>${escapeHtml(movie.title)}${movie.year ? ` (${movie.year})` : ""}</strong>
+                <span>Нет в локальной базе · TMDb</span>
+                <span>${escapeHtml(movie.reason || "Возможное внешнее совпадение")}</span>
+                <span>TMDb score · ${Number(movie.matchScore || 0).toFixed(3)}</span>
+              </span>
+            </button>
+          `,
+        )
+        .join("")}
+    `
+    : "";
+  els.semanticResults.innerHTML = notice + analysis + localResults + externalResults;
+}
+
+function renderQueryAnalysis(analysis = {}) {
+  const chips = [
+    ...(analysis.genres || []).map((item) => `жанр: ${item}`),
+    ...(analysis.objects || []).map((item) => `объект: ${item}`),
+    ...(analysis.characters || []).map((item) => `персонаж: ${item}`),
+    ...(analysis.visual || []).map((item) => `визуально: ${item}`),
+    ...(analysis.actions || []).map((item) => `действие: ${item}`),
+    ...(analysis.themes || []).map((item) => `тема: ${item}`),
+    ...(analysis.english_terms || []).map((item) => item),
+    ...(analysis.possible_titles || []).map((item) => `возможно: ${item}`),
+  ].slice(0, 12);
+  if (!chips.length) return "";
+  return `<div class="semantic-analysis">${chips.map((chip) => `<span>${escapeHtml(chip)}</span>`).join("")}</div>`;
 }
 
 async function handleMovieRequest(event) {

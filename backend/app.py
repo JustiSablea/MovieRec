@@ -16,12 +16,32 @@ from .tmdb import enrich_movie
 
 app = Flask(__name__, static_folder=None)
 app.secret_key = "movierec-dev-secret-change-before-production"
-APP_VERSION = "2026-04-28-semantic-optimizer"
+APP_VERSION = "2026-04-28-semantic-understanding"
 
 MOVIE_REQUEST_LIMITS = {}
 LLM_RERANK_CACHE = {}
+QUERY_PARSE_CACHE = {}
+TMDB_SEARCH_CACHE = {}
 TITLE_RE = re.compile(r"^[\w\s:;,.!?&'’()\-а-яА-ЯёЁ0-9]+$", re.UNICODE)
 HINT_STOP_TOKENS = {"the", "a", "an", "of", "and", "из", "и", "в", "на"}
+TMDB_BASE_URL = "https://api.themoviedb.org/3"
+TMDB_IMAGE_URL = "https://image.tmdb.org/t/p/w500"
+SEARCH_TERM_ALIASES = {
+    "animation": ("мультфильм", "анимация", "cartoon", "family"),
+    "cartoon": ("мультфильм", "animation"),
+    "action": ("боевик", "action"),
+    "superhero": ("супергерой", "super hero", "comic book"),
+    "sci-fi": ("фантастика", "science fiction", "sci fi"),
+    "science fiction": ("фантастика", "sci-fi"),
+    "mystery": ("детектив", "тайна", "загадка"),
+    "cat": ("кот", "кошка", "кошачий"),
+    "orange cat": ("рыжий кот", "оранжевый кот", "cat"),
+    "talking cat": ("говорящий кот", "cat"),
+    "prison": ("тюрьма", "заключенный"),
+    "prison escape": ("побег из тюрьмы", "escape"),
+    "heist": ("ограбление", "кража"),
+    "dream": ("сон", "сны", "подсознание"),
+}
 GENRE_LABELS = {
     "Action": "боевик",
     "Adventure": "приключения",
@@ -110,6 +130,12 @@ SEMANTIC_TITLE_HINTS = [
         "label": "сны, подсознание и преступление",
         "groups": (("сон", "сны", "снах", "dream", "подсозн"), ("ограб", "краж", "вор", "heist")),
         "searches": ("Inception", "Начало"),
+    },
+    {
+        "label": "мультфильм про кота",
+        "groups": (("кот", "котик", "кошка", "кошк", "cat", "puss"), ("мульт", "анимац", "animation", "cartoon")),
+        "searches": ("Кот сапогах", "Puss Boots", "talking cat", "cat", "кот"),
+        "required_genres": ("мультфильм", "семейный"),
     },
 ]
 
@@ -419,39 +445,49 @@ def semantic_search():
         return jsonify({"movies": []})
     with get_connection() as connection:
         recommender = HybridRecommender(connection)
+        query_analysis, parse_mode, parse_error = understand_semantic_query(query)
+        search_text = semantic_search_text(query, query_analysis)
         embedding_error = None
         try:
-            embedded = embedding_search(connection, recommender, query, limit=60)
+            embedded = embedding_search(connection, recommender, search_text, limit=60)
         except Exception as error:
             embedded = None
             embedding_error = str(error)
         if embedded is not None:
             provider = embedded[0].get("embeddingProvider", "embeddings") if embedded else "embeddings"
-            content = recommender.semantic_search(expand_query(query), limit=60)
-            hinted = semantic_hint_candidates(recommender, query)
+            content = recommender.semantic_search(expand_query(search_text), limit=60)
+            hinted = semantic_hint_candidates(recommender, query) + semantic_facet_candidates(recommender, query_analysis)
             merged = rerank_semantic_results(query, embedded, content, hinted)
             reranked, rerank_mode, rerank_error = maybe_llm_rerank(query, merged[:12])
             return jsonify(
                 {
                     "mode": f"{provider}_embeddings",
+                    "parseMode": parse_mode,
+                    "parseError": parse_error,
                     "rerankMode": rerank_mode,
                     "rerankError": rerank_error,
                     "embeddingError": embedding_error,
-                    "expandedQuery": expand_query(query),
+                    "queryAnalysis": query_analysis,
+                    "expandedQuery": expand_query(search_text),
                     "movies": reranked[:10],
+                    "externalCandidates": tmdb_external_candidates(query, query_analysis, recommender),
                 }
             )
-        hinted = semantic_hint_candidates(recommender, query)
-        fallback = rerank_semantic_results(query, [], recommender.semantic_search(expand_query(query), limit=60), hinted)
+        hinted = semantic_hint_candidates(recommender, query) + semantic_facet_candidates(recommender, query_analysis)
+        fallback = rerank_semantic_results(query, [], recommender.semantic_search(expand_query(search_text), limit=60), hinted)
         reranked, rerank_mode, rerank_error = maybe_llm_rerank(query, fallback[:12])
         return jsonify(
             {
                 "mode": "tfidf_fallback",
+                "parseMode": parse_mode,
+                "parseError": parse_error,
                 "rerankMode": rerank_mode,
                 "rerankError": rerank_error,
                 "embeddingError": embedding_error,
-                "expandedQuery": expand_query(query),
+                "queryAnalysis": query_analysis,
+                "expandedQuery": expand_query(search_text),
                 "movies": reranked[:10],
+                "externalCandidates": tmdb_external_candidates(query, query_analysis, recommender),
             }
         )
 
@@ -460,11 +496,14 @@ def rerank_semantic_results(query, embedded, content, hinted=None):
     merged = {}
     for index, movie in enumerate(hinted or []):
         hint_priority = float(movie.get("hintPriority", index))
+        existing = merged.get(movie["id"])
+        if existing and existing.get("_hint", 0) >= movie.get("hintScore", 1.0):
+            continue
         merged[movie["id"]] = {
             **movie,
             "_embedding": 0.0,
             "_content": 0.0,
-            "_hint": max(0.35, 1.0 - hint_priority * 0.08 - index * 0.015),
+            "_hint": max(0.35, float(movie.get("hintScore", 1.0)) - hint_priority * 0.08 - index * 0.01),
             "_rank": index,
         }
     for index, movie in enumerate(embedded):
@@ -486,7 +525,7 @@ def rerank_semantic_results(query, embedded, content, hinted=None):
     for item in merged.values():
         concept_matches = semantic_concept_matches(query, item)
         boost = semantic_intent_boost(concept_matches)
-        combined = item["_embedding"] * 0.32 + item["_content"] * 0.32 + item["_hint"] * 0.95 + item.get("weightedScore", 0) / 100 + boost
+        combined = item["_embedding"] * 0.26 + item["_content"] * 0.3 + item["_hint"] * 1.08 + item.get("weightedScore", 0) / 100 + boost
         item["semanticScore"] = round(combined, 4)
         item["matchedConcepts"] = [concept["label"] for concept in concept_matches]
         item["reason"] = semantic_reason(item, concept_matches, item.get("hintLabel"))
@@ -520,6 +559,351 @@ def semantic_concept_matches(query, movie):
     return matches
 
 
+def understand_semantic_query(query):
+    normalized = normalize_semantic_text(query)
+    if normalized in QUERY_PARSE_CACHE:
+        cached = QUERY_PARSE_CACHE[normalized]
+        return dict(cached["analysis"]), cached["mode"], cached.get("error")
+    provider = os.environ.get("SEMANTIC_RERANK_PROVIDER", "").lower()
+    if provider in {"ollama", "qwen"}:
+        analysis, error = ollama_parse_query(query)
+        if analysis:
+            QUERY_PARSE_CACHE[normalized] = {"analysis": analysis, "mode": "ollama", "error": error}
+            return dict(analysis), "ollama", error
+    analysis = heuristic_query_analysis(query)
+    QUERY_PARSE_CACHE[normalized] = {"analysis": analysis, "mode": "heuristic", "error": None}
+    return analysis, "heuristic", None
+
+
+def ollama_parse_query(query):
+    base_url = os.environ.get("OLLAMA_BASE_URL", "http://127.0.0.1:11434").rstrip("/")
+    model = os.environ.get("OLLAMA_MODEL", "qwen2.5:3b")
+    prompt = (
+        "Разбери пользовательский запрос о фильме в JSON. "
+        "Нужны признаки для поиска по базе фильмов, а не ответ пользователю. "
+        "Верни строго JSON с ключами: genres, objects, characters, visual, actions, themes, "
+        "english_terms, possible_titles, negative_terms. Все значения - массивы строк. "
+        "Добавляй английские поисковые термины и вероятные оригинальные названия, если они напрашиваются. "
+        "Пример: 'мультфильм про рыжего котика' -> english_terms ['animation','cat','orange cat','talking cat'], "
+        "possible_titles ['Garfield','Puss in Boots'].\nЗапрос: "
+        + query
+    )
+    try:
+        response = requests.post(
+            f"{base_url}/api/chat",
+            json={
+                "model": model,
+                "messages": [{"role": "user", "content": prompt}],
+                "stream": False,
+                "format": "json",
+                "keep_alive": "10m",
+                "options": {"temperature": 0, "num_predict": 220},
+            },
+            timeout=35,
+        )
+        response.raise_for_status()
+        raw = response.json().get("message", {}).get("content", "{}")
+        return normalize_query_analysis(json.loads(raw)), None
+    except Exception as error:
+        return None, str(error)
+
+
+def normalize_query_analysis(value):
+    keys = ("genres", "objects", "characters", "visual", "actions", "themes", "english_terms", "possible_titles", "negative_terms")
+    analysis = {}
+    for key in keys:
+        raw_items = value.get(key, []) if isinstance(value, dict) else []
+        if isinstance(raw_items, str):
+            raw_items = [raw_items]
+        clean = []
+        for item in raw_items or []:
+            text = str(item).strip()
+            if text and text.lower() not in {entry.lower() for entry in clean}:
+                clean.append(text[:80])
+        analysis[key] = clean[:12]
+    return analysis
+
+
+def heuristic_query_analysis(query):
+    normalized = normalize_semantic_text(query)
+    analysis = normalize_query_analysis({})
+    keyword_map = {
+        "genres": {
+            "мульт": "мультфильм",
+            "анимац": "мультфильм",
+            "cartoon": "мультфильм",
+            "робот": "фантастика",
+            "космос": "фантастика",
+            "супергер": "боевик",
+            "тюрьм": "криминал",
+        },
+        "objects": {
+            "кот": "кот",
+            "котик": "кот",
+            "кошк": "кошка",
+            "робот": "робот",
+            "кайдз": "кайдзю",
+            "фокус": "фокус",
+            "тюрьм": "тюрьма",
+        },
+        "visual": {
+            "рыж": "рыжий",
+            "оранж": "оранжевый",
+            "желт": "желтый",
+            "красн": "красный",
+        },
+        "actions": {
+            "побег": "побег",
+            "сбеж": "побег",
+            "ограб": "ограбление",
+            "разгад": "расследование",
+        },
+        "themes": {
+            "сон": "сны",
+            "сны": "сны",
+            "маг": "магия",
+            "фокус": "иллюзия",
+            "супергер": "супергерои",
+        },
+    }
+    english_terms = {
+        "кот": ["cat", "talking cat"],
+        "котик": ["cat", "orange cat", "talking cat"],
+        "кошк": ["cat"],
+        "рыж": ["orange", "orange cat"],
+        "мульт": ["animation", "cartoon", "family"],
+        "робот": ["robot", "giant robot"],
+        "кайдз": ["kaiju", "monster"],
+        "побег": ["escape", "prison escape"],
+        "тюрьм": ["prison"],
+        "сон": ["dream"],
+        "сны": ["dream"],
+        "ограб": ["heist"],
+    }
+    possible_titles = {
+        "кот": ["Puss in Boots", "Garfield"],
+        "котик": ["Puss in Boots", "Garfield"],
+        "рыж": ["Garfield", "Puss in Boots"],
+    }
+    for target, rules in keyword_map.items():
+        for needle, value in rules.items():
+            if needle in normalized:
+                analysis[target].append(value)
+    for needle, values in english_terms.items():
+        if needle in normalized:
+            analysis["english_terms"].extend(values)
+    for needle, values in possible_titles.items():
+        if needle in normalized:
+            analysis["possible_titles"].extend(values)
+    return normalize_query_analysis(analysis)
+
+
+def semantic_search_text(query, analysis):
+    parts = [query]
+    for key in ("genres", "objects", "characters", "visual", "actions", "themes", "english_terms", "possible_titles"):
+        parts.extend(expand_search_terms(analysis.get(key, [])))
+    return " ".join(parts)
+
+
+def semantic_facet_candidates(recommender, analysis):
+    terms_by_group = {
+        "possible_titles": analysis.get("possible_titles", []),
+        "genres": expand_search_terms(analysis.get("genres", [])),
+        "objects": expand_search_terms(analysis.get("objects", []) + analysis.get("characters", [])),
+        "visual": expand_search_terms(analysis.get("visual", [])),
+        "actions": expand_search_terms(analysis.get("actions", [])),
+        "themes": expand_search_terms(analysis.get("themes", [])),
+        "english_terms": expand_search_terms(analysis.get("english_terms", [])),
+    }
+    candidates = []
+    for movie in recommender.movies:
+        score, reasons = facet_match_score(movie, terms_by_group)
+        if score <= 0:
+            continue
+        candidates.append(
+            {
+                **movie,
+                "hintLabel": "понятые признаки: " + ", ".join(reasons[:3]),
+                "hintPriority": 0 if score >= 1.2 else 2,
+                "hintScore": min(1.08, 0.28 + score),
+            }
+        )
+    candidates.sort(key=lambda movie: (movie.get("hintScore", 0), movie.get("weightedScore", 0)), reverse=True)
+    return candidates[:40]
+
+
+def expand_search_terms(terms):
+    expanded = []
+    for term in terms or []:
+        clean = str(term).strip()
+        if not clean:
+            continue
+        variants = [clean, *SEARCH_TERM_ALIASES.get(clean.lower(), ())]
+        for variant in variants:
+            if variant and variant.lower() not in {item.lower() for item in expanded}:
+                expanded.append(variant)
+    return expanded
+
+
+def facet_match_score(movie, terms_by_group):
+    title_tokens = set(normalize_semantic_text(movie.get("title", "")).split())
+    genre_text = normalize_semantic_text(" ".join(movie.get("genres", [])))
+    tag_text = normalize_semantic_text(" ".join(movie.get("tags", [])))
+    description_text = normalize_semantic_text(movie.get("description", ""))
+    full_text = " ".join([normalize_semantic_text(movie.get("title", "")), genre_text, tag_text, description_text])
+    score = 0.0
+    reasons = []
+    score += title_match_score(terms_by_group["possible_titles"], normalize_semantic_text(movie.get("title", "")) + " " + tag_text, 0.55, reasons)
+    score += group_match_score(terms_by_group["genres"], genre_text, 0.22, reasons, "жанр")
+    score += group_match_score(terms_by_group["objects"], full_text, 0.22, reasons, "объект")
+    score += group_match_score(terms_by_group["english_terms"], full_text, 0.2, reasons, "англ. тег")
+    score += group_match_score(terms_by_group["actions"], full_text, 0.18, reasons, "действие")
+    score += group_match_score(terms_by_group["themes"], full_text, 0.18, reasons, "тема")
+    score += group_match_score(terms_by_group["visual"], full_text, 0.14, reasons, "визуальный признак")
+    if terms_by_group["possible_titles"]:
+        tag_tokens = set(tag_text.split())
+        for title in terms_by_group["possible_titles"]:
+            tokens = [token for token in normalize_semantic_text(title).split() if token not in HINT_STOP_TOKENS]
+            if tokens and all(token in title_tokens or token in tag_tokens for token in tokens):
+                score += 0.45
+                break
+    return score, reasons
+
+
+def title_match_score(terms, text, weight, reasons):
+    score = 0.0
+    text_tokens = set(text.split())
+    for term in terms:
+        tokens = [token for token in normalize_semantic_text(term).split() if token not in HINT_STOP_TOKENS]
+        if not tokens:
+            continue
+        matches = sum(1 for token in tokens if token in text_tokens)
+        if matches == len(tokens) or (len(tokens) >= 2 and matches >= len(tokens) - 1):
+            score += weight
+            reason = f"название: {term}"
+            if reason not in reasons:
+                reasons.append(reason)
+    return min(score, weight * 2)
+
+
+def group_match_score(terms, text, weight, reasons, label):
+    score = 0.0
+    text_tokens = set(text.split())
+    for term in terms:
+        tokens = [token for token in normalize_semantic_text(term).split() if token not in HINT_STOP_TOKENS]
+        if not tokens:
+            continue
+        matches = sum(1 for token in tokens if token in text_tokens)
+        needed = 1 if len(tokens) == 1 else max(2, math.ceil(len(tokens) * 0.6))
+        if matches >= needed:
+            score += weight * (matches / len(tokens))
+            reason = f"{label}: {term}"
+            if reason not in reasons:
+                reasons.append(reason)
+    return min(score, weight * 2.5)
+
+
+def tmdb_external_candidates(query, analysis, recommender):
+    api_key = os.environ.get("TMDB_API_KEY")
+    if not api_key:
+        return []
+    existing_tmdb = {movie.get("tmdbId") or movie.get("tmdb_id") for movie in recommender.movies if movie.get("tmdbId") or movie.get("tmdb_id")}
+    search_queries = []
+    search_queries.extend(analysis.get("possible_titles", []))
+    search_queries.extend(compound_tmdb_queries(analysis))
+    search_queries.append(query)
+    candidates = {}
+    for search_query in search_queries:
+        normalized = normalize_semantic_text(search_query)
+        if not normalized or normalized in TMDB_SEARCH_CACHE and TMDB_SEARCH_CACHE[normalized] == []:
+            continue
+        try:
+            results = TMDB_SEARCH_CACHE.get(normalized)
+            if results is None:
+                response = requests.get(
+                    f"{TMDB_BASE_URL}/search/movie",
+                    params={
+                        "api_key": api_key,
+                        "language": "ru-RU",
+                        "query": search_query,
+                        "include_adult": "false",
+                        "page": 1,
+                    },
+                    timeout=8,
+                )
+                response.raise_for_status()
+                results = response.json().get("results", [])[:5]
+                TMDB_SEARCH_CACHE[normalized] = results
+            for item in results:
+                tmdb_id = item.get("id")
+                if not tmdb_id or tmdb_id in existing_tmdb or tmdb_id in candidates:
+                    continue
+                candidates[tmdb_id] = tmdb_candidate_payload(item, analysis, search_query)
+        except Exception:
+            continue
+    ranked = sorted(candidates.values(), key=lambda item: item["matchScore"], reverse=True)
+    return ranked[:4]
+
+
+def compound_tmdb_queries(analysis):
+    values = []
+    english = analysis.get("english_terms", [])
+    genres = analysis.get("genres", [])
+    objects = analysis.get("objects", []) + analysis.get("characters", [])
+    visual = analysis.get("visual", [])
+    for left in visual[:3]:
+        for right in objects[:3]:
+            values.append(f"{left} {right}")
+    for term in english[:8]:
+        values.append(term)
+    for genre in genres[:3]:
+        for obj in objects[:3]:
+            values.append(f"{genre} {obj}")
+    return values[:12]
+
+
+def tmdb_candidate_payload(item, analysis, source_query):
+    title = item.get("title") or item.get("original_title") or "TMDb"
+    year = parse_tmdb_year(item.get("release_date"))
+    overview = item.get("overview") or ""
+    text = normalize_semantic_text(" ".join([title, item.get("original_title") or "", overview]))
+    score = 0.15 + min(float(item.get("popularity") or 0) / 120, 0.25)
+    reasons = []
+    for key, label in (
+        ("possible_titles", "возможное название"),
+        ("english_terms", "английский признак"),
+        ("objects", "объект"),
+        ("characters", "персонаж"),
+        ("visual", "визуальный признак"),
+        ("themes", "тема"),
+    ):
+        for term in analysis.get(key, []):
+            tokens = [token for token in normalize_semantic_text(term).split() if token not in HINT_STOP_TOKENS]
+            if tokens and any(token in text for token in tokens):
+                score += 0.16
+                reasons.append(f"{label}: {term}")
+                break
+    return {
+        "tmdbId": item.get("id"),
+        "title": title,
+        "year": year,
+        "poster": f"{TMDB_IMAGE_URL}{item['poster_path']}" if item.get("poster_path") else None,
+        "description": overview,
+        "matchScore": round(score, 4),
+        "sourceQuery": source_query,
+        "reason": ", ".join(reasons[:3]) or "Найдено во внешнем поиске TMDb",
+    }
+
+
+def parse_tmdb_year(value):
+    if not value or len(value) < 4:
+        return None
+    try:
+        return int(value[:4])
+    except ValueError:
+        return None
+
+
 def semantic_hint_candidates(recommender, query):
     hints = matching_title_hints(query)
     if not hints:
@@ -527,16 +911,26 @@ def semantic_hint_candidates(recommender, query):
     candidates = {}
     for hint in hints:
         for movie, priority in token_scan_movies(recommender.movies, hint["searches"]):
+            if not movie_matches_hint(movie, hint):
+                continue
             candidate = {
                 **movie,
                 "hintLabel": hint["label"],
                 "hintPriority": min(priority, candidates.get(movie["id"], {}).get("hintPriority", priority)),
+                "hintScore": 1.45,
             }
             candidates[movie["id"]] = candidate
     return sorted(
         candidates.values(),
         key=lambda movie: (movie.get("hintPriority", 99), -movie.get("weightedScore", 0)),
     )[:24]
+
+
+def movie_matches_hint(movie, hint):
+    required_genres = set(hint.get("required_genres") or [])
+    if required_genres and not required_genres.intersection(movie.get("genres", [])):
+        return False
+    return True
 
 
 def matching_title_hints(query):

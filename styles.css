@@ -848,6 +848,32 @@ button {
   font-weight: 800;
 }
 
+.semantic-analysis {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 2px;
+}
+
+.semantic-analysis span {
+  padding: 6px 9px;
+  border: 1px solid rgba(211, 62, 213, 0.32);
+  border-radius: 999px;
+  background: rgba(211, 62, 213, 0.08);
+  color: #f0d4f7;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.semantic-section-title {
+  grid-column: 1 / -1;
+  margin-top: 12px;
+  color: #f7f7fb;
+  font-size: 15px;
+  font-weight: 900;
+}
+
 .semantic-card {
   display: grid;
   min-height: 162px;
@@ -862,6 +888,16 @@ button {
   cursor: pointer;
   text-align: left;
   transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.semantic-card-external {
+  border-style: dashed;
+  border-color: rgba(245, 158, 11, 0.42);
+}
+
+.semantic-card-external:hover,
+.semantic-card-external:focus-visible {
+  border-color: rgba(245, 158, 11, 0.76);
 }
 
 .semantic-card:hover,
