@@ -41,6 +41,10 @@ SEARCH_TERM_ALIASES = {
     "prison escape": ("побег из тюрьмы", "escape"),
     "heist": ("ограбление", "кража"),
     "dream": ("сон", "сны", "подсознание"),
+    "moving castle": ("ходячий замок", "движущийся замок"),
+    "castle travels": ("ходячий замок", "движущийся замок"),
+    "castle movement": ("ходячий замок", "движущийся замок"),
+    "magic castle": ("волшебный замок", "ходячий замок"),
 }
 GENRE_LABELS = {
     "Action": "боевик",
@@ -747,13 +751,14 @@ def expand_search_terms(terms):
 
 def facet_match_score(movie, terms_by_group):
     title_tokens = set(normalize_semantic_text(movie.get("title", "")).split())
+    title_text = normalize_semantic_text(movie.get("title", ""))
     genre_text = normalize_semantic_text(" ".join(movie.get("genres", [])))
     tag_text = normalize_semantic_text(" ".join(movie.get("tags", [])))
     description_text = normalize_semantic_text(movie.get("description", ""))
     full_text = " ".join([normalize_semantic_text(movie.get("title", "")), genre_text, tag_text, description_text])
     score = 0.0
     reasons = []
-    score += title_match_score(terms_by_group["possible_titles"], normalize_semantic_text(movie.get("title", "")) + " " + tag_text, 0.55, reasons)
+    score += title_match_score(terms_by_group["possible_titles"], title_text + " " + tag_text, 0.8, reasons)
     score += group_match_score(terms_by_group["genres"], genre_text, 0.22, reasons, "жанр")
     score += group_match_score(terms_by_group["objects"], full_text, 0.22, reasons, "объект")
     score += group_match_score(terms_by_group["english_terms"], full_text, 0.2, reasons, "англ. тег")
@@ -765,7 +770,10 @@ def facet_match_score(movie, terms_by_group):
         for title in terms_by_group["possible_titles"]:
             tokens = [token for token in normalize_semantic_text(title).split() if token not in HINT_STOP_TOKENS]
             if tokens and all(token in title_tokens or token in tag_tokens for token in tokens):
-                score += 0.45
+                score += 0.85
+                break
+            if tokens and normalize_semantic_text(title) in title_text:
+                score += 0.85
                 break
     return score, reasons
 
@@ -935,11 +943,22 @@ def movie_matches_hint(movie, hint):
 
 def matching_title_hints(query):
     normalized = normalize_semantic_text(query)
+    query_tokens = set(normalized.split())
     matches = []
     for hint in SEMANTIC_TITLE_HINTS:
-        if all(any(term in normalized for term in group) for group in hint["groups"]):
+        if all(any(term_matches_query(term, normalized, query_tokens) for term in group) for group in hint["groups"]):
             matches.append(hint)
     return matches
+
+
+def term_matches_query(term, normalized_query, query_tokens):
+    tokens = [token for token in normalize_semantic_text(term).split() if token not in HINT_STOP_TOKENS]
+    if not tokens:
+        return False
+    if len(tokens) == 1:
+        token = tokens[0]
+        return token in query_tokens or (len(token) >= 5 and any(part.startswith(token) for part in query_tokens))
+    return all(token in query_tokens or token in normalized_query for token in tokens)
 
 
 def token_scan_movies(movies, searches):
