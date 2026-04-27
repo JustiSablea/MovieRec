@@ -733,8 +733,9 @@ async function renderSemanticSearch() {
     tfidf_fallback: "TF-IDF резерв",
   };
   const mode = payload.rerankMode === "gpt" ? "GPT rerank" : modeLabels[payload.mode] || "Embeddings";
+  const notice = payload.rerankError ? `<div class="semantic-note">${escapeHtml(payload.rerankError)}</div>` : "";
   els.semanticResults.innerHTML = movies.length
-    ? movies
+    ? notice + movies
         .map(
           (movie) => `
             <button class="compact-card" type="button" data-movie-id="${movie.id}">

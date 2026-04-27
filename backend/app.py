@@ -395,21 +395,23 @@ def semantic_search():
             provider = embedded[0].get("embeddingProvider", "embeddings") if embedded else "embeddings"
             content = recommender.semantic_search(expand_query(query), limit=30)
             merged = rerank_semantic_results(query, embedded, content)
-            reranked, rerank_mode = maybe_gpt_rerank(query, merged[:14])
+            reranked, rerank_mode, rerank_error = maybe_gpt_rerank(query, merged[:14])
             return jsonify(
                 {
                     "mode": f"{provider}_embeddings",
                     "rerankMode": rerank_mode,
+                    "rerankError": rerank_error,
                     "expandedQuery": expand_query(query),
                     "movies": reranked[:10],
                 }
             )
         fallback = rerank_semantic_results(query, [], recommender.semantic_search(expand_query(query), limit=30))
-        reranked, rerank_mode = maybe_gpt_rerank(query, fallback[:14])
+        reranked, rerank_mode, rerank_error = maybe_gpt_rerank(query, fallback[:14])
         return jsonify(
             {
                 "mode": "tfidf_fallback",
                 "rerankMode": rerank_mode,
+                "rerankError": rerank_error,
                 "expandedQuery": expand_query(query),
                 "movies": reranked[:10],
             }
@@ -488,10 +490,10 @@ def semantic_reason(movie, concept_matches):
 
 def maybe_gpt_rerank(query, movies):
     if os.environ.get("SEMANTIC_RERANK_PROVIDER", "").lower() not in {"gpt", "openai"}:
-        return movies, "local"
+        return movies, "local", None
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key or not movies:
-        return movies, "local"
+        return movies, "local", "OPENAI_API_KEY не задан или нет кандидатов для rerank."
     try:
         payload = {
             "model": os.environ.get("OPENAI_RERANK_MODEL", "gpt-4o-mini"),
@@ -538,9 +540,9 @@ def maybe_gpt_rerank(query, movies):
         reranked.extend(movie for movie in movies if movie["id"] not in set(order))
         for index, movie in enumerate(reranked):
             movie["gptRank"] = index + 1
-        return reranked, "gpt"
-    except Exception:
-        return movies, "local"
+        return reranked, "gpt", None
+    except Exception as error:
+        return movies, "local", f"GPT rerank недоступен: {error}"
 
 
 @app.post("/api/embeddings/rebuild")

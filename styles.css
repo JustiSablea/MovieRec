@@ -837,6 +837,17 @@ button {
   margin-top: 2px;
 }
 
+.semantic-note {
+  grid-column: 1 / -1;
+  padding: 10px 12px;
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.08);
+  color: #f5d38a;
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .semantic-page-panel {
   padding: 18px;
   border: 1px solid var(--line);
