@@ -395,7 +395,7 @@ def semantic_search():
             provider = embedded[0].get("embeddingProvider", "embeddings") if embedded else "embeddings"
             content = recommender.semantic_search(expand_query(query), limit=30)
             merged = rerank_semantic_results(query, embedded, content)
-            reranked, rerank_mode, rerank_error = maybe_gpt_rerank(query, merged[:14])
+            reranked, rerank_mode, rerank_error = maybe_llm_rerank(query, merged[:14])
             return jsonify(
                 {
                     "mode": f"{provider}_embeddings",
@@ -406,7 +406,7 @@ def semantic_search():
                 }
             )
         fallback = rerank_semantic_results(query, [], recommender.semantic_search(expand_query(query), limit=30))
-        reranked, rerank_mode, rerank_error = maybe_gpt_rerank(query, fallback[:14])
+        reranked, rerank_mode, rerank_error = maybe_llm_rerank(query, fallback[:14])
         return jsonify(
             {
                 "mode": "tfidf_fallback",
@@ -488,9 +488,74 @@ def semantic_reason(movie, concept_matches):
     return "Похоже по жанрам, тегам и популярности"
 
 
-def maybe_gpt_rerank(query, movies):
-    if os.environ.get("SEMANTIC_RERANK_PROVIDER", "").lower() not in {"gpt", "openai"}:
+def maybe_llm_rerank(query, movies):
+    provider = os.environ.get("SEMANTIC_RERANK_PROVIDER", "").lower()
+    if provider not in {"gpt", "openai", "ollama", "qwen"}:
         return movies, "local", None
+    if provider in {"ollama", "qwen"}:
+        return ollama_rerank(query, movies)
+    return openai_rerank(query, movies)
+
+
+def rerank_prompt_payload(query, movies):
+    return {
+        "query": query,
+        "movies": [
+            {
+                "id": movie["id"],
+                "title": movie["title"],
+                "year": movie.get("year"),
+                "genres": movie.get("genres", []),
+                "description": (movie.get("description") or "")[:600],
+                "matchedConcepts": movie.get("matchedConcepts", []),
+            }
+            for movie in movies
+        ],
+    }
+
+
+def apply_llm_order(movies, order, mode):
+    by_id = {movie["id"]: movie for movie in movies}
+    reranked = [by_id[movie_id] for movie_id in order if movie_id in by_id]
+    reranked.extend(movie for movie in movies if movie["id"] not in set(order))
+    for index, movie in enumerate(reranked):
+        movie["llmRank"] = index + 1
+        movie["rerankProvider"] = mode
+    return reranked
+
+
+def ollama_rerank(query, movies):
+    if not movies:
+        return movies, "local", "Нет кандидатов для локального rerank."
+    base_url = os.environ.get("OLLAMA_BASE_URL", "http://127.0.0.1:11434").rstrip("/")
+    model = os.environ.get("OLLAMA_MODEL", "qwen2.5:3b")
+    prompt = (
+        "Ты ранжируешь фильмы по смыслу пользовательского описания. "
+        "Верни только JSON без markdown и пояснений: {\"ids\":[movie_id...]}. "
+        "Ставь выше фильмы, где совпадают ключевые темы запроса.\n\n"
+        + json.dumps(rerank_prompt_payload(query, movies), ensure_ascii=False)
+    )
+    try:
+        response = requests.post(
+            f"{base_url}/api/chat",
+            json={
+                "model": model,
+                "messages": [{"role": "user", "content": prompt}],
+                "stream": False,
+                "format": "json",
+                "options": {"temperature": 0},
+            },
+            timeout=45,
+        )
+        response.raise_for_status()
+        content = response.json().get("message", {}).get("content", "{}")
+        order = json.loads(content).get("ids", [])
+        return apply_llm_order(movies, order, "ollama"), "ollama", None
+    except Exception as error:
+        return movies, "local", f"Ollama/Qwen rerank недоступен: {error}"
+
+
+def openai_rerank(query, movies):
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key or not movies:
         return movies, "local", "OPENAI_API_KEY не задан или нет кандидатов для rerank."
@@ -505,20 +570,7 @@ def maybe_gpt_rerank(query, movies):
                 {
                     "role": "user",
                     "content": json.dumps(
-                        {
-                            "query": query,
-                            "movies": [
-                                {
-                                    "id": movie["id"],
-                                    "title": movie["title"],
-                                    "year": movie.get("year"),
-                                    "genres": movie.get("genres", []),
-                                    "description": (movie.get("description") or "")[:600],
-                                    "matchedConcepts": movie.get("matchedConcepts", []),
-                                }
-                                for movie in movies
-                            ],
-                        },
+                        rerank_prompt_payload(query, movies),
                         ensure_ascii=False,
                     ),
                 },
@@ -535,12 +587,7 @@ def maybe_gpt_rerank(query, movies):
         response.raise_for_status()
         content = response.json()["choices"][0]["message"]["content"]
         order = json.loads(content).get("ids", [])
-        by_id = {movie["id"]: movie for movie in movies}
-        reranked = [by_id[movie_id] for movie_id in order if movie_id in by_id]
-        reranked.extend(movie for movie in movies if movie["id"] not in set(order))
-        for index, movie in enumerate(reranked):
-            movie["gptRank"] = index + 1
-        return reranked, "gpt", None
+        return apply_llm_order(movies, order, "gpt"), "gpt", None
     except Exception as error:
         return movies, "local", f"GPT rerank недоступен: {error}"
 

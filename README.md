@@ -85,14 +85,29 @@ Invoke-RestMethod -Method Post "http://localhost:8000/api/embeddings/rebuild?pro
 
 Без построенных embeddings сайт использует TF-IDF fallback.
 
-Опциональный GPT rerank для нейропоиска:
+Опциональный локальный LLM-rerank через Ollama/Qwen:
+
+```powershell
+$env:SEMANTIC_RERANK_PROVIDER="ollama"
+$env:OLLAMA_MODEL="qwen2.5:3b"
+$env:OLLAMA_BASE_URL="http://127.0.0.1:11434"
+```
+
+В этом режиме MovieRec сначала находит кандидатов через embeddings/TF-IDF, а затем локальная модель переупорядочивает верхние результаты по смыслу запроса. Хороший легкий вариант для ноутбука: `qwen2.5:3b`; если ресурсов хватает, можно попробовать `qwen2.5:7b`.
+
+Команды после установки Ollama:
+
+```powershell
+ollama pull qwen2.5:3b
+ollama serve
+```
+
+OpenAI/GPT rerank остается поддержанным, но не обязателен:
 
 ```powershell
 $env:SEMANTIC_RERANK_PROVIDER="gpt"
 $env:OPENAI_API_KEY="ваш_ключ"
 ```
-
-В этом режиме MovieRec сначала находит кандидатов через embeddings/TF-IDF, а затем GPT переупорядочивает верхние результаты по смыслу запроса. Без этих переменных система продолжает работать локально.
 
 ## Расширение
 

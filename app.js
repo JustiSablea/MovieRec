@@ -732,7 +732,8 @@ async function renderSemanticSearch() {
     local_embeddings: "Локальная нейромодель",
     tfidf_fallback: "TF-IDF резерв",
   };
-  const mode = payload.rerankMode === "gpt" ? "GPT rerank" : modeLabels[payload.mode] || "Embeddings";
+  const llmLabels = { gpt: "GPT rerank", ollama: "Qwen/Ollama rerank" };
+  const mode = llmLabels[payload.rerankMode] || modeLabels[payload.mode] || "Embeddings";
   const notice = payload.rerankError ? `<div class="semantic-note">${escapeHtml(payload.rerankError)}</div>` : "";
   els.semanticResults.innerHTML = movies.length
     ? notice + movies
