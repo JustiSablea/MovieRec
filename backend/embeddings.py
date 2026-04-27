@@ -16,6 +16,7 @@ LOCAL_EMBEDDING_MODEL = os.environ.get(
     "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
 )
 _LOCAL_MODEL = None
+_LOCAL_MODEL_ERROR = None
 TOKEN_RE = re.compile(r"[a-zа-яё0-9]{2,}", re.IGNORECASE)
 QUERY_EXPANSIONS = {
     "сын": ["сны", "сон", "dream", "dreams"],
@@ -82,19 +83,26 @@ def openai_embed(texts):
 
 
 def local_embed(texts, model_name=None):
-    global _LOCAL_MODEL
+    global _LOCAL_MODEL, _LOCAL_MODEL_ERROR
     model_name = model_name or LOCAL_EMBEDDING_MODEL
+    if _LOCAL_MODEL_ERROR:
+        raise RuntimeError(_LOCAL_MODEL_ERROR)
     os.environ.setdefault("HF_HUB_OFFLINE", "1")
     os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
     try:
         from sentence_transformers import SentenceTransformer
-    except ImportError as error:
-        raise RuntimeError(
+    except Exception as error:
+        _LOCAL_MODEL_ERROR = (
             "Для локального нейропоиска установите sentence-transformers: "
             "pip install sentence-transformers. После этого задайте EMBEDDING_PROVIDER=local."
-        ) from error
+        )
+        raise RuntimeError(_LOCAL_MODEL_ERROR) from error
     if _LOCAL_MODEL is None:
-        _LOCAL_MODEL = SentenceTransformer(model_name, local_files_only=True)
+        try:
+            _LOCAL_MODEL = SentenceTransformer(model_name, local_files_only=True)
+        except Exception as error:
+            _LOCAL_MODEL_ERROR = f"Локальная embedding-модель недоступна: {error}"
+            raise RuntimeError(_LOCAL_MODEL_ERROR) from error
     vectors = _LOCAL_MODEL.encode(texts, normalize_embeddings=True)
     return [vector.tolist() for vector in vectors]
 

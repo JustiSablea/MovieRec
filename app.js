@@ -739,11 +739,17 @@ async function renderSemanticSearch() {
     ? notice + movies
         .map(
           (movie) => `
-            <button class="compact-card" type="button" data-movie-id="${movie.id}">
-              <strong>${escapeHtml(formatMovieTitle(movie))}</strong>
-              <span>${escapeHtml(formatGenres(movie.genres))}</span>
-              <span>${escapeHtml(movie.reason || "Похоже по смыслу")}</span>
-              <span>${mode}${movie.semanticScore ? ` · ${Number(movie.semanticScore).toFixed(3)}` : ""}</span>
+            <button class="semantic-card" type="button" data-movie-id="${movie.id}" style="${posterVars(movie)}">
+              <span class="semantic-card-poster">
+                <span class="rating-badge">${movie.averageRating.toFixed(1)}</span>
+                ${posterMarkup(movie)}
+              </span>
+              <span class="semantic-card-body">
+                <strong>${escapeHtml(formatMovieTitle(movie))}</strong>
+                <span>${escapeHtml(formatGenres(movie.genres))}</span>
+                <span>${escapeHtml(movie.reason || "Похоже по смыслу")}</span>
+                <span>${mode}${movie.llmScore || movie.semanticScore ? ` · ${Number(movie.llmScore || movie.semanticScore).toFixed(3)}` : ""}</span>
+              </span>
             </button>
           `,
         )

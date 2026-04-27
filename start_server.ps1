@@ -5,6 +5,17 @@ $Port = 8000
 
 Set-Location $ProjectRoot
 $env:PYTHONPATH = $ProjectRoot
+$EnvPath = Join-Path $ProjectRoot ".env"
+if (Test-Path $EnvPath) {
+  Get-Content $EnvPath | ForEach-Object {
+    $line = $_.Trim()
+    if (-not $line -or $line.StartsWith("#") -or -not $line.Contains("=")) {
+      return
+    }
+    $name, $value = $line.Split("=", 2)
+    [Environment]::SetEnvironmentVariable($name.Trim(), $value.Trim().Trim('"').Trim("'"), "Process")
+  }
+}
 $listeners = Get-NetTCPConnection -LocalPort 8000 -State Listen -ErrorAction SilentlyContinue
 foreach ($listener in $listeners) {
   $processId = $listener.OwningProcess

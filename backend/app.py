@@ -16,10 +16,12 @@ from .tmdb import enrich_movie
 
 app = Flask(__name__, static_folder=None)
 app.secret_key = "movierec-dev-secret-change-before-production"
-APP_VERSION = "2026-04-27-semantic-extension"
+APP_VERSION = "2026-04-28-semantic-optimizer"
 
 MOVIE_REQUEST_LIMITS = {}
+LLM_RERANK_CACHE = {}
 TITLE_RE = re.compile(r"^[\w\s:;,.!?&'’()\-а-яА-ЯёЁ0-9]+$", re.UNICODE)
+HINT_STOP_TOKENS = {"the", "a", "an", "of", "and", "из", "и", "в", "на"}
 GENRE_LABELS = {
     "Action": "боевик",
     "Adventure": "приключения",
@@ -83,6 +85,33 @@ SEMANTIC_CONCEPTS = {
         "movie": ("любов", "роман", "relationship", "romance", "мелодрама"),
     },
 }
+SEMANTIC_TITLE_HINTS = [
+    {
+        "label": "фокус, иллюзия и разгадка",
+        "groups": (("фокус", "маг", "иллюз", "трюк"), ("разгад", "тайн", "секрет", "сюжет", "обман")),
+        "searches": ("The Prestige", "Престиж", "Now You See Me", "Иллюзия обмана", "The Illusionist"),
+    },
+    {
+        "label": "супергерои, костюмы и грубый юмор",
+        "groups": (("супергер", "геро", "комикс", "мутант"), ("желт", "красн", "мат", "руга", "пошл")),
+        "searches": ("Deadpool Wolverine", "Deadpool", "Wolverine", "Дэдпул", "Росомаха"),
+    },
+    {
+        "label": "побег из тюрьмы",
+        "groups": (("побег", "сбеж", "бежать"), ("тюрьм", "заключ", "prison")),
+        "searches": ("The Shawshank Redemption", "Побег из Шоушенка", "Escape Plan", "План побега"),
+    },
+    {
+        "label": "роботы против монстров",
+        "groups": (("робот", "мех", "егер", "гигант"), ("кайдз", "монстр", "годзил", "kaiju")),
+        "searches": ("Pacific Rim", "Тихоокеанский рубеж", "Godzilla", "Transformers"),
+    },
+    {
+        "label": "сны, подсознание и преступление",
+        "groups": (("сон", "сны", "снах", "dream", "подсозн"), ("ограб", "краж", "вор", "heist")),
+        "searches": ("Inception", "Начало"),
+    },
+]
 
 
 def current_user_id():
@@ -390,46 +419,66 @@ def semantic_search():
         return jsonify({"movies": []})
     with get_connection() as connection:
         recommender = HybridRecommender(connection)
-        embedded = embedding_search(connection, recommender, query, limit=30)
+        embedding_error = None
+        try:
+            embedded = embedding_search(connection, recommender, query, limit=60)
+        except Exception as error:
+            embedded = None
+            embedding_error = str(error)
         if embedded is not None:
             provider = embedded[0].get("embeddingProvider", "embeddings") if embedded else "embeddings"
-            content = recommender.semantic_search(expand_query(query), limit=30)
-            merged = rerank_semantic_results(query, embedded, content)
-            reranked, rerank_mode, rerank_error = maybe_llm_rerank(query, merged[:14])
+            content = recommender.semantic_search(expand_query(query), limit=60)
+            hinted = semantic_hint_candidates(recommender, query)
+            merged = rerank_semantic_results(query, embedded, content, hinted)
+            reranked, rerank_mode, rerank_error = maybe_llm_rerank(query, merged[:12])
             return jsonify(
                 {
                     "mode": f"{provider}_embeddings",
                     "rerankMode": rerank_mode,
                     "rerankError": rerank_error,
+                    "embeddingError": embedding_error,
                     "expandedQuery": expand_query(query),
                     "movies": reranked[:10],
                 }
             )
-        fallback = rerank_semantic_results(query, [], recommender.semantic_search(expand_query(query), limit=30))
-        reranked, rerank_mode, rerank_error = maybe_llm_rerank(query, fallback[:14])
+        hinted = semantic_hint_candidates(recommender, query)
+        fallback = rerank_semantic_results(query, [], recommender.semantic_search(expand_query(query), limit=60), hinted)
+        reranked, rerank_mode, rerank_error = maybe_llm_rerank(query, fallback[:12])
         return jsonify(
             {
                 "mode": "tfidf_fallback",
                 "rerankMode": rerank_mode,
                 "rerankError": rerank_error,
+                "embeddingError": embedding_error,
                 "expandedQuery": expand_query(query),
                 "movies": reranked[:10],
             }
         )
 
 
-def rerank_semantic_results(query, embedded, content):
+def rerank_semantic_results(query, embedded, content, hinted=None):
     merged = {}
-    for index, movie in enumerate(embedded):
-        normalized_embedding = (float(movie.get("semanticScore") or 0) + 1) / 2
+    for index, movie in enumerate(hinted or []):
+        hint_priority = float(movie.get("hintPriority", index))
         merged[movie["id"]] = {
             **movie,
-            "_embedding": normalized_embedding,
+            "_embedding": 0.0,
             "_content": 0.0,
+            "_hint": max(0.35, 1.0 - hint_priority * 0.08 - index * 0.015),
             "_rank": index,
         }
+    for index, movie in enumerate(embedded):
+        normalized_embedding = max(0.0, (float(movie.get("semanticScore") or 0) + 1) / 2)
+        entry = merged.get(movie["id"], {**movie, "_content": 0.0, "_hint": 0.0, "_rank": index})
+        merged[movie["id"]] = {
+            **entry,
+            **movie,
+            "_embedding": normalized_embedding,
+            "_hint": entry.get("_hint", 0.0),
+            "_rank": min(entry.get("_rank", index), index),
+        }
     for index, movie in enumerate(content):
-        entry = merged.get(movie["id"], {**movie, "_embedding": 0.0, "_rank": 100 + index})
+        entry = merged.get(movie["id"], {**movie, "_embedding": 0.0, "_hint": 0.0, "_rank": 100 + index})
         entry["_content"] = max(entry.get("_content", 0.0), 1 - index / max(1, len(content)))
         entry["semanticScore"] = max(float(entry.get("semanticScore") or 0), float(movie.get("semanticScore") or 0))
         merged[movie["id"]] = entry
@@ -437,12 +486,13 @@ def rerank_semantic_results(query, embedded, content):
     for item in merged.values():
         concept_matches = semantic_concept_matches(query, item)
         boost = semantic_intent_boost(concept_matches)
-        combined = item["_embedding"] * 0.38 + item["_content"] * 0.52 + item.get("weightedScore", 0) / 100 + boost
+        combined = item["_embedding"] * 0.32 + item["_content"] * 0.32 + item["_hint"] * 0.95 + item.get("weightedScore", 0) / 100 + boost
         item["semanticScore"] = round(combined, 4)
         item["matchedConcepts"] = [concept["label"] for concept in concept_matches]
-        item["reason"] = semantic_reason(item, concept_matches)
+        item["reason"] = semantic_reason(item, concept_matches, item.get("hintLabel"))
         item.pop("_embedding", None)
         item.pop("_content", None)
+        item.pop("_hint", None)
         item.pop("_rank", None)
         results.append(item)
     results.sort(key=lambda movie: (movie["semanticScore"], movie.get("weightedScore", 0)), reverse=True)
@@ -470,6 +520,64 @@ def semantic_concept_matches(query, movie):
     return matches
 
 
+def semantic_hint_candidates(recommender, query):
+    hints = matching_title_hints(query)
+    if not hints:
+        return []
+    candidates = {}
+    for hint in hints:
+        for movie, priority in token_scan_movies(recommender.movies, hint["searches"]):
+            candidate = {
+                **movie,
+                "hintLabel": hint["label"],
+                "hintPriority": min(priority, candidates.get(movie["id"], {}).get("hintPriority", priority)),
+            }
+            candidates[movie["id"]] = candidate
+    return sorted(
+        candidates.values(),
+        key=lambda movie: (movie.get("hintPriority", 99), -movie.get("weightedScore", 0)),
+    )[:24]
+
+
+def matching_title_hints(query):
+    normalized = normalize_semantic_text(query)
+    matches = []
+    for hint in SEMANTIC_TITLE_HINTS:
+        if all(any(term in normalized for term in group) for group in hint["groups"]):
+            matches.append(hint)
+    return matches
+
+
+def token_scan_movies(movies, searches):
+    found = []
+    for priority, search in enumerate(searches):
+        tokens = [
+            token
+            for token in normalize_semantic_text(search).split()
+            if len(token) >= 3 and token not in HINT_STOP_TOKENS
+        ]
+        if not tokens:
+            continue
+        for movie in movies:
+            text_tokens = set(
+                normalize_semantic_text(
+                    " ".join(
+                        [
+                            movie.get("title", ""),
+                            " ".join(movie.get("tags", [])),
+                        ]
+                    )
+                ).split()
+            )
+            if all(token in text_tokens for token in tokens):
+                found.append((movie, priority))
+    return found
+
+
+def normalize_semantic_text(value):
+    return re.sub(r"[^a-zа-я0-9]+", " ", str(value).lower().replace("ё", "е")).strip()
+
+
 def semantic_intent_boost(matched_concepts):
     boost = 0.0
     if matched_concepts:
@@ -479,7 +587,9 @@ def semantic_intent_boost(matched_concepts):
     return boost
 
 
-def semantic_reason(movie, concept_matches):
+def semantic_reason(movie, concept_matches, hint_label=None):
+    if hint_label:
+        return f"Подсказка запроса: {hint_label}"
     if concept_matches:
         labels = ", ".join(concept["label"] for concept in concept_matches[:3])
         return f"Совпало по смыслу: {labels}"
@@ -492,9 +602,25 @@ def maybe_llm_rerank(query, movies):
     provider = os.environ.get("SEMANTIC_RERANK_PROVIDER", "").lower()
     if provider not in {"gpt", "openai", "ollama", "qwen"}:
         return movies, "local", None
+    cache_key = llm_cache_key(provider, query, movies)
+    cached = LLM_RERANK_CACHE.get(cache_key)
+    if cached:
+        return [dict(movie) for movie in cached["movies"]], cached["mode"], None
     if provider in {"ollama", "qwen"}:
-        return ollama_rerank(query, movies)
-    return openai_rerank(query, movies)
+        reranked, mode, error = ollama_rerank(query, movies)
+    else:
+        reranked, mode, error = openai_rerank(query, movies)
+    if error is None and mode != "local":
+        LLM_RERANK_CACHE[cache_key] = {"mode": mode, "movies": [dict(movie) for movie in reranked]}
+        if len(LLM_RERANK_CACHE) > 80:
+            LLM_RERANK_CACHE.pop(next(iter(LLM_RERANK_CACHE)))
+    return reranked, mode, error
+
+
+def llm_cache_key(provider, query, movies):
+    model = os.environ.get("OLLAMA_MODEL" if provider in {"ollama", "qwen"} else "OPENAI_RERANK_MODEL", "")
+    movie_ids = tuple(movie["id"] for movie in movies)
+    return provider, model, normalize_semantic_text(query), movie_ids
 
 
 def rerank_prompt_payload(query, movies):
@@ -508,6 +634,8 @@ def rerank_prompt_payload(query, movies):
                 "genres": movie.get("genres", []),
                 "description": (movie.get("description") or "")[:600],
                 "matchedConcepts": movie.get("matchedConcepts", []),
+                "retrievalReason": movie.get("reason", ""),
+                "baseScore": movie.get("semanticScore", 0),
             }
             for movie in movies
         ],
@@ -516,8 +644,18 @@ def rerank_prompt_payload(query, movies):
 
 def apply_llm_order(movies, order, mode):
     by_id = {movie["id"]: movie for movie in movies}
-    reranked = [by_id[movie_id] for movie_id in order if movie_id in by_id]
-    reranked.extend(movie for movie in movies if movie["id"] not in set(order))
+    normalized_order = []
+    for movie_id in order:
+        try:
+            normalized_order.append(int(movie_id))
+        except (TypeError, ValueError):
+            continue
+    order_rank = {movie_id: index for index, movie_id in enumerate(normalized_order)}
+    for movie in movies:
+        rank = order_rank.get(movie["id"])
+        llm_boost = 0.0 if rank is None else max(0.0, 0.28 - rank * 0.025)
+        movie["llmScore"] = round(float(movie.get("semanticScore") or 0) + llm_boost, 4)
+    reranked = sorted(movies, key=lambda movie: (movie["llmScore"], movie.get("weightedScore", 0)), reverse=True)
     for index, movie in enumerate(reranked):
         movie["llmRank"] = index + 1
         movie["rerankProvider"] = mode
@@ -532,7 +670,9 @@ def ollama_rerank(query, movies):
     prompt = (
         "Ты ранжируешь фильмы по смыслу пользовательского описания. "
         "Верни только JSON без markdown и пояснений: {\"ids\":[movie_id...]}. "
-        "Ставь выше фильмы, где совпадают ключевые темы запроса.\n\n"
+        "Ставь выше фильмы, где совпадают сюжет, персонажи и ситуация из запроса. "
+        "Не выбирай фильм только потому, что одно слово совпало с названием. "
+        "Если retrievalReason говорит о подсказке запроса, учитывай это как сильный сигнал.\n\n"
         + json.dumps(rerank_prompt_payload(query, movies), ensure_ascii=False)
     )
     try:
@@ -543,7 +683,8 @@ def ollama_rerank(query, movies):
                 "messages": [{"role": "user", "content": prompt}],
                 "stream": False,
                 "format": "json",
-                "options": {"temperature": 0},
+                "keep_alive": "10m",
+                "options": {"temperature": 0, "num_predict": 128},
             },
             timeout=45,
         )

@@ -848,6 +848,72 @@ button {
   font-weight: 800;
 }
 
+.semantic-card {
+  display: grid;
+  min-height: 162px;
+  grid-template-columns: 86px minmax(0, 1fr);
+  gap: 13px;
+  align-items: stretch;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #18181b;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.semantic-card:hover,
+.semantic-card:focus-visible {
+  border-color: rgba(211, 62, 213, 0.6);
+  outline: 0;
+  transform: translateY(-2px);
+}
+
+.semantic-card-poster {
+  position: relative;
+  overflow: hidden;
+  border-radius: 9px;
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, 0.17), transparent 35%),
+    linear-gradient(145deg, var(--poster-a), var(--poster-b));
+}
+
+.semantic-card-poster img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.semantic-card-poster .poster-fallback {
+  padding: 10px;
+  font-size: 16px;
+}
+
+.semantic-card-body {
+  display: grid;
+  min-width: 0;
+  align-content: center;
+  gap: 8px;
+}
+
+.semantic-card-body strong {
+  color: #ffffff;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.semantic-card-body span {
+  color: var(--muted-strong);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
 .semantic-page-panel {
   padding: 18px;
   border: 1px solid var(--line);
