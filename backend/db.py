@@ -23,6 +23,7 @@ def init_db():
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT NOT NULL UNIQUE,
+                email TEXT NOT NULL DEFAULT '',
                 password_hash TEXT NOT NULL,
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
@@ -133,6 +134,7 @@ def init_db():
             );
             """
         )
+        ensure_column(connection, "users", "email", "TEXT NOT NULL DEFAULT ''")
         ensure_column(connection, "movie_requests", "admin_note", "TEXT NOT NULL DEFAULT ''")
         ensure_column(connection, "movie_requests", "added_movie_id", "INTEGER")
         ensure_column(connection, "movie_requests", "resolved_at", "TEXT")

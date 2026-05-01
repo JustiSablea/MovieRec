@@ -165,13 +165,19 @@ def user_is_admin(row):
 def public_user(row):
     if not row:
         return None
-    return {"id": row["id"], "username": row["username"], "createdAt": row["created_at"], "isAdmin": user_is_admin(row)}
+    return {
+        "id": row["id"],
+        "username": row["username"],
+        "email": row["email"] or "",
+        "createdAt": row["created_at"],
+        "isAdmin": user_is_admin(row),
+    }
 
 
 def get_user(connection, user_id):
     if not user_id:
         return None
-    return connection.execute("SELECT id, username, created_at FROM users WHERE id = ?", (user_id,)).fetchone()
+    return connection.execute("SELECT id, username, email, created_at FROM users WHERE id = ?", (user_id,)).fetchone()
 
 
 def require_admin(connection):
@@ -236,9 +242,12 @@ def static_files(path):
 def register():
     payload = request.get_json(force=True)
     username = (payload.get("username") or "").strip()
+    email = (payload.get("email") or "").strip()
     password = payload.get("password") or ""
     if len(username) < 3:
         return jsonify({"error": "Логин должен быть не короче 3 символов"}), 400
+    if email and ("@" not in email or len(email) > 160):
+        return jsonify({"error": "Проверьте адрес электронной почты"}), 400
     if len(password) < 4:
         return jsonify({"error": "Пароль должен быть не короче 4 символов"}), 400
 
@@ -247,8 +256,8 @@ def register():
         if exists:
             return jsonify({"error": "Такой логин уже зарегистрирован"}), 409
         cursor = connection.execute(
-            "INSERT INTO users (username, password_hash) VALUES (?, ?)",
-            (username, generate_password_hash(password)),
+            "INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)",
+            (username, email, generate_password_hash(password)),
         )
         connection.commit()
         session["user_id"] = cursor.lastrowid
@@ -274,6 +283,75 @@ def login():
 def logout():
     session.clear()
     return jsonify({"ok": True})
+
+
+@app.patch("/api/profile")
+def update_profile():
+    user_id = current_user_id()
+    if not user_id:
+        return jsonify({"error": "Сначала войдите в аккаунт"}), 401
+    payload = request.get_json(force=True)
+    username = (payload.get("username") or "").strip()
+    email = (payload.get("email") or "").strip()
+    if len(username) < 3:
+        return jsonify({"error": "Логин должен быть не короче 3 символов"}), 400
+    if email and ("@" not in email or len(email) > 160):
+        return jsonify({"error": "Проверьте адрес электронной почты"}), 400
+
+    with get_connection() as connection:
+        exists = connection.execute(
+            "SELECT id FROM users WHERE lower(username) = lower(?) AND id != ?",
+            (username, user_id),
+        ).fetchone()
+        if exists:
+            return jsonify({"error": "Такой логин уже занят"}), 409
+        connection.execute(
+            "UPDATE users SET username = ?, email = ? WHERE id = ?",
+            (username, email, user_id),
+        )
+        connection.commit()
+        user = get_user(connection, user_id)
+        return jsonify({"user": public_user(user)})
+
+
+@app.patch("/api/profile/password")
+def update_password():
+    user_id = current_user_id()
+    if not user_id:
+        return jsonify({"error": "Сначала войдите в аккаунт"}), 401
+    payload = request.get_json(force=True)
+    current_password = payload.get("currentPassword") or ""
+    new_password = payload.get("newPassword") or ""
+    if len(new_password) < 4:
+        return jsonify({"error": "Новый пароль должен быть не короче 4 символов"}), 400
+
+    with get_connection() as connection:
+        user = connection.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+        if not user or not check_password_hash(user["password_hash"], current_password):
+            return jsonify({"error": "Текущий пароль указан неверно"}), 401
+        connection.execute(
+            "UPDATE users SET password_hash = ? WHERE id = ?",
+            (generate_password_hash(new_password), user_id),
+        )
+        connection.commit()
+        return jsonify({"ok": True, "message": "Пароль обновлен"})
+
+
+@app.delete("/api/profile")
+def delete_profile():
+    user_id = current_user_id()
+    if not user_id:
+        return jsonify({"error": "Сначала войдите в аккаунт"}), 401
+    payload = request.get_json(silent=True) or {}
+    current_password = payload.get("currentPassword") or ""
+    with get_connection() as connection:
+        user = connection.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+        if not user or not check_password_hash(user["password_hash"], current_password):
+            return jsonify({"error": "Введите текущий пароль для удаления аккаунта"}), 401
+        connection.execute("DELETE FROM users WHERE id = ?", (user_id,))
+        connection.commit()
+    session.clear()
+    return jsonify({"ok": True, "message": "Аккаунт удален"})
 
 
 @app.get("/api/session")
@@ -436,9 +514,13 @@ def admin_movie_requests():
         status = (request.args.get("status") or "").strip()
         params = []
         where = ""
-        if status:
+        if status == "all":
+            where = ""
+        elif status:
             where = "WHERE mr.status = ?"
             params.append(status)
+        else:
+            where = "WHERE mr.status IN ('new', 'reviewing')"
         rows = connection.execute(
             f"""
             SELECT mr.*, u.username, m.title AS added_movie_title
@@ -492,13 +574,36 @@ def admin_update_movie_request(request_id):
 
 @app.delete("/api/admin/requests/<int:request_id>")
 def admin_delete_movie_request(request_id):
+    payload = request.get_json(silent=True) or {}
+    reason = (payload.get("reason") or "").strip()
+    if len(reason) < 3:
+        return jsonify({"error": "Укажите причину отклонения заявки"}), 400
+    if len(reason) > 700:
+        return jsonify({"error": "Причина слишком длинная"}), 400
     with get_connection() as connection:
         _, error = require_admin(connection)
         if error:
             return error
-        connection.execute("DELETE FROM movie_requests WHERE id = ?", (request_id,))
+        connection.execute(
+            """
+            UPDATE movie_requests
+            SET status = 'rejected', admin_note = ?, resolved_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+            """,
+            (reason, request_id),
+        )
         connection.commit()
-        return jsonify({"ok": True})
+        row = connection.execute(
+            """
+            SELECT mr.*, u.username, m.title AS added_movie_title
+            FROM movie_requests mr
+            LEFT JOIN users u ON u.id = mr.user_id
+            LEFT JOIN movies m ON m.id = mr.added_movie_id
+            WHERE mr.id = ?
+            """,
+            (request_id,),
+        ).fetchone()
+        return jsonify({"ok": True, "request": movie_request_payload(row)})
 
 
 @app.get("/api/admin/tmdb/search")

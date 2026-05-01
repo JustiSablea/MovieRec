@@ -3,6 +3,8 @@ const API = {
   register: "/api/register",
   login: "/api/login",
   logout: "/api/logout",
+  profile: "/api/profile",
+  profilePassword: "/api/profile/password",
   movies: "/api/movies",
   ratings: "/api/ratings",
   recommendations: "/api/recommendations",
@@ -131,6 +133,14 @@ function cacheElements() {
   els.profileRatedMovies = document.querySelector("#profileRatedMovies");
   els.profileRequests = document.querySelector("#profileRequests");
   els.refreshProfileRequests = document.querySelector("#refreshProfileRequests");
+  els.profileSettingsForm = document.querySelector("#profileSettingsForm");
+  els.profileNameInput = document.querySelector("#profileNameInput");
+  els.profileEmailInput = document.querySelector("#profileEmailInput");
+  els.profilePasswordForm = document.querySelector("#profilePasswordForm");
+  els.profileCurrentPassword = document.querySelector("#profileCurrentPassword");
+  els.profileNewPassword = document.querySelector("#profileNewPassword");
+  els.deleteAccountForm = document.querySelector("#deleteAccountForm");
+  els.deleteAccountPassword = document.querySelector("#deleteAccountPassword");
   els.movieModal = document.querySelector("#movieModal");
   els.modalPoster = document.querySelector("#modalPoster");
   els.modalRating = document.querySelector("#modalRating");
@@ -292,6 +302,9 @@ function wireEvents() {
   });
   els.movieRequestForm.addEventListener("submit", handleMovieRequest);
   els.refreshProfileRequests?.addEventListener("click", renderProfileRequests);
+  els.profileSettingsForm?.addEventListener("submit", handleProfileSettings);
+  els.profilePasswordForm?.addEventListener("submit", handleProfilePassword);
+  els.deleteAccountForm?.addEventListener("submit", handleDeleteAccount);
   els.refreshAdminRequests?.addEventListener("click", renderAdminRequests);
   els.adminRequests?.addEventListener("click", handleAdminRequestClick);
   els.adminTmdbSearch?.addEventListener("click", renderAdminTmdbSearch);
@@ -480,6 +493,8 @@ function renderProfile() {
         : "Оценки, заявки и поддержка сохраняются в вашем аккаунте."
       : "Войдите, чтобы видеть оценки, заявки и историю обращений.";
     els.profileRatingCount.textContent = String(state.profile.length);
+    if (els.profileNameInput) els.profileNameInput.value = state.user?.username || "";
+    if (els.profileEmailInput) els.profileEmailInput.value = state.user?.email || "";
   }
   renderProfileRatedMovies();
   if (!state.user) {
@@ -953,6 +968,61 @@ async function renderProfileRequests() {
     : '<div class="empty-state">Заявок пока нет</div>';
 }
 
+async function handleProfileSettings(event) {
+  event.preventDefault();
+  if (!state.user) {
+    openAuth("login");
+    return;
+  }
+  const payload = await api(API.profile, {
+    method: "PATCH",
+    body: JSON.stringify({
+      username: els.profileNameInput.value.trim(),
+      email: els.profileEmailInput.value.trim(),
+    }),
+  });
+  state.user = payload.user;
+  renderAuthState();
+  renderProfile();
+  showToast("Профиль обновлен");
+}
+
+async function handleProfilePassword(event) {
+  event.preventDefault();
+  if (!state.user) {
+    openAuth("login");
+    return;
+  }
+  await api(API.profilePassword, {
+    method: "PATCH",
+    body: JSON.stringify({
+      currentPassword: els.profileCurrentPassword.value,
+      newPassword: els.profileNewPassword.value,
+    }),
+  });
+  els.profilePasswordForm.reset();
+  showToast("Пароль обновлен");
+}
+
+async function handleDeleteAccount(event) {
+  event.preventDefault();
+  if (!state.user) return;
+  const confirmed = window.confirm("Удалить аккаунт? Оценки будут удалены, а восстановить профиль нельзя.");
+  if (!confirmed) return;
+  await api(API.profile, {
+    method: "DELETE",
+    body: JSON.stringify({ currentPassword: els.deleteAccountPassword.value }),
+  });
+  state.user = null;
+  state.profile = [];
+  state.profileRequests = [];
+  state.activeSupportThreadId = null;
+  resetSupportChat();
+  await renderAll();
+  showScreen("recommendations");
+  showToast("Аккаунт удален");
+}
+
 async function renderAdminRequests() {
   if (!state.user?.isAdmin || !els.adminRequests) return;
   const payload = await api(API.adminRequests);
@@ -999,8 +1069,19 @@ async function handleAdminRequestClick(event) {
     return;
   }
   if (action === "delete") {
-    if (!window.confirm("Удалить заявку из очереди?")) return;
-    await api(`${API.adminRequests}/${requestId}`, { method: "DELETE" });
+    const reason = window.prompt(
+      "Почему заявка удаляется из очереди?",
+      "Фильм не подходит для базы или не найден в TMDb.",
+    );
+    if (reason === null) return;
+    if (reason.trim().length < 3) {
+      showToast("Укажите причину отклонения");
+      return;
+    }
+    await api(`${API.adminRequests}/${requestId}`, {
+      method: "DELETE",
+      body: JSON.stringify({ reason: reason.trim() }),
+    });
     await renderAdminRequests();
     await renderProfileRequests();
     return;

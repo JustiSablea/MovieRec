@@ -183,7 +183,7 @@
         </section>
 
         <section class="screen" id="semanticScreen" data-screen="semantic" aria-labelledby="semanticTitle">
-          <div class="content-narrow">
+          <div class="content-narrow semantic-content">
             <div class="section-kicker">Нейропоиск</div>
             <h1 id="semanticTitle">Найти фильм по описанию</h1>
             <div class="semantic-layout">
@@ -193,7 +193,7 @@
                     <input id="semanticInput" type="text" placeholder="Фильм про сны и ограбление" autocomplete="off" />
                     <button class="outline-button" id="semanticSearchButton" type="button">Найти</button>
                   </div>
-                  <div id="semanticResults" class="compact-grid semantic-results"></div>
+                  <div id="semanticResults" class="semantic-results"></div>
                 </div>
               </div>
               <aside class="semantic-side">
@@ -249,6 +249,49 @@
                 <div id="profileRequests" class="profile-list"></div>
               </section>
             </div>
+            <section class="profile-panel account-settings-panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Настройки аккаунта</h2>
+                  <p>Логин, почта и безопасность профиля.</p>
+                </div>
+              </div>
+              <div class="account-settings-grid">
+                <form id="profileSettingsForm" class="settings-form">
+                  <h3>Данные профиля</h3>
+                  <label>
+                    <span>Логин</span>
+                    <input id="profileNameInput" type="text" minlength="3" maxlength="60" autocomplete="username" />
+                  </label>
+                  <label>
+                    <span>Почта</span>
+                    <input id="profileEmailInput" type="email" maxlength="160" autocomplete="email" placeholder="name@example.com" />
+                  </label>
+                  <button class="outline-button" type="submit">Сохранить</button>
+                </form>
+                <form id="profilePasswordForm" class="settings-form">
+                  <h3>Смена пароля</h3>
+                  <label>
+                    <span>Текущий пароль</span>
+                    <input id="profileCurrentPassword" type="password" autocomplete="current-password" />
+                  </label>
+                  <label>
+                    <span>Новый пароль</span>
+                    <input id="profileNewPassword" type="password" minlength="4" autocomplete="new-password" />
+                  </label>
+                  <button class="outline-button" type="submit">Обновить пароль</button>
+                </form>
+                <form id="deleteAccountForm" class="settings-form danger-zone">
+                  <h3>Удаление аккаунта</h3>
+                  <p>Удаление уберет аккаунт и оценки. Заявки и сообщения останутся в истории без привязки к пользователю.</p>
+                  <label>
+                    <span>Текущий пароль</span>
+                    <input id="deleteAccountPassword" type="password" autocomplete="current-password" />
+                  </label>
+                  <button class="ghost-button danger-button" type="submit">Удалить аккаунт</button>
+                </form>
+              </div>
+            </section>
             <form id="movieRequestForm" class="request-panel request-panel-profile">
               <div>
                 <h2>Не нашли фильм?</h2>
