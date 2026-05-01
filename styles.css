@@ -974,6 +974,14 @@ button {
   font-size: 18px;
 }
 
+.request-panel p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
 .request-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 120px;
@@ -984,6 +992,113 @@ button {
   min-height: 92px;
   padding-top: 11px;
   resize: vertical;
+}
+
+.profile-page {
+  max-width: 1120px;
+}
+
+.profile-dashboard,
+.profile-sections,
+.admin-summary {
+  display: grid;
+  gap: 16px;
+}
+
+.profile-dashboard {
+  grid-template-columns: 1.2fr repeat(2, 0.7fr);
+  margin-top: 22px;
+}
+
+.profile-sections {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  margin-top: 20px;
+}
+
+.profile-card,
+.profile-panel {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(24, 24, 27, 0.92);
+  box-shadow: var(--shadow);
+}
+
+.profile-card {
+  display: grid;
+  gap: 7px;
+  padding: 18px;
+}
+
+.profile-card span,
+.profile-list-item span,
+.profile-list-item small {
+  color: var(--muted-strong);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.profile-card strong {
+  color: #fff;
+  font-size: 26px;
+  line-height: 1.05;
+}
+
+.profile-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.profile-panel {
+  display: grid;
+  gap: 14px;
+  min-height: 280px;
+  padding: 18px;
+}
+
+.profile-list {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.profile-list-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.profile-list-item strong {
+  display: block;
+  color: #fff;
+  font-size: 14px;
+}
+
+.profile-list-item.request-status {
+  grid-template-columns: minmax(0, 1fr);
+  border-left: 3px solid rgba(211, 62, 213, 0.55);
+}
+
+.profile-list-item.request-status.added {
+  border-left-color: #22c55e;
+}
+
+.profile-list-item.request-status.rejected {
+  border-left-color: #ef4444;
+}
+
+.request-panel-profile {
+  margin-top: 20px;
+  background:
+    linear-gradient(135deg, rgba(211, 62, 213, 0.12), rgba(240, 15, 36, 0.08)),
+    rgba(24, 24, 27, 0.92);
 }
 
 .starter-row > span {
@@ -1026,11 +1141,20 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 14px;
 }
 
 .panel-heading h2 {
   margin: 0;
   font-size: 18px;
+}
+
+.panel-heading p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
 }
 
 .panel-heading span {
@@ -1496,14 +1620,46 @@ button {
 }
 
 .admin-page {
-  max-width: 1180px;
+  max-width: 1240px;
+}
+
+.admin-summary {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 20px 0;
+}
+
+.admin-summary article {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(24, 24, 27, 0.9);
+}
+
+.admin-summary span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.admin-summary strong {
+  color: #fff;
+  font-size: 28px;
 }
 
 .admin-grid,
 .admin-support-layout {
   display: grid;
   gap: 20px;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+}
+
+.admin-grid {
+  grid-template-columns: minmax(330px, 0.8fr) minmax(0, 1.2fr);
+}
+
+.admin-support-layout {
+  grid-template-columns: minmax(260px, 0.75fr) minmax(0, 1.25fr);
 }
 
 .admin-panel {
@@ -1522,7 +1678,7 @@ button {
 
 .admin-list {
   display: grid;
-  max-height: 560px;
+  max-height: 480px;
   gap: 10px;
   overflow: auto;
   padding-right: 2px;
@@ -1540,6 +1696,14 @@ button {
   display: grid;
   gap: 10px;
   padding: 14px;
+}
+
+.admin-request.new {
+  border-color: rgba(211, 62, 213, 0.38);
+}
+
+.admin-request.reviewing {
+  border-color: rgba(245, 158, 11, 0.38);
 }
 
 .admin-request.added {
@@ -1599,18 +1763,21 @@ button {
 .admin-tmdb-results {
   display: grid;
   gap: 12px;
+  max-height: 520px;
+  overflow: auto;
+  padding-right: 4px;
 }
 
 .admin-tmdb-card {
   display: grid;
-  grid-template-columns: 78px minmax(0, 1fr);
+  grid-template-columns: 92px minmax(0, 1fr);
   gap: 12px;
-  padding: 10px;
+  padding: 12px;
 }
 
 .admin-tmdb-poster {
   display: grid;
-  min-height: 112px;
+  min-height: 138px;
   place-items: center;
   overflow: hidden;
   border-radius: 9px;
@@ -1643,7 +1810,7 @@ button {
 
 .admin-chat {
   display: grid;
-  min-height: 440px;
+  min-height: 420px;
   grid-template-rows: minmax(0, 1fr) auto;
   gap: 12px;
 }
@@ -1653,6 +1820,10 @@ button {
   z-index: 110;
   right: 22px;
   bottom: 22px;
+}
+
+.support-widget.is-hidden {
+  display: none;
 }
 
 .support-toggle {
@@ -1681,13 +1852,56 @@ button {
   border-radius: 16px;
   background: #18181d;
   box-shadow: var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(18px) scale(0.96);
+  transform-origin: bottom right;
+}
+
+.support-panel.is-open {
+  animation: supportPanelIn 180ms ease forwards;
+  pointer-events: auto;
+}
+
+.support-panel.is-closing {
+  animation: supportPanelOut 160ms ease forwards;
+}
+
+@keyframes supportPanelIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes supportPanelOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
 }
 
 .support-head {
+  position: relative;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
+  padding-right: 44px;
+}
+
+.support-head .modal-close {
+  top: 0;
+  right: 0;
+  color: #fff;
 }
 
 .support-head strong {
@@ -1810,12 +2024,15 @@ button {
   }
 
   .profile-grid,
+  .profile-dashboard,
+  .profile-sections,
   .info-grid,
   .workflow-strip,
   .detail-layout,
   .explain-grid,
   .movie-modal,
   .admin-grid,
+  .admin-summary,
   .admin-support-layout {
     grid-template-columns: 1fr;
   }

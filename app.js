@@ -65,6 +65,7 @@ const state = {
   activeMovie: null,
   activeMovieRequestId: null,
   activeSupportThreadId: null,
+  profileRequests: [],
   authMode: "login",
   catalogPage: 1,
   catalogCategory: "all",
@@ -122,6 +123,13 @@ function cacheElements() {
   els.requestTitle = document.querySelector("#requestTitle");
   els.requestYear = document.querySelector("#requestYear");
   els.requestNote = document.querySelector("#requestNote");
+  els.profileUserName = document.querySelector("#profileUserName");
+  els.profileUserHint = document.querySelector("#profileUserHint");
+  els.profileRatingCount = document.querySelector("#profileRatingCount");
+  els.profileRequestCount = document.querySelector("#profileRequestCount");
+  els.profileRatedMovies = document.querySelector("#profileRatedMovies");
+  els.profileRequests = document.querySelector("#profileRequests");
+  els.refreshProfileRequests = document.querySelector("#refreshProfileRequests");
   els.movieModal = document.querySelector("#movieModal");
   els.modalPoster = document.querySelector("#modalPoster");
   els.modalRating = document.querySelector("#modalRating");
@@ -168,7 +176,11 @@ function cacheElements() {
   els.adminTmdbQuery = document.querySelector("#adminTmdbQuery");
   els.adminTmdbYear = document.querySelector("#adminTmdbYear");
   els.adminTmdbSearch = document.querySelector("#adminTmdbSearch");
+  els.adminTmdbHint = document.querySelector("#adminTmdbHint");
   els.adminTmdbResults = document.querySelector("#adminTmdbResults");
+  els.adminNewRequests = document.querySelector("#adminNewRequests");
+  els.adminReviewingRequests = document.querySelector("#adminReviewingRequests");
+  els.adminOpenThreads = document.querySelector("#adminOpenThreads");
   els.refreshAdminSupport = document.querySelector("#refreshAdminSupport");
   els.adminSupportThreads = document.querySelector("#adminSupportThreads");
   els.adminSupportMessages = document.querySelector("#adminSupportMessages");
@@ -272,6 +284,7 @@ function wireEvents() {
     if (tmdbCard) window.open(`https://www.themoviedb.org/movie/${tmdbCard.dataset.tmdbId}`, "_blank", "noopener");
   });
   els.movieRequestForm.addEventListener("submit", handleMovieRequest);
+  els.refreshProfileRequests?.addEventListener("click", renderProfileRequests);
   els.refreshAdminRequests?.addEventListener("click", renderAdminRequests);
   els.adminRequests?.addEventListener("click", handleAdminRequestClick);
   els.adminTmdbSearch?.addEventListener("click", renderAdminTmdbSearch);
@@ -282,8 +295,10 @@ function wireEvents() {
   els.refreshAdminSupport?.addEventListener("click", renderAdminSupport);
   els.adminSupportThreads?.addEventListener("click", handleAdminSupportThreadClick);
   els.adminSupportForm?.addEventListener("submit", handleAdminSupportReply);
-  els.supportToggle?.addEventListener("click", openSupportChat);
-  els.supportClose?.addEventListener("click", closeSupportChat);
+  els.supportToggle?.addEventListener("click", toggleSupportChat);
+  els.supportWidget?.addEventListener("click", (event) => {
+    if (event.target.closest("#supportClose")) closeSupportChat();
+  });
   els.supportForm?.addEventListener("submit", handleSupportMessage);
   els.resetProfile.addEventListener("click", async () => {
     if (!state.profile.length) return;
@@ -332,6 +347,10 @@ function wireEvents() {
     const removeButton = event.target.closest("[data-remove-id]");
     if (removeButton) await removeFromProfile(Number(removeButton.dataset.removeId));
   });
+  els.profileRatedMovies?.addEventListener("click", async (event) => {
+    const removeButton = event.target.closest("[data-remove-id]");
+    if (removeButton) await removeFromProfile(Number(removeButton.dataset.removeId));
+  });
 
   els.closeMovieModal.addEventListener("click", closeMovieModal);
   els.movieModal.addEventListener("click", (event) => {
@@ -346,7 +365,9 @@ function wireEvents() {
       await api(API.logout, { method: "POST" });
       state.user = null;
       state.profile = [];
+      state.profileRequests = [];
       state.activeSupportThreadId = null;
+      resetSupportChat();
       await renderAll();
       showToast("Вы вышли из аккаунта");
       return;
@@ -401,6 +422,7 @@ async function renderAll() {
   await renderCatalog();
   await renderStarterMovies();
   renderProfile();
+  await renderProfileRequests();
   await renderRecommendations();
   await renderMetrics();
 }
@@ -443,6 +465,16 @@ async function renderStarterMovies() {
 
 function renderProfile() {
   els.ratedCount.textContent = String(state.profile.length);
+  if (els.profileUserName) {
+    els.profileUserName.textContent = state.user?.username || "Гость";
+    els.profileUserHint.textContent = state.user
+      ? state.user.isAdmin
+        ? "У вас есть доступ к панели администратора."
+        : "Оценки, заявки и поддержка сохраняются в вашем аккаунте."
+      : "Войдите, чтобы видеть оценки, заявки и историю обращений.";
+    els.profileRatingCount.textContent = String(state.profile.length);
+  }
+  renderProfileRatedMovies();
   if (!state.user) {
     els.ratedList.innerHTML = '<div class="empty-state">Войдите или зарегистрируйтесь, чтобы сохранить оценки в базе</div>';
     return;
@@ -467,6 +499,29 @@ function renderProfile() {
       `,
     )
     .join("");
+}
+
+function renderProfileRatedMovies() {
+  if (!els.profileRatedMovies) return;
+  if (!state.user) {
+    els.profileRatedMovies.innerHTML = '<div class="empty-state">Войдите, чтобы открыть историю оценок</div>';
+    return;
+  }
+  els.profileRatedMovies.innerHTML = state.profile.length
+    ? state.profile
+        .map(
+          (entry) => `
+            <div class="profile-list-item">
+              <div>
+                <strong>${escapeHtml(formatRatingTitle(entry))}</strong>
+                <span>Ваша оценка: ${Number(entry.rating).toFixed(1)}</span>
+              </div>
+              <button class="outline-button" type="button" data-remove-id="${entry.movie_id}">Убрать</button>
+            </div>
+          `,
+        )
+        .join("")
+    : '<div class="empty-state">Вы пока не оценивали фильмы</div>';
 }
 
 async function renderRecommendations() {
@@ -844,6 +899,11 @@ function renderQueryAnalysis(analysis = {}) {
 
 async function handleMovieRequest(event) {
   event.preventDefault();
+  if (!state.user) {
+    openAuth("register");
+    showToast("Войдите, чтобы видеть статус заявки в личном кабинете");
+    return;
+  }
   const payload = await api(API.movieRequests, {
     method: "POST",
     body: JSON.stringify({
@@ -854,13 +914,44 @@ async function handleMovieRequest(event) {
   });
   showToast(payload.message || "Заявка сохранена");
   els.movieRequestForm.reset();
+  await renderProfileRequests();
   if (state.user?.isAdmin) await renderAdminRequests();
+}
+
+async function renderProfileRequests() {
+  if (!els.profileRequests) return;
+  if (!state.user) {
+    state.profileRequests = [];
+    els.profileRequestCount.textContent = "0";
+    els.profileRequests.innerHTML = '<div class="empty-state">После входа здесь появятся ваши заявки</div>';
+    return;
+  }
+  const payload = await api(API.movieRequests);
+  state.profileRequests = payload.requests || [];
+  els.profileRequestCount.textContent = String(state.profileRequests.length);
+  els.profileRequests.innerHTML = state.profileRequests.length
+    ? state.profileRequests
+        .map(
+          (item) => `
+            <div class="profile-list-item request-status ${item.status}">
+              <div>
+                <strong>${escapeHtml(item.title)}${item.year ? ` (${item.year})` : ""}</strong>
+                <span>${escapeHtml(statusLabel(item.status))}${item.addedMovieTitle ? ` · добавлено: ${escapeHtml(item.addedMovieTitle)}` : ""}</span>
+              </div>
+              <small>${escapeHtml(item.adminNote || item.note || "Ожидает проверки")}</small>
+            </div>
+          `,
+        )
+        .join("")
+    : '<div class="empty-state">Заявок пока нет</div>';
 }
 
 async function renderAdminRequests() {
   if (!state.user?.isAdmin || !els.adminRequests) return;
   const payload = await api(API.adminRequests);
   const requests = payload.requests || [];
+  if (els.adminNewRequests) els.adminNewRequests.textContent = String(requests.filter((item) => item.status === "new").length);
+  if (els.adminReviewingRequests) els.adminReviewingRequests.textContent = String(requests.filter((item) => item.status === "reviewing").length);
   els.adminRequests.innerHTML = requests.length
     ? requests
         .map(
@@ -868,7 +959,7 @@ async function renderAdminRequests() {
             <article class="admin-request ${item.status}" data-request-id="${item.id}" data-title="${escapeHtml(item.title)}" data-year="${item.year || ""}">
               <div>
                 <strong>${escapeHtml(item.title)}${item.year ? ` (${item.year})` : ""}</strong>
-                <span>${escapeHtml(item.username)} · ${statusLabel(item.status)}</span>
+                <span>${escapeHtml(item.username)} · ${statusLabel(item.status)} · ${formatDate(item.createdAt)}</span>
               </div>
               <p>${escapeHtml(item.note || "Комментарий не указан")}</p>
               ${item.addedMovieTitle ? `<small>Добавлено: ${escapeHtml(item.addedMovieTitle)}</small>` : ""}
@@ -894,6 +985,7 @@ async function handleAdminRequestClick(event) {
     state.activeMovieRequestId = requestId;
     els.adminTmdbQuery.value = card.dataset.title || "";
     els.adminTmdbYear.value = card.dataset.year || "";
+    if (els.adminTmdbHint) els.adminTmdbHint.textContent = `Поиск для заявки: ${card.dataset.title || "фильм"}`;
     await renderAdminTmdbSearch();
     els.adminTmdbQuery.scrollIntoView({ block: "center" });
     return;
@@ -947,14 +1039,38 @@ async function handleAdminTmdbClick(event) {
   await renderRecommendations();
 }
 
+async function toggleSupportChat() {
+  if (!els.supportPanel.hidden && els.supportPanel.classList.contains("is-open")) {
+    closeSupportChat();
+    return;
+  }
+  await openSupportChat();
+}
+
 async function openSupportChat() {
   els.supportPanel.hidden = false;
+  els.supportPanel.classList.remove("is-closing");
+  requestAnimationFrame(() => els.supportPanel.classList.add("is-open"));
   await renderSupportThread();
   setTimeout(() => els.supportInput.focus(), 0);
 }
 
 function closeSupportChat() {
-  els.supportPanel.hidden = true;
+  els.supportPanel.classList.remove("is-open");
+  els.supportPanel.classList.add("is-closing");
+  clearTimeout(closeSupportChat.timer);
+  closeSupportChat.timer = setTimeout(() => {
+    els.supportPanel.hidden = true;
+    els.supportPanel.classList.remove("is-closing");
+  }, 180);
+}
+
+function resetSupportChat() {
+  if (els.supportMessages) els.supportMessages.innerHTML = "";
+  if (els.supportPanel) {
+    els.supportPanel.hidden = true;
+    els.supportPanel.classList.remove("is-open", "is-closing");
+  }
 }
 
 async function renderSupportThread() {
@@ -979,6 +1095,7 @@ async function renderAdminSupport() {
   if (!state.user?.isAdmin || !els.adminSupportThreads) return;
   const payload = await api(API.adminSupportThreads);
   const threads = payload.threads || [];
+  if (els.adminOpenThreads) els.adminOpenThreads.textContent = String(threads.filter((thread) => thread.status === "open").length);
   els.adminSupportThreads.innerHTML = threads.length
     ? threads
         .map(
@@ -986,7 +1103,7 @@ async function renderAdminSupport() {
             <button class="support-thread${state.activeSupportThreadId === thread.id ? " is-active" : ""}" type="button" data-thread-id="${thread.id}">
               <strong>${escapeHtml(thread.username)}</strong>
               <span>${escapeHtml(thread.lastMessage || "Сообщений пока нет")}</span>
-              <small>${statusLabel(thread.status)} · ${thread.messageCount || 0} сообщ.</small>
+              <small>${statusLabel(thread.status)} · ${thread.messageCount || 0} сообщ. · ${formatDate(thread.updatedAt)}</small>
             </button>
           `,
         )
@@ -1055,6 +1172,13 @@ function statusLabel(status) {
   }[status] || status;
 }
 
+function formatDate(value) {
+  if (!value) return "";
+  const date = new Date(String(value).replace(" ", "T"));
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit" });
+}
+
 function openAuth(mode) {
   state.authMode = mode;
   const isRegister = mode === "register";
@@ -1081,6 +1205,8 @@ async function handleAuthSubmit(event) {
   });
   state.user = payload.user;
   state.profile = payload.ratings || [];
+  state.profileRequests = [];
+  resetSupportChat();
   closeAuth();
   await renderAll();
   showToast(state.authMode === "register" ? "Аккаунт создан" : "Вход выполнен");
@@ -1102,7 +1228,7 @@ async function hydrateRoute() {
       return;
     }
   }
-  const route = ["home", "recommendations", "catalog", "semantic", "about", "contacts", "report", "admin"].includes(hashRoute)
+  const route = ["home", "recommendations", "catalog", "semantic", "profile", "about", "contacts", "report", "admin"].includes(hashRoute)
     ? hashRoute
     : "recommendations";
   showScreen(route, false);
@@ -1122,6 +1248,8 @@ function showScreen(route, pushHash = true) {
     link.classList.toggle("is-active", link.dataset.route === activeRoute);
   });
   if (pushHash) history.replaceState(null, "", `#${route}`);
+  if (els.supportWidget) els.supportWidget.classList.toggle("is-hidden", route === "admin");
+  if (route === "admin") closeSupportChat();
   if (route === "admin") {
     void renderAdminRequests();
     void renderAdminSupport();

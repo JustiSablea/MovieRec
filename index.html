@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MovieRec</title>
     <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%23151517"/><path d="M17 18h30v28H17zM17 26h30M26 18v8M38 18v8M28 32l10 6-10 6z" fill="none" stroke="%23d33ed5" stroke-width="4" stroke-linejoin="round"/></svg>' />
-    <link rel="stylesheet" href="styles.css?v=20260501-admin" />
+    <link rel="stylesheet" href="styles.css?v=20260501-profile" />
   </head>
   <body>
     <div class="app-shell">
@@ -25,6 +25,7 @@
           <button class="nav-link is-active" data-route="recommendations" type="button">Рекомендации</button>
           <button class="nav-link" data-route="catalog" type="button">Каталог</button>
           <button class="nav-link" data-route="semantic" type="button">Нейропоиск</button>
+          <button class="nav-link" data-route="profile" type="button">Кабинет</button>
           <button class="nav-link" data-route="about" type="button">О нас</button>
           <button class="nav-link" data-route="report" type="button">Метрики</button>
           <button class="nav-link" data-route="contacts" type="button">Контакты</button>
@@ -193,8 +194,51 @@
               </div>
               <div id="semanticResults" class="compact-grid semantic-results"></div>
             </div>
-            <form id="movieRequestForm" class="request-panel">
-              <h2>Фильма нет в выборке</h2>
+          </div>
+        </section>
+
+        <section class="screen" id="profileScreen" data-screen="profile" aria-labelledby="profileTitle">
+          <div class="content-narrow profile-page">
+            <div class="section-kicker">Личный кабинет</div>
+            <h1 id="profileTitle">Ваш MovieRec</h1>
+            <div class="profile-dashboard">
+              <article class="profile-card">
+                <span>Аккаунт</span>
+                <strong id="profileUserName">Гость</strong>
+                <p id="profileUserHint">Войдите, чтобы видеть оценки, заявки и историю обращений.</p>
+              </article>
+              <article class="profile-card">
+                <span>Оцененные фильмы</span>
+                <strong id="profileRatingCount">0</strong>
+                <p>Эти оценки формируют персональные рекомендации.</p>
+              </article>
+              <article class="profile-card">
+                <span>Заявки</span>
+                <strong id="profileRequestCount">0</strong>
+                <p>Статусы обновляются после проверки администратором.</p>
+              </article>
+            </div>
+            <div class="profile-sections">
+              <section class="profile-panel">
+                <div class="panel-heading">
+                  <h2>Ваши оценки</h2>
+                  <button class="outline-button" type="button" data-route="home">Изменить профиль</button>
+                </div>
+                <div id="profileRatedMovies" class="profile-list"></div>
+              </section>
+              <section class="profile-panel">
+                <div class="panel-heading">
+                  <h2>Заявки на добавление</h2>
+                  <button class="outline-button" id="refreshProfileRequests" type="button">Обновить</button>
+                </div>
+                <div id="profileRequests" class="profile-list"></div>
+              </section>
+            </div>
+            <form id="movieRequestForm" class="request-panel request-panel-profile">
+              <div>
+                <h2>Не нашли фильм?</h2>
+                <p>Отправьте заявку, а администратор проверит фильм в TMDb и добавит его в базу.</p>
+              </div>
               <div class="request-grid">
                 <input id="requestTitle" type="text" maxlength="120" placeholder="Название фильма" required />
                 <input id="requestYear" type="number" min="1888" max="2035" placeholder="Год" />
@@ -299,17 +343,28 @@
           <div class="content-narrow admin-page">
             <div class="section-kicker">Панель администратора</div>
             <h1 id="adminTitle">Заявки и поддержка</h1>
+            <div class="admin-summary">
+              <article><span>Новые заявки</span><strong id="adminNewRequests">0</strong></article>
+              <article><span>В работе</span><strong id="adminReviewingRequests">0</strong></article>
+              <article><span>Диалоги поддержки</span><strong id="adminOpenThreads">0</strong></article>
+            </div>
             <div class="admin-grid">
-              <section class="admin-panel">
+              <section class="admin-panel admin-queue-panel">
                 <div class="panel-heading">
-                  <h2>Заявки на фильмы</h2>
+                  <div>
+                    <h2>Очередь заявок</h2>
+                    <p>Выберите заявку, найдите фильм в TMDb и добавьте его в базу.</p>
+                  </div>
                   <button class="outline-button" id="refreshAdminRequests" type="button">Обновить</button>
                 </div>
                 <div id="adminRequests" class="admin-list"></div>
               </section>
-              <section class="admin-panel">
+              <section class="admin-panel admin-tmdb-panel">
                 <div class="panel-heading">
-                  <h2>Поиск в TMDb</h2>
+                  <div>
+                    <h2>Поиск в TMDb</h2>
+                    <p id="adminTmdbHint">Введите название вручную или нажмите “Найти TMDb” в заявке.</p>
+                  </div>
                 </div>
                 <div class="admin-search-row">
                   <input id="adminTmdbQuery" type="search" placeholder="Название фильма" autocomplete="off" />
@@ -321,7 +376,10 @@
             </div>
             <section class="admin-panel admin-support-panel">
               <div class="panel-heading">
-                <h2>Сообщения поддержки</h2>
+                <div>
+                  <h2>Сообщения поддержки</h2>
+                  <p>История обращений пользователей и быстрый ответ от имени поддержки.</p>
+                </div>
                 <button class="outline-button" id="refreshAdminSupport" type="button">Обновить</button>
               </div>
               <div class="admin-support-layout">
@@ -414,6 +472,6 @@
     </div>
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
-    <script src="app.js?v=20260501-admin"></script>
+    <script src="app.js?v=20260501-profile"></script>
   </body>
 </html>

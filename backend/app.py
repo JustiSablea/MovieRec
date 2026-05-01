@@ -406,6 +406,27 @@ def create_movie_request():
     return jsonify({"ok": True, "requestId": cursor.lastrowid, "message": "Заявка сохранена. Фильм можно добавить после проверки через TMDb/MovieLens."}), 201
 
 
+@app.get("/api/movie-requests")
+def user_movie_requests():
+    user_id = current_user_id()
+    if not user_id:
+        return jsonify({"requests": []})
+    with get_connection() as connection:
+        rows = connection.execute(
+            """
+            SELECT mr.*, u.username, m.title AS added_movie_title
+            FROM movie_requests mr
+            LEFT JOIN users u ON u.id = mr.user_id
+            LEFT JOIN movies m ON m.id = mr.added_movie_id
+            WHERE mr.user_id = ?
+            ORDER BY mr.created_at DESC
+            LIMIT 50
+            """,
+            (user_id,),
+        ).fetchall()
+        return jsonify({"requests": [movie_request_payload(row) for row in rows]})
+
+
 @app.get("/api/admin/requests")
 def admin_movie_requests():
     with get_connection() as connection:
@@ -685,17 +706,36 @@ def ensure_support_thread(connection):
             (user_id,),
         ).fetchone()
         if row:
+            ensure_support_welcome(connection, row["id"])
             return row["id"]
         cursor = connection.execute("INSERT INTO support_threads (user_id) VALUES (?)", (user_id,))
         connection.commit()
+        ensure_support_welcome(connection, cursor.lastrowid)
         return cursor.lastrowid
     thread_id = session.get("support_thread_id")
     if thread_id and connection.execute("SELECT id FROM support_threads WHERE id = ?", (thread_id,)).fetchone():
+        ensure_support_welcome(connection, thread_id)
         return thread_id
     cursor = connection.execute("INSERT INTO support_threads (guest_name) VALUES ('Гость')")
     connection.commit()
     session["support_thread_id"] = cursor.lastrowid
+    ensure_support_welcome(connection, cursor.lastrowid)
     return cursor.lastrowid
+
+
+def ensure_support_welcome(connection, thread_id):
+    exists = connection.execute("SELECT id FROM support_messages WHERE thread_id = ? LIMIT 1", (thread_id,)).fetchone()
+    if exists:
+        return
+    connection.execute(
+        """
+        INSERT INTO support_messages (thread_id, user_id, sender_role, body)
+        VALUES (?, NULL, 'admin', 'Здравствуйте! Столкнулись с проблемой или нужна помощь с рекомендациями? Напишите сюда, и мы подскажем.')
+        """,
+        (thread_id,),
+    )
+    connection.execute("UPDATE support_threads SET updated_at = CURRENT_TIMESTAMP WHERE id = ?", (thread_id,))
+    connection.commit()
 
 
 def support_thread_payload(connection, thread_id, row=None):
@@ -736,7 +776,7 @@ def support_messages(connection, thread_id):
         """,
         (thread_id,),
     ).fetchall()
-    return [
+    messages = [
         {
             "id": row["id"],
             "threadId": row["thread_id"],
@@ -747,6 +787,19 @@ def support_messages(connection, thread_id):
         }
         for row in rows
     ]
+    if not messages or messages[0]["senderRole"] != "admin":
+        messages.insert(
+            0,
+            {
+                "id": 0,
+                "threadId": thread_id,
+                "senderRole": "admin",
+                "username": "Поддержка",
+                "body": "Здравствуйте! Столкнулись с проблемой или нужна помощь с рекомендациями? Напишите сюда, и мы подскажем.",
+                "createdAt": "",
+            },
+        )
+    return messages
 
 
 @app.get("/api/movies/<int:movie_id>")
