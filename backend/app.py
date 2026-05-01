@@ -759,6 +759,12 @@ def facet_match_score(movie, terms_by_group):
     score = 0.0
     reasons = []
     score += title_match_score(terms_by_group["possible_titles"], title_text + " " + tag_text, 0.8, reasons)
+    score += entity_phrase_score(
+        terms_by_group["objects"] + terms_by_group["visual"],
+        title_text + " " + tag_text,
+        0.7,
+        reasons,
+    )
     score += group_match_score(terms_by_group["genres"], genre_text, 0.22, reasons, "жанр")
     score += group_match_score(terms_by_group["objects"], full_text, 0.22, reasons, "объект")
     score += group_match_score(terms_by_group["english_terms"], full_text, 0.2, reasons, "англ. тег")
@@ -786,9 +792,24 @@ def title_match_score(terms, text, weight, reasons):
         if not tokens:
             continue
         matches = sum(1 for token in tokens if token in text_tokens)
-        if matches == len(tokens) or (len(tokens) >= 2 and matches >= len(tokens) - 1):
+        if matches == len(tokens):
             score += weight
             reason = f"название: {term}"
+            if reason not in reasons:
+                reasons.append(reason)
+    return min(score, weight * 2)
+
+
+def entity_phrase_score(terms, text, weight, reasons):
+    score = 0.0
+    text_tokens = set(text.split())
+    for term in terms:
+        tokens = [token for token in normalize_semantic_text(term).split() if token not in HINT_STOP_TOKENS]
+        if len(tokens) < 2:
+            continue
+        if all(token in text_tokens for token in tokens):
+            score += weight
+            reason = f"точный объект: {term}"
             if reason not in reasons:
                 reasons.append(reason)
     return min(score, weight * 2)
