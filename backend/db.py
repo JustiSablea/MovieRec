@@ -102,12 +102,47 @@ def init_db():
                 year INTEGER,
                 note TEXT NOT NULL DEFAULT '',
                 status TEXT NOT NULL DEFAULT 'new',
+                admin_note TEXT NOT NULL DEFAULT '',
+                added_movie_id INTEGER,
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                resolved_at TEXT,
+                FOREIGN KEY (added_movie_id) REFERENCES movies(id) ON DELETE SET NULL,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS support_threads (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                guest_name TEXT NOT NULL DEFAULT '',
+                subject TEXT NOT NULL DEFAULT 'Поддержка MovieRec',
+                status TEXT NOT NULL DEFAULT 'open',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS support_messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                thread_id INTEGER NOT NULL,
+                user_id INTEGER,
+                sender_role TEXT NOT NULL,
+                body TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (thread_id) REFERENCES support_threads(id) ON DELETE CASCADE,
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
             );
             """
         )
+        ensure_column(connection, "movie_requests", "admin_note", "TEXT NOT NULL DEFAULT ''")
+        ensure_column(connection, "movie_requests", "added_movie_id", "INTEGER")
+        ensure_column(connection, "movie_requests", "resolved_at", "TEXT")
         import_movies(connection)
+
+
+def ensure_column(connection, table, column, definition):
+    columns = {row["name"] for row in connection.execute(f"PRAGMA table_info({table})").fetchall()}
+    if column not in columns:
+        connection.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
 
 
 def import_movies(connection):
@@ -116,7 +151,11 @@ def import_movies(connection):
 
     data = json.loads(MOVIES_JSON.read_text(encoding="utf-8"))
     imported_ids = {movie["id"] for movie in data["movies"]}
-    movie_count = connection.execute("SELECT COUNT(*) FROM movies").fetchone()[0]
+    placeholders = ",".join("?" for _ in imported_ids)
+    movie_count = connection.execute(
+        f"SELECT COUNT(*) FROM movies WHERE id IN ({placeholders})",
+        tuple(imported_ids),
+    ).fetchone()[0]
     if movie_count == data.get("movieCount"):
         return
 
@@ -180,8 +219,7 @@ def import_movies(connection):
             ),
         )
     if imported_ids:
-        placeholders = ",".join("?" for _ in imported_ids)
-        connection.execute(f"DELETE FROM movies WHERE id NOT IN ({placeholders})", tuple(imported_ids))
+        connection.execute(f"DELETE FROM movies WHERE id NOT IN ({placeholders}) AND id < 10000000", tuple(imported_ids))
     for movie in data["movies"]:
         for similar in movie.get("similar", []):
             if similar["id"] not in imported_ids:

@@ -9,6 +9,12 @@ const API = {
   semantic: "/api/search/semantic",
   genres: "/api/genres",
   movieRequests: "/api/movie-requests",
+  adminRequests: "/api/admin/requests",
+  adminTmdbSearch: "/api/admin/tmdb/search",
+  adminAddTmdbMovie: "/api/admin/movies/from-tmdb",
+  supportThread: "/api/support/thread",
+  supportMessages: "/api/support/messages",
+  adminSupportThreads: "/api/admin/support/threads",
 };
 
 const ALPHA_KEY = "movierec.alpha";
@@ -57,6 +63,8 @@ const state = {
   alpha: Math.min(Number(localStorage.getItem(ALPHA_KEY)) || 0.65, 0.75),
   selectedPreferenceMovie: null,
   activeMovie: null,
+  activeMovieRequestId: null,
+  activeSupportThreadId: null,
   authMode: "login",
   catalogPage: 1,
   catalogCategory: "all",
@@ -154,6 +162,25 @@ function cacheElements() {
   els.explainNeighbors = document.querySelector("#explainNeighbors");
   els.metricsGrid = document.querySelector("#metricsGrid");
   els.metricsNote = document.querySelector("#metricsNote");
+  els.adminNav = document.querySelector(".admin-nav");
+  els.adminRequests = document.querySelector("#adminRequests");
+  els.refreshAdminRequests = document.querySelector("#refreshAdminRequests");
+  els.adminTmdbQuery = document.querySelector("#adminTmdbQuery");
+  els.adminTmdbYear = document.querySelector("#adminTmdbYear");
+  els.adminTmdbSearch = document.querySelector("#adminTmdbSearch");
+  els.adminTmdbResults = document.querySelector("#adminTmdbResults");
+  els.refreshAdminSupport = document.querySelector("#refreshAdminSupport");
+  els.adminSupportThreads = document.querySelector("#adminSupportThreads");
+  els.adminSupportMessages = document.querySelector("#adminSupportMessages");
+  els.adminSupportForm = document.querySelector("#adminSupportForm");
+  els.adminSupportInput = document.querySelector("#adminSupportInput");
+  els.supportWidget = document.querySelector("#supportWidget");
+  els.supportToggle = document.querySelector("#supportToggle");
+  els.supportPanel = document.querySelector("#supportPanel");
+  els.supportClose = document.querySelector("#supportClose");
+  els.supportMessages = document.querySelector("#supportMessages");
+  els.supportForm = document.querySelector("#supportForm");
+  els.supportInput = document.querySelector("#supportInput");
 }
 
 function wireEvents() {
@@ -245,6 +272,19 @@ function wireEvents() {
     if (tmdbCard) window.open(`https://www.themoviedb.org/movie/${tmdbCard.dataset.tmdbId}`, "_blank", "noopener");
   });
   els.movieRequestForm.addEventListener("submit", handleMovieRequest);
+  els.refreshAdminRequests?.addEventListener("click", renderAdminRequests);
+  els.adminRequests?.addEventListener("click", handleAdminRequestClick);
+  els.adminTmdbSearch?.addEventListener("click", renderAdminTmdbSearch);
+  els.adminTmdbQuery?.addEventListener("keydown", async (event) => {
+    if (event.key === "Enter") await renderAdminTmdbSearch();
+  });
+  els.adminTmdbResults?.addEventListener("click", handleAdminTmdbClick);
+  els.refreshAdminSupport?.addEventListener("click", renderAdminSupport);
+  els.adminSupportThreads?.addEventListener("click", handleAdminSupportThreadClick);
+  els.adminSupportForm?.addEventListener("submit", handleAdminSupportReply);
+  els.supportToggle?.addEventListener("click", openSupportChat);
+  els.supportClose?.addEventListener("click", closeSupportChat);
+  els.supportForm?.addEventListener("submit", handleSupportMessage);
   els.resetProfile.addEventListener("click", async () => {
     if (!state.profile.length) return;
     for (const entry of [...state.profile]) {
@@ -306,6 +346,7 @@ function wireEvents() {
       await api(API.logout, { method: "POST" });
       state.user = null;
       state.profile = [];
+      state.activeSupportThreadId = null;
       await renderAll();
       showToast("Вы вышли из аккаунта");
       return;
@@ -368,10 +409,12 @@ function renderAuthState() {
   if (state.user) {
     els.loginButton.textContent = "Выйти";
     els.registerButton.querySelector("span").textContent = state.user.username;
+    if (els.adminNav) els.adminNav.hidden = !state.user.isAdmin;
     return;
   }
   els.loginButton.textContent = "Войти";
   els.registerButton.querySelector("span").textContent = "Регистрация";
+  if (els.adminNav) els.adminNav.hidden = true;
 }
 
 function renderCatalogCategories() {
@@ -811,6 +854,205 @@ async function handleMovieRequest(event) {
   });
   showToast(payload.message || "Заявка сохранена");
   els.movieRequestForm.reset();
+  if (state.user?.isAdmin) await renderAdminRequests();
+}
+
+async function renderAdminRequests() {
+  if (!state.user?.isAdmin || !els.adminRequests) return;
+  const payload = await api(API.adminRequests);
+  const requests = payload.requests || [];
+  els.adminRequests.innerHTML = requests.length
+    ? requests
+        .map(
+          (item) => `
+            <article class="admin-request ${item.status}" data-request-id="${item.id}" data-title="${escapeHtml(item.title)}" data-year="${item.year || ""}">
+              <div>
+                <strong>${escapeHtml(item.title)}${item.year ? ` (${item.year})` : ""}</strong>
+                <span>${escapeHtml(item.username)} · ${statusLabel(item.status)}</span>
+              </div>
+              <p>${escapeHtml(item.note || "Комментарий не указан")}</p>
+              ${item.addedMovieTitle ? `<small>Добавлено: ${escapeHtml(item.addedMovieTitle)}</small>` : ""}
+              <div class="admin-actions">
+                <button class="outline-button" type="button" data-admin-action="tmdb">Найти TMDb</button>
+                <button class="ghost-button" type="button" data-admin-action="reviewing">В работу</button>
+                <button class="ghost-button" type="button" data-admin-action="rejected">Отклонить</button>
+              </div>
+            </article>
+          `,
+        )
+        .join("")
+    : '<div class="empty-state">Новых заявок пока нет</div>';
+}
+
+async function handleAdminRequestClick(event) {
+  const button = event.target.closest("[data-admin-action]");
+  const card = event.target.closest("[data-request-id]");
+  if (!button || !card) return;
+  const requestId = Number(card.dataset.requestId);
+  const action = button.dataset.adminAction;
+  if (action === "tmdb") {
+    state.activeMovieRequestId = requestId;
+    els.adminTmdbQuery.value = card.dataset.title || "";
+    els.adminTmdbYear.value = card.dataset.year || "";
+    await renderAdminTmdbSearch();
+    els.adminTmdbQuery.scrollIntoView({ block: "center" });
+    return;
+  }
+  await api(`${API.adminRequests}/${requestId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ status: action, adminNote: action === "rejected" ? "Отклонено администратором" : "Заявка взята в работу" }),
+  });
+  await renderAdminRequests();
+}
+
+async function renderAdminTmdbSearch() {
+  if (!state.user?.isAdmin) return;
+  const query = els.adminTmdbQuery.value.trim();
+  if (!query) {
+    els.adminTmdbResults.innerHTML = '<div class="empty-state">Введите название фильма</div>';
+    return;
+  }
+  const params = new URLSearchParams({ q: query });
+  if (els.adminTmdbYear.value) params.set("year", els.adminTmdbYear.value);
+  const payload = await api(`${API.adminTmdbSearch}?${params}`);
+  const movies = payload.movies || [];
+  els.adminTmdbResults.innerHTML = movies.length
+    ? movies
+        .map(
+          (movie) => `
+            <article class="admin-tmdb-card">
+              <div class="admin-tmdb-poster">${movie.poster ? `<img src="${movie.poster}" alt="" loading="lazy" />` : `<span>${escapeHtml(movie.title.slice(0, 2))}</span>`}</div>
+              <div>
+                <strong>${escapeHtml(movie.title)}${movie.year ? ` (${movie.year})` : ""}</strong>
+                <p>${escapeHtml(movie.description || "Описание TMDb пока пустое")}</p>
+                <button class="primary-button" type="button" data-tmdb-add="${movie.tmdbId}">Добавить в базу</button>
+              </div>
+            </article>
+          `,
+        )
+        .join("")
+    : '<div class="empty-state">TMDb ничего не нашел</div>';
+}
+
+async function handleAdminTmdbClick(event) {
+  const button = event.target.closest("[data-tmdb-add]");
+  if (!button) return;
+  const payload = await api(API.adminAddTmdbMovie, {
+    method: "POST",
+    body: JSON.stringify({ tmdbId: Number(button.dataset.tmdbAdd), requestId: state.activeMovieRequestId }),
+  });
+  showToast(`Фильм добавлен: ${formatMovieTitle(payload.movie)}`);
+  await renderAdminRequests();
+  await renderCatalog();
+  await renderRecommendations();
+}
+
+async function openSupportChat() {
+  els.supportPanel.hidden = false;
+  await renderSupportThread();
+  setTimeout(() => els.supportInput.focus(), 0);
+}
+
+function closeSupportChat() {
+  els.supportPanel.hidden = true;
+}
+
+async function renderSupportThread() {
+  const payload = await api(API.supportThread);
+  renderChatMessages(els.supportMessages, payload.messages || []);
+}
+
+async function handleSupportMessage(event) {
+  event.preventDefault();
+  const body = els.supportInput.value.trim();
+  if (!body) return;
+  const payload = await api(API.supportMessages, {
+    method: "POST",
+    body: JSON.stringify({ body }),
+  });
+  els.supportInput.value = "";
+  renderChatMessages(els.supportMessages, payload.messages || []);
+  if (state.user?.isAdmin) await renderAdminSupport();
+}
+
+async function renderAdminSupport() {
+  if (!state.user?.isAdmin || !els.adminSupportThreads) return;
+  const payload = await api(API.adminSupportThreads);
+  const threads = payload.threads || [];
+  els.adminSupportThreads.innerHTML = threads.length
+    ? threads
+        .map(
+          (thread) => `
+            <button class="support-thread${state.activeSupportThreadId === thread.id ? " is-active" : ""}" type="button" data-thread-id="${thread.id}">
+              <strong>${escapeHtml(thread.username)}</strong>
+              <span>${escapeHtml(thread.lastMessage || "Сообщений пока нет")}</span>
+              <small>${statusLabel(thread.status)} · ${thread.messageCount || 0} сообщ.</small>
+            </button>
+          `,
+        )
+        .join("")
+    : '<div class="empty-state">Обращений пока нет</div>';
+  if (!state.activeSupportThreadId && threads[0]) {
+    state.activeSupportThreadId = threads[0].id;
+    await renderAdminSupportMessages();
+  }
+}
+
+async function handleAdminSupportThreadClick(event) {
+  const button = event.target.closest("[data-thread-id]");
+  if (!button) return;
+  state.activeSupportThreadId = Number(button.dataset.threadId);
+  await renderAdminSupport();
+  await renderAdminSupportMessages();
+}
+
+async function renderAdminSupportMessages() {
+  if (!state.activeSupportThreadId) {
+    els.adminSupportMessages.innerHTML = '<div class="empty-state">Выберите диалог</div>';
+    return;
+  }
+  const payload = await api(`${API.adminSupportThreads}/${state.activeSupportThreadId}/messages`);
+  renderChatMessages(els.adminSupportMessages, payload.messages || []);
+}
+
+async function handleAdminSupportReply(event) {
+  event.preventDefault();
+  const body = els.adminSupportInput.value.trim();
+  if (!body || !state.activeSupportThreadId) return;
+  const payload = await api(`${API.adminSupportThreads}/${state.activeSupportThreadId}/messages`, {
+    method: "POST",
+    body: JSON.stringify({ body }),
+  });
+  els.adminSupportInput.value = "";
+  renderChatMessages(els.adminSupportMessages, payload.messages || []);
+  await renderAdminSupport();
+}
+
+function renderChatMessages(container, messages) {
+  container.innerHTML = messages.length
+    ? messages
+        .map(
+          (message) => `
+            <div class="chat-message ${message.senderRole === "admin" ? "admin" : "user"}">
+              <span>${escapeHtml(message.senderRole === "admin" ? "Поддержка" : message.username)}</span>
+              <p>${escapeHtml(message.body)}</p>
+            </div>
+          `,
+        )
+        .join("")
+    : '<div class="empty-state">Напишите первое сообщение</div>';
+  container.scrollTop = container.scrollHeight;
+}
+
+function statusLabel(status) {
+  return {
+    new: "новая",
+    reviewing: "в работе",
+    added: "добавлено",
+    rejected: "отклонено",
+    open: "открыт",
+    closed: "закрыт",
+  }[status] || status;
 }
 
 function openAuth(mode) {
@@ -860,13 +1102,18 @@ async function hydrateRoute() {
       return;
     }
   }
-  const route = ["home", "recommendations", "catalog", "semantic", "about", "contacts", "report"].includes(hashRoute)
+  const route = ["home", "recommendations", "catalog", "semantic", "about", "contacts", "report", "admin"].includes(hashRoute)
     ? hashRoute
     : "recommendations";
   showScreen(route, false);
 }
 
 function showScreen(route, pushHash = true) {
+  if (route === "admin" && !state.user?.isAdmin) {
+    openAuth("login");
+    showToast("Для админки войдите под администратором");
+    route = "recommendations";
+  }
   els.screens.forEach((screen) => {
     screen.classList.toggle("is-active", screen.dataset.screen === route);
   });
@@ -875,6 +1122,10 @@ function showScreen(route, pushHash = true) {
     link.classList.toggle("is-active", link.dataset.route === activeRoute);
   });
   if (pushHash) history.replaceState(null, "", `#${route}`);
+  if (route === "admin") {
+    void renderAdminRequests();
+    void renderAdminSupport();
+  }
 }
 
 function closeMovieModal() {

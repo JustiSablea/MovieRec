@@ -2,6 +2,7 @@ import json
 import math
 import os
 import re
+from datetime import datetime
 from time import time
 
 import requests
@@ -26,6 +27,7 @@ TITLE_RE = re.compile(r"^[\w\s:;,.!?&'’()\-а-яА-ЯёЁ0-9]+$", re.UNICODE)
 HINT_STOP_TOKENS = {"the", "a", "an", "of", "and", "из", "и", "в", "на"}
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
 TMDB_IMAGE_URL = "https://image.tmdb.org/t/p/w500"
+DEFAULT_ADMIN_USERNAMES = "admin,azzma,justisablea"
 SEARCH_TERM_ALIASES = {
     "animation": ("мультфильм", "анимация", "cartoon", "family"),
     "cartoon": ("мультфильм", "animation"),
@@ -148,16 +150,35 @@ def current_user_id():
     return session.get("user_id")
 
 
+def admin_usernames():
+    return {
+        name.strip().lower()
+        for name in os.environ.get("ADMIN_USERNAMES", DEFAULT_ADMIN_USERNAMES).split(",")
+        if name.strip()
+    }
+
+
+def user_is_admin(row):
+    return bool(row and row["username"].lower() in admin_usernames())
+
+
 def public_user(row):
     if not row:
         return None
-    return {"id": row["id"], "username": row["username"], "createdAt": row["created_at"]}
+    return {"id": row["id"], "username": row["username"], "createdAt": row["created_at"], "isAdmin": user_is_admin(row)}
 
 
 def get_user(connection, user_id):
     if not user_id:
         return None
     return connection.execute("SELECT id, username, created_at FROM users WHERE id = ?", (user_id,)).fetchone()
+
+
+def require_admin(connection):
+    user = get_user(connection, current_user_id())
+    if not user_is_admin(user):
+        return None, (jsonify({"error": "Нужны права администратора. Войдите под логином admin или добавьте свой логин в ADMIN_USERNAMES."}), 403)
+    return user, None
 
 
 def limited_request(bucket, max_events=5, window_seconds=600):
@@ -383,6 +404,349 @@ def create_movie_request():
         )
         connection.commit()
     return jsonify({"ok": True, "requestId": cursor.lastrowid, "message": "Заявка сохранена. Фильм можно добавить после проверки через TMDb/MovieLens."}), 201
+
+
+@app.get("/api/admin/requests")
+def admin_movie_requests():
+    with get_connection() as connection:
+        _, error = require_admin(connection)
+        if error:
+            return error
+        status = (request.args.get("status") or "").strip()
+        params = []
+        where = ""
+        if status:
+            where = "WHERE mr.status = ?"
+            params.append(status)
+        rows = connection.execute(
+            f"""
+            SELECT mr.*, u.username, m.title AS added_movie_title
+            FROM movie_requests mr
+            LEFT JOIN users u ON u.id = mr.user_id
+            LEFT JOIN movies m ON m.id = mr.added_movie_id
+            {where}
+            ORDER BY mr.created_at DESC
+            LIMIT 80
+            """,
+            tuple(params),
+        ).fetchall()
+        return jsonify({"requests": [movie_request_payload(row) for row in rows]})
+
+
+@app.patch("/api/admin/requests/<int:request_id>")
+def admin_update_movie_request(request_id):
+    payload = request.get_json(force=True)
+    status = (payload.get("status") or "").strip()
+    admin_note = (payload.get("adminNote") or "").strip()
+    if status not in {"new", "reviewing", "added", "rejected"}:
+        return jsonify({"error": "Некорректный статус заявки"}), 400
+    if len(admin_note) > 700:
+        return jsonify({"error": "Комментарий администратора слишком длинный"}), 400
+    resolved_at = datetime.utcnow().isoformat() if status in {"added", "rejected"} else None
+    with get_connection() as connection:
+        _, error = require_admin(connection)
+        if error:
+            return error
+        connection.execute(
+            """
+            UPDATE movie_requests
+            SET status = ?, admin_note = ?, resolved_at = COALESCE(?, resolved_at)
+            WHERE id = ?
+            """,
+            (status, admin_note, resolved_at, request_id),
+        )
+        connection.commit()
+        row = connection.execute(
+            """
+            SELECT mr.*, u.username, m.title AS added_movie_title
+            FROM movie_requests mr
+            LEFT JOIN users u ON u.id = mr.user_id
+            LEFT JOIN movies m ON m.id = mr.added_movie_id
+            WHERE mr.id = ?
+            """,
+            (request_id,),
+        ).fetchone()
+        return jsonify({"request": movie_request_payload(row)})
+
+
+@app.get("/api/admin/tmdb/search")
+def admin_tmdb_search():
+    api_key = os.environ.get("TMDB_API_KEY")
+    if not api_key:
+        return jsonify({"error": "TMDB_API_KEY не задан в .env"}), 400
+    query = (request.args.get("q") or "").strip()
+    year = request.args.get("year", type=int)
+    if len(query) < 2:
+        return jsonify({"movies": []})
+    with get_connection() as connection:
+        _, error = require_admin(connection)
+        if error:
+            return error
+    response = requests.get(
+        f"{TMDB_BASE_URL}/search/movie",
+        params={"api_key": api_key, "language": "ru-RU", "query": query, "year": year, "include_adult": "false"},
+        timeout=15,
+    )
+    response.raise_for_status()
+    movies = [tmdb_candidate_payload(item, {}, query) for item in response.json().get("results", [])[:8]]
+    return jsonify({"movies": movies})
+
+
+@app.post("/api/admin/movies/from-tmdb")
+def admin_add_movie_from_tmdb():
+    api_key = os.environ.get("TMDB_API_KEY")
+    if not api_key:
+        return jsonify({"error": "TMDB_API_KEY не задан в .env"}), 400
+    payload = request.get_json(force=True)
+    tmdb_id = int(payload.get("tmdbId") or 0)
+    request_id = payload.get("requestId")
+    if not tmdb_id:
+        return jsonify({"error": "Не передан tmdbId"}), 400
+    with get_connection() as connection:
+        _, error = require_admin(connection)
+        if error:
+            return error
+        existing = connection.execute("SELECT id FROM movies WHERE tmdb_id = ?", (tmdb_id,)).fetchone()
+        if existing:
+            movie_id = existing["id"]
+        else:
+            movie_id = insert_tmdb_movie(connection, tmdb_id, api_key)
+        if request_id:
+            connection.execute(
+                """
+                UPDATE movie_requests
+                SET status = 'added', added_movie_id = ?, admin_note = COALESCE(NULLIF(admin_note, ''), 'Добавлено через TMDb'), resolved_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+                """,
+                (movie_id, request_id),
+            )
+        connection.commit()
+        movie = HybridRecommender(connection).movie_details(movie_id, current_user_id())
+        return jsonify({"ok": True, "movie": movie})
+
+
+def movie_request_payload(row):
+    if not row:
+        return None
+    return {
+        "id": row["id"],
+        "title": row["title"],
+        "year": row["year"],
+        "note": row["note"],
+        "status": row["status"],
+        "adminNote": row["admin_note"],
+        "createdAt": row["created_at"],
+        "resolvedAt": row["resolved_at"],
+        "username": row["username"] or "Гость",
+        "addedMovieId": row["added_movie_id"],
+        "addedMovieTitle": row["added_movie_title"],
+    }
+
+
+def insert_tmdb_movie(connection, tmdb_id, api_key):
+    response = requests.get(
+        f"{TMDB_BASE_URL}/movie/{tmdb_id}",
+        params={"api_key": api_key, "language": "ru-RU", "append_to_response": "credits,keywords"},
+        timeout=18,
+    )
+    response.raise_for_status()
+    payload = response.json()
+    movie_id = 10_000_000 + tmdb_id
+    year = parse_tmdb_year(payload.get("release_date"))
+    genres = [genre.get("name") for genre in payload.get("genres", []) if genre.get("name")]
+    vote_average = float(payload.get("vote_average") or 0)
+    average_rating = round(min(5.0, max(0.5, vote_average / 2)), 2) if vote_average else 3.5
+    rating_count = int(payload.get("vote_count") or 0)
+    weighted_score = round(average_rating + min(0.35, math.log1p(rating_count) / 40), 4)
+    popularity = float(payload.get("popularity") or rating_count or 1)
+    poster = f"{TMDB_IMAGE_URL}{payload['poster_path']}" if payload.get("poster_path") else None
+    credits = payload.get("credits") or {}
+    director = next((person.get("name") for person in credits.get("crew", []) if person.get("job") == "Director"), None)
+    actors = [person.get("name") for person in credits.get("cast", [])[:6] if person.get("name")]
+    keywords = [item.get("name") for item in (payload.get("keywords") or {}).get("keywords", [])[:12] if item.get("name")]
+    tags = [*(genres[:4]), *keywords, payload.get("original_title") or ""]
+    palette = ["#d33ed5", "#111827"]
+    connection.execute(
+        """
+        INSERT INTO movies (id, title, year, genres, average_rating, rating_count, weighted_score, popularity, tmdb_id, imdb_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            movie_id,
+            payload.get("title") or payload.get("original_title") or f"TMDb {tmdb_id}",
+            year,
+            json.dumps(genres, ensure_ascii=False),
+            average_rating,
+            rating_count,
+            weighted_score,
+            popularity,
+            tmdb_id,
+            (payload.get("imdb_id") or "").replace("tt", "") or None,
+        ),
+    )
+    connection.execute(
+        """
+        INSERT INTO movie_metadata (movie_id, poster, palette, tags, description, actors, director, source)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'tmdb')
+        """,
+        (
+            movie_id,
+            poster,
+            json.dumps(palette, ensure_ascii=False),
+            json.dumps([tag for tag in tags if tag], ensure_ascii=False),
+            payload.get("overview") or "Фильм добавлен из TMDb по заявке пользователя.",
+            json.dumps(actors, ensure_ascii=False),
+            director,
+        ),
+    )
+    return movie_id
+
+
+@app.get("/api/support/thread")
+def support_thread():
+    with get_connection() as connection:
+        thread_id = ensure_support_thread(connection)
+        return jsonify({"thread": support_thread_payload(connection, thread_id), "messages": support_messages(connection, thread_id)})
+
+
+@app.post("/api/support/messages")
+def support_send_message():
+    payload = request.get_json(force=True)
+    body = (payload.get("body") or "").strip()
+    if len(body) < 1 or len(body) > 1000:
+        return jsonify({"error": "Сообщение должно быть от 1 до 1000 символов"}), 400
+    with get_connection() as connection:
+        thread_id = ensure_support_thread(connection)
+        connection.execute(
+            "INSERT INTO support_messages (thread_id, user_id, sender_role, body) VALUES (?, ?, 'user', ?)",
+            (thread_id, current_user_id(), body),
+        )
+        connection.execute("UPDATE support_threads SET updated_at = CURRENT_TIMESTAMP, status = 'open' WHERE id = ?", (thread_id,))
+        connection.commit()
+        return jsonify({"thread": support_thread_payload(connection, thread_id), "messages": support_messages(connection, thread_id)})
+
+
+@app.get("/api/admin/support/threads")
+def admin_support_threads():
+    with get_connection() as connection:
+        _, error = require_admin(connection)
+        if error:
+            return error
+        rows = connection.execute(
+            """
+            SELECT st.*, u.username,
+                   (SELECT body FROM support_messages sm WHERE sm.thread_id = st.id ORDER BY sm.created_at DESC, sm.id DESC LIMIT 1) AS last_message,
+                   (SELECT COUNT(*) FROM support_messages sm WHERE sm.thread_id = st.id) AS message_count
+            FROM support_threads st
+            LEFT JOIN users u ON u.id = st.user_id
+            ORDER BY st.updated_at DESC
+            LIMIT 80
+            """
+        ).fetchall()
+        return jsonify({"threads": [support_thread_payload(connection, row["id"], row) for row in rows]})
+
+
+@app.get("/api/admin/support/threads/<int:thread_id>/messages")
+def admin_support_messages(thread_id):
+    with get_connection() as connection:
+        _, error = require_admin(connection)
+        if error:
+            return error
+        return jsonify({"thread": support_thread_payload(connection, thread_id), "messages": support_messages(connection, thread_id)})
+
+
+@app.post("/api/admin/support/threads/<int:thread_id>/messages")
+def admin_support_reply(thread_id):
+    payload = request.get_json(force=True)
+    body = (payload.get("body") or "").strip()
+    if len(body) < 1 or len(body) > 1000:
+        return jsonify({"error": "Сообщение должно быть от 1 до 1000 символов"}), 400
+    with get_connection() as connection:
+        admin, error = require_admin(connection)
+        if error:
+            return error
+        connection.execute(
+            "INSERT INTO support_messages (thread_id, user_id, sender_role, body) VALUES (?, ?, 'admin', ?)",
+            (thread_id, admin["id"], body),
+        )
+        status = (payload.get("status") or "open").strip()
+        if status not in {"open", "closed"}:
+            status = "open"
+        connection.execute("UPDATE support_threads SET updated_at = CURRENT_TIMESTAMP, status = ? WHERE id = ?", (status, thread_id))
+        connection.commit()
+        return jsonify({"thread": support_thread_payload(connection, thread_id), "messages": support_messages(connection, thread_id)})
+
+
+def ensure_support_thread(connection):
+    user_id = current_user_id()
+    if user_id:
+        row = connection.execute(
+            "SELECT id FROM support_threads WHERE user_id = ? ORDER BY updated_at DESC LIMIT 1",
+            (user_id,),
+        ).fetchone()
+        if row:
+            return row["id"]
+        cursor = connection.execute("INSERT INTO support_threads (user_id) VALUES (?)", (user_id,))
+        connection.commit()
+        return cursor.lastrowid
+    thread_id = session.get("support_thread_id")
+    if thread_id and connection.execute("SELECT id FROM support_threads WHERE id = ?", (thread_id,)).fetchone():
+        return thread_id
+    cursor = connection.execute("INSERT INTO support_threads (guest_name) VALUES ('Гость')")
+    connection.commit()
+    session["support_thread_id"] = cursor.lastrowid
+    return cursor.lastrowid
+
+
+def support_thread_payload(connection, thread_id, row=None):
+    row = row or connection.execute(
+        """
+        SELECT st.*, u.username,
+               (SELECT body FROM support_messages sm WHERE sm.thread_id = st.id ORDER BY sm.created_at DESC, sm.id DESC LIMIT 1) AS last_message,
+               (SELECT COUNT(*) FROM support_messages sm WHERE sm.thread_id = st.id) AS message_count
+        FROM support_threads st
+        LEFT JOIN users u ON u.id = st.user_id
+        WHERE st.id = ?
+        """,
+        (thread_id,),
+    ).fetchone()
+    if not row:
+        return None
+    return {
+        "id": row["id"],
+        "userId": row["user_id"],
+        "username": row["username"] or row["guest_name"] or "Гость",
+        "subject": row["subject"],
+        "status": row["status"],
+        "createdAt": row["created_at"],
+        "updatedAt": row["updated_at"],
+        "lastMessage": row["last_message"] if "last_message" in row.keys() else "",
+        "messageCount": row["message_count"] if "message_count" in row.keys() else 0,
+    }
+
+
+def support_messages(connection, thread_id):
+    rows = connection.execute(
+        """
+        SELECT sm.*, u.username
+        FROM support_messages sm
+        LEFT JOIN users u ON u.id = sm.user_id
+        WHERE sm.thread_id = ?
+        ORDER BY sm.created_at ASC, sm.id ASC
+        """,
+        (thread_id,),
+    ).fetchall()
+    return [
+        {
+            "id": row["id"],
+            "threadId": row["thread_id"],
+            "senderRole": row["sender_role"],
+            "username": row["username"] or ("Администратор" if row["sender_role"] == "admin" else "Гость"),
+            "body": row["body"],
+            "createdAt": row["created_at"],
+        }
+        for row in rows
+    ]
 
 
 @app.get("/api/movies/<int:movie_id>")

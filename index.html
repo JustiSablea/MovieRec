@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MovieRec</title>
     <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%23151517"/><path d="M17 18h30v28H17zM17 26h30M26 18v8M38 18v8M28 32l10 6-10 6z" fill="none" stroke="%23d33ed5" stroke-width="4" stroke-linejoin="round"/></svg>' />
-    <link rel="stylesheet" href="styles.css?v=20260428-2" />
+    <link rel="stylesheet" href="styles.css?v=20260501-admin" />
   </head>
   <body>
     <div class="app-shell">
@@ -28,6 +28,7 @@
           <button class="nav-link" data-route="about" type="button">О нас</button>
           <button class="nav-link" data-route="report" type="button">Метрики</button>
           <button class="nav-link" data-route="contacts" type="button">Контакты</button>
+          <button class="nav-link admin-nav" data-route="admin" type="button" hidden>Админ</button>
         </nav>
 
         <div class="sidebar-line"></div>
@@ -293,8 +294,69 @@
             <p id="metricsNote" class="home-lead"></p>
           </div>
         </section>
+
+        <section class="screen" id="adminScreen" data-screen="admin" aria-labelledby="adminTitle">
+          <div class="content-narrow admin-page">
+            <div class="section-kicker">Панель администратора</div>
+            <h1 id="adminTitle">Заявки и поддержка</h1>
+            <div class="admin-grid">
+              <section class="admin-panel">
+                <div class="panel-heading">
+                  <h2>Заявки на фильмы</h2>
+                  <button class="outline-button" id="refreshAdminRequests" type="button">Обновить</button>
+                </div>
+                <div id="adminRequests" class="admin-list"></div>
+              </section>
+              <section class="admin-panel">
+                <div class="panel-heading">
+                  <h2>Поиск в TMDb</h2>
+                </div>
+                <div class="admin-search-row">
+                  <input id="adminTmdbQuery" type="search" placeholder="Название фильма" autocomplete="off" />
+                  <input id="adminTmdbYear" type="number" min="1888" max="2035" placeholder="Год" />
+                  <button class="outline-button" id="adminTmdbSearch" type="button">Найти</button>
+                </div>
+                <div id="adminTmdbResults" class="admin-tmdb-results"></div>
+              </section>
+            </div>
+            <section class="admin-panel admin-support-panel">
+              <div class="panel-heading">
+                <h2>Сообщения поддержки</h2>
+                <button class="outline-button" id="refreshAdminSupport" type="button">Обновить</button>
+              </div>
+              <div class="admin-support-layout">
+                <div id="adminSupportThreads" class="admin-list"></div>
+                <div class="admin-chat">
+                  <div id="adminSupportMessages" class="chat-messages"></div>
+                  <form id="adminSupportForm" class="chat-input-row">
+                    <input id="adminSupportInput" type="text" maxlength="1000" placeholder="Ответ пользователю" />
+                    <button class="primary-button" type="submit">Ответить</button>
+                  </form>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
       </main>
     </div>
+
+    <aside class="support-widget" id="supportWidget" aria-label="Чат поддержки">
+      <button class="support-toggle" id="supportToggle" type="button">Поддержка</button>
+      <div class="support-panel" id="supportPanel" hidden>
+        <div class="support-head">
+          <div>
+            <strong>Поддержка MovieRec</strong>
+            <span>Задайте вопрос по сайту или рекомендациям</span>
+          </div>
+          <button class="modal-close" id="supportClose" type="button" aria-label="Закрыть чат">×</button>
+        </div>
+        <div id="supportMessages" class="chat-messages"></div>
+        <form id="supportForm" class="chat-input-row">
+          <input id="supportInput" type="text" maxlength="1000" placeholder="Напишите сообщение" />
+          <button class="primary-button" type="submit">Отправить</button>
+        </form>
+      </div>
+    </aside>
 
     <div class="modal-backdrop" id="movieModal" hidden>
       <article class="movie-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
@@ -352,6 +414,6 @@
     </div>
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
-    <script src="app.js?v=20260428-2"></script>
+    <script src="app.js?v=20260501-admin"></script>
   </body>
 </html>
