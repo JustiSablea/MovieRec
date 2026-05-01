@@ -119,6 +119,7 @@ function cacheElements() {
   els.semanticInput = document.querySelector("#semanticInput");
   els.semanticSearchButton = document.querySelector("#semanticSearchButton");
   els.semanticResults = document.querySelector("#semanticResults");
+  els.semanticExamples = document.querySelector("#semanticExamples");
   els.movieRequestForm = document.querySelector("#movieRequestForm");
   els.requestTitle = document.querySelector("#requestTitle");
   els.requestYear = document.querySelector("#requestYear");
@@ -277,6 +278,12 @@ function wireEvents() {
   els.semanticInput.addEventListener("keydown", async (event) => {
     if (event.key === "Enter") await renderSemanticSearch();
   });
+  els.semanticExamples?.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-semantic-example]");
+    if (!button) return;
+    els.semanticInput.value = button.dataset.semanticExample;
+    await renderSemanticSearch();
+  });
   els.semanticResults.addEventListener("click", async (event) => {
     const card = event.target.closest("[data-movie-id]");
     if (card) await openMoviePage(Number(card.dataset.movieId));
@@ -376,7 +383,7 @@ function wireEvents() {
   });
   els.registerButton.addEventListener("click", () => {
     if (state.user) {
-      showToast(`Вы вошли как ${state.user.username}`);
+      showScreen("profile");
       return;
     }
     openAuth("register");
@@ -967,6 +974,7 @@ async function renderAdminRequests() {
                 <button class="outline-button" type="button" data-admin-action="tmdb">Найти TMDb</button>
                 <button class="ghost-button" type="button" data-admin-action="reviewing">В работу</button>
                 <button class="ghost-button" type="button" data-admin-action="rejected">Отклонить</button>
+                <button class="ghost-button danger-button" type="button" data-admin-action="delete">Удалить</button>
               </div>
             </article>
           `,
@@ -988,6 +996,13 @@ async function handleAdminRequestClick(event) {
     if (els.adminTmdbHint) els.adminTmdbHint.textContent = `Поиск для заявки: ${card.dataset.title || "фильм"}`;
     await renderAdminTmdbSearch();
     els.adminTmdbQuery.scrollIntoView({ block: "center" });
+    return;
+  }
+  if (action === "delete") {
+    if (!window.confirm("Удалить заявку из очереди?")) return;
+    await api(`${API.adminRequests}/${requestId}`, { method: "DELETE" });
+    await renderAdminRequests();
+    await renderProfileRequests();
     return;
   }
   await api(`${API.adminRequests}/${requestId}`, {
@@ -1096,6 +1111,10 @@ async function renderAdminSupport() {
   const payload = await api(API.adminSupportThreads);
   const threads = payload.threads || [];
   if (els.adminOpenThreads) els.adminOpenThreads.textContent = String(threads.filter((thread) => thread.status === "open").length);
+  if (state.activeSupportThreadId && !threads.some((thread) => thread.id === state.activeSupportThreadId)) {
+    state.activeSupportThreadId = null;
+    els.adminSupportMessages.innerHTML = '<div class="empty-state">Выберите диалог</div>';
+  }
   els.adminSupportThreads.innerHTML = threads.length
     ? threads
         .map(

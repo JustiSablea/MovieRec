@@ -25,7 +25,6 @@
           <button class="nav-link is-active" data-route="recommendations" type="button">Рекомендации</button>
           <button class="nav-link" data-route="catalog" type="button">Каталог</button>
           <button class="nav-link" data-route="semantic" type="button">Нейропоиск</button>
-          <button class="nav-link" data-route="profile" type="button">Кабинет</button>
           <button class="nav-link" data-route="about" type="button">О нас</button>
           <button class="nav-link" data-route="report" type="button">Метрики</button>
           <button class="nav-link" data-route="contacts" type="button">Контакты</button>
@@ -187,12 +186,28 @@
           <div class="content-narrow">
             <div class="section-kicker">Нейропоиск</div>
             <h1 id="semanticTitle">Найти фильм по описанию</h1>
-            <div class="semantic-panel semantic-page-panel">
-              <div class="semantic-row">
-                <input id="semanticInput" type="text" placeholder="Фильм про сны и ограбление" autocomplete="off" />
-                <button class="outline-button" id="semanticSearchButton" type="button">Найти</button>
+            <div class="semantic-layout">
+              <div class="semantic-main">
+                <div class="semantic-panel semantic-page-panel">
+                  <div class="semantic-row">
+                    <input id="semanticInput" type="text" placeholder="Фильм про сны и ограбление" autocomplete="off" />
+                    <button class="outline-button" id="semanticSearchButton" type="button">Найти</button>
+                  </div>
+                  <div id="semanticResults" class="compact-grid semantic-results"></div>
+                </div>
               </div>
-              <div id="semanticResults" class="compact-grid semantic-results"></div>
+              <aside class="semantic-side">
+                <article>
+                  <h2>Опишите сюжет своими словами</h2>
+                  <p>Поиск учитывает жанры, объекты, персонажей, действия и похожие описания из базы.</p>
+                </article>
+                <div class="semantic-example-list" id="semanticExamples">
+                  <button type="button" data-semantic-example="Фильм про сны и ограбления">сны и ограбления</button>
+                  <button type="button" data-semantic-example="Мультфильм в котором замок передвигается">движущийся замок</button>
+                  <button type="button" data-semantic-example="Фильм про невероятный фокус и загадку">фокус и загадка</button>
+                  <button type="button" data-semantic-example="Фильм про огромных роботов и кайдзю">роботы и кайдзю</button>
+                </div>
+              </div>
             </div>
           </div>
         </section>

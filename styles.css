@@ -333,6 +333,16 @@ button {
   transform: translateY(-1px);
 }
 
+.danger-button {
+  color: #fecaca;
+}
+
+.danger-button:hover,
+.danger-button:focus-visible {
+  border-color: rgba(239, 68, 68, 0.65);
+  color: #fff;
+}
+
 .ghost-button:focus-visible,
 .primary-button:focus-visible,
 .outline-button:focus-visible,
@@ -951,11 +961,75 @@ button {
 }
 
 .semantic-page-panel {
+  min-height: 420px;
   padding: 18px;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: rgba(24, 24, 27, 0.92);
   box-shadow: var(--shadow);
+}
+
+.semantic-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 20px;
+  align-items: start;
+  margin-top: 18px;
+}
+
+.semantic-side {
+  display: grid;
+  gap: 14px;
+}
+
+.semantic-side article,
+.semantic-example-list {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(24, 24, 27, 0.92);
+  box-shadow: var(--shadow);
+}
+
+.semantic-side article {
+  padding: 19px;
+}
+
+.semantic-side h2 {
+  margin: 0 0 8px;
+  color: #fff;
+  font-size: 18px;
+}
+
+.semantic-side p {
+  margin: 0;
+  color: var(--muted-strong);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.semantic-example-list {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+}
+
+.semantic-example-list button {
+  min-height: 42px;
+  padding: 0 13px;
+  border: 1px solid rgba(211, 62, 213, 0.42);
+  border-radius: 11px;
+  background: rgba(211, 62, 213, 0.08);
+  color: #f5dbff;
+  cursor: pointer;
+  text-align: left;
+  font-weight: 900;
+}
+
+.semantic-example-list button:hover,
+.semantic-example-list button:focus-visible {
+  border-color: rgba(211, 62, 213, 0.82);
+  outline: 0;
 }
 
 .request-panel {
@@ -1656,6 +1730,7 @@ button {
 
 .admin-grid {
   grid-template-columns: minmax(330px, 0.8fr) minmax(0, 1.2fr);
+  align-items: start;
 }
 
 .admin-support-layout {
@@ -1741,7 +1816,7 @@ button {
 }
 
 .admin-actions {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .admin-search-row {
@@ -1763,7 +1838,7 @@ button {
 .admin-tmdb-results {
   display: grid;
   gap: 12px;
-  max-height: 520px;
+  max-height: 420px;
   overflow: auto;
   padding-right: 4px;
 }
@@ -2026,6 +2101,7 @@ button {
   .profile-grid,
   .profile-dashboard,
   .profile-sections,
+  .semantic-layout,
   .info-grid,
   .workflow-strip,
   .detail-layout,

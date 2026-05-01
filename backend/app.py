@@ -490,6 +490,17 @@ def admin_update_movie_request(request_id):
         return jsonify({"request": movie_request_payload(row)})
 
 
+@app.delete("/api/admin/requests/<int:request_id>")
+def admin_delete_movie_request(request_id):
+    with get_connection() as connection:
+        _, error = require_admin(connection)
+        if error:
+            return error
+        connection.execute("DELETE FROM movie_requests WHERE id = ?", (request_id,))
+        connection.commit()
+        return jsonify({"ok": True})
+
+
 @app.get("/api/admin/tmdb/search")
 def admin_tmdb_search():
     api_key = os.environ.get("TMDB_API_KEY")
@@ -657,9 +668,15 @@ def admin_support_threads():
             """
             SELECT st.*, u.username,
                    (SELECT body FROM support_messages sm WHERE sm.thread_id = st.id ORDER BY sm.created_at DESC, sm.id DESC LIMIT 1) AS last_message,
-                   (SELECT COUNT(*) FROM support_messages sm WHERE sm.thread_id = st.id) AS message_count
+                   (SELECT COUNT(*) FROM support_messages sm WHERE sm.thread_id = st.id) AS message_count,
+                   (SELECT COUNT(*) FROM support_messages sm WHERE sm.thread_id = st.id AND sm.sender_role = 'user') AS user_message_count
             FROM support_threads st
             LEFT JOIN users u ON u.id = st.user_id
+            WHERE EXISTS (
+                SELECT 1
+                FROM support_messages sm
+                WHERE sm.thread_id = st.id AND sm.sender_role = 'user'
+            )
             ORDER BY st.updated_at DESC
             LIMIT 80
             """
@@ -743,7 +760,8 @@ def support_thread_payload(connection, thread_id, row=None):
         """
         SELECT st.*, u.username,
                (SELECT body FROM support_messages sm WHERE sm.thread_id = st.id ORDER BY sm.created_at DESC, sm.id DESC LIMIT 1) AS last_message,
-               (SELECT COUNT(*) FROM support_messages sm WHERE sm.thread_id = st.id) AS message_count
+               (SELECT COUNT(*) FROM support_messages sm WHERE sm.thread_id = st.id) AS message_count,
+               (SELECT COUNT(*) FROM support_messages sm WHERE sm.thread_id = st.id AND sm.sender_role = 'user') AS user_message_count
         FROM support_threads st
         LEFT JOIN users u ON u.id = st.user_id
         WHERE st.id = ?
@@ -762,6 +780,7 @@ def support_thread_payload(connection, thread_id, row=None):
         "updatedAt": row["updated_at"],
         "lastMessage": row["last_message"] if "last_message" in row.keys() else "",
         "messageCount": row["message_count"] if "message_count" in row.keys() else 0,
+        "userMessageCount": row["user_message_count"] if "user_message_count" in row.keys() else 0,
     }
 
 
