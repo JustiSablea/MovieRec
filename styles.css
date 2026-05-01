@@ -884,10 +884,19 @@ button {
   font-weight: 900;
 }
 
+.semantic-results {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: stretch;
+  margin-top: 14px;
+}
+
 .semantic-card {
   display: grid;
-  min-height: 162px;
-  grid-template-columns: 86px minmax(0, 1fr);
+  min-width: 0;
+  min-height: 194px;
+  grid-template-columns: 96px minmax(0, 1fr);
   gap: 13px;
   align-items: stretch;
   padding: 10px;
@@ -920,6 +929,7 @@ button {
 .semantic-card-poster {
   position: relative;
   overflow: hidden;
+  min-height: 174px;
   border-radius: 9px;
   background:
     linear-gradient(155deg, rgba(255, 255, 255, 0.17), transparent 35%),
@@ -948,16 +958,28 @@ button {
 }
 
 .semantic-card-body strong {
+  display: -webkit-box;
+  overflow: hidden;
   color: #ffffff;
   font-size: 14px;
   line-height: 1.25;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .semantic-card-body span {
+  display: -webkit-box;
+  overflow: hidden;
   color: var(--muted-strong);
   font-size: 12px;
   font-weight: 800;
   line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.semantic-card-body span:last-child {
+  -webkit-line-clamp: 1;
 }
 
 .semantic-page-panel {
@@ -971,7 +993,7 @@ button {
 
 .semantic-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-columns: minmax(620px, 1fr) 320px;
   gap: 20px;
   align-items: start;
   margin-top: 18px;
@@ -2113,6 +2135,10 @@ button {
     grid-template-columns: 1fr;
   }
 
+  .semantic-results {
+    grid-template-columns: 1fr;
+  }
+
   .compact-grid,
   .metrics-grid,
   .explain-summary {
@@ -2188,6 +2214,7 @@ button {
   .alpha-row,
   .rated-item,
   .compact-grid,
+  .semantic-results,
   .metrics-grid,
   .explain-summary {
     grid-template-columns: 1fr;
