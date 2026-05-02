@@ -19,6 +19,7 @@
       .mrec-list{display:grid;gap:8px;padding:12px}.mrec-item{display:grid;width:100%;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 11px;border:0;border-radius:11px;background:#222228;text-align:left;cursor:pointer}
       .mrec-item strong{display:block;overflow:hidden;color:#fff;font-size:13px;text-overflow:ellipsis;white-space:nowrap}.mrec-item span{color:#9c9ca7;font-size:11px}.mrec-item small{display:inline-grid;min-width:34px;min-height:27px;place-items:center;border-radius:999px;background:rgba(211,62,213,.16);color:#f7d9ff;font-weight:900}
       .mrec-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px 12px}.mrec-actions button{min-height:34px;border:0;border-radius:9px;cursor:pointer;color:white;font:800 12px Inter,system-ui,sans-serif}.mrec-primary{background:linear-gradient(92deg,#d33ed5,#f00f24)}.mrec-ghost{background:rgba(255,255,255,.08)}
+      .mrec-missing{display:grid;gap:9px;padding:12px;border:1px dashed rgba(211,62,213,.35);border-radius:12px;background:rgba(211,62,213,.07);color:#b8b8c3;font-size:12px;font-weight:800;line-height:1.35}.mrec-missing button{min-height:34px;border:0;border-radius:9px;background:linear-gradient(92deg,#d33ed5,#f00f24);color:white;cursor:pointer;font:900 12px Inter,system-ui,sans-serif}
     </style>
     <div id="movierec-panel" role="dialog" aria-label="MovieRec">
       <div class="mrec-head"><strong>MovieRec</strong><span id="mrec-context">Подборка по странице</span></div>
@@ -57,6 +58,8 @@
   list.addEventListener("click", (event) => {
     const item = event.target.closest("[data-mrec-id]");
     if (item) window.open(`${apiBase}/#movie/${item.dataset.mrecId}`, "_blank", "noopener,noreferrer");
+    const requestButton = event.target.closest("[data-mrec-request]");
+    if (requestButton) requestMissingMovie();
   });
 
   async function renderPanel() {
@@ -67,8 +70,16 @@
     const recs = matched
       ? (await fetchJson(`/api/movies/${matched.id}`)).movie.similarMovies
       : (await fetchJson("/api/recommendations?limit=4")).recommendations;
-    context.textContent = matched ? `Похоже на ${formatTitle(matched)}` : "Стартовая подборка MovieRec";
-    list.innerHTML = recs
+    context.textContent = matched ? `Похоже на ${formatTitle(matched)}` : "Фильм не найден в базе";
+    const requestCard = matched
+      ? ""
+      : `
+        <div class="mrec-missing">
+          <span>Похоже, это “${escapeHtml(pageContext.candidates[0] || document.title)}”, но такого фильма нет в базе MovieRec.</span>
+          <button type="button" data-mrec-request="1">Отправить заявку</button>
+        </div>
+      `;
+    list.innerHTML = requestCard + recs
       .filter(Boolean)
       .slice(0, 4)
       .map(
@@ -82,14 +93,36 @@
       .join("");
   }
 
+  async function requestMissingMovie() {
+    await resolveApiBase();
+    const pageContext = extractPageContext();
+    const candidate = pageContext.candidates[0] || document.title;
+    const title = candidate.replace(/\(\d{4}(?:\s*[–-]\s*[^)]*)?\)/g, "").slice(0, 120).trim();
+    if (!title) return;
+    await fetchJson("/api/movie-requests", {
+      method: "POST",
+      body: JSON.stringify({
+        title,
+        year: extractYear([candidate, pageContext.title].join(" ")),
+        note: `Заявка из расширения. Страница: ${pageContext.url}`,
+      }),
+    });
+    context.textContent = "Заявка отправлена";
+    list.innerHTML = '<div class="mrec-missing"><span>Заявка ушла администратору. Статус будет виден в личном кабинете MovieRec.</span></div>';
+  }
+
   async function findMatchedMovie(text) {
     const payload = await fetchJson(`/api/movies?q=${encodeURIComponent(text.slice(0, 140))}&limit=5`);
     const normalized = normalize(text);
     return (payload.movies || []).find((movie) => normalized.includes(normalize(movie.title))) || null;
   }
 
-  async function fetchJson(path) {
-    const response = await fetch(`${apiBase}${path}`, { credentials: "include" });
+  async function fetchJson(path, options = {}) {
+    const response = await fetch(`${apiBase}${path}`, {
+      credentials: "include",
+      headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+      ...options,
+    });
     return response.json();
   }
 
@@ -156,6 +189,11 @@
 
   function normalize(value) {
     return String(value).toLowerCase().trim().replace(/ё/g, "е");
+  }
+
+  function extractYear(value) {
+    const match = String(value || "").match(/\b(19\d{2}|20\d{2})\b/);
+    return match ? Number(match[1]) : "";
   }
 
   function escapeHtml(value) {

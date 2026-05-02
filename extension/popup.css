@@ -212,8 +212,18 @@ button {
 }
 
 .detected-card.is-empty {
+  gap: 10px;
   color: var(--muted);
   font-size: 12px;
+}
+
+.request-missing {
+  min-height: 34px;
+  border-radius: 9px;
+  background: linear-gradient(92deg, var(--pink), var(--red));
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
 }
 
 .detected-title {

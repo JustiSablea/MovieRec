@@ -119,7 +119,10 @@ function renderDetectedMovie(movie, status) {
     els.detectedMovie.className = "detected-card is-empty";
     const candidate = state.pageContext?.candidates?.[0];
     els.detectedMovie.innerHTML = candidate
-      ? `Похоже, это “${escapeHtml(candidate)}”, но точного совпадения в локальной базе MovieRec нет. Можно найти фильм вручную ниже или отправить заявку на сайте.`
+      ? `
+        <div>Похоже, это “${escapeHtml(candidate)}”, но точного совпадения в локальной базе MovieRec нет.</div>
+        <button class="primary request-missing" type="button" data-detected-action="request">Отправить заявку</button>
+      `
       : "Откройте страницу фильма на IMDb, TMDb, Кинопоиске, YouTube или выделите название на странице.";
     return;
   }
@@ -163,6 +166,24 @@ async function handleDetectedAction(event) {
     await renderRecommendations();
     renderDetectedMovie(state.detectedMovie, "оценка сохранена");
   }
+  if (action === "request") {
+    await requestMissingMovie();
+  }
+}
+
+async function requestMissingMovie() {
+  const candidate = state.pageContext?.candidates?.[0];
+  if (!candidate) return;
+  const title = candidate.replace(/\(\d{4}(?:\s*[–-]\s*[^)]*)?\)/g, "").trim().slice(0, 120);
+  const year = extractYear([candidate, state.pageContext?.title].filter(Boolean).join(" "));
+  const note = `Заявка из расширения. Страница: ${state.pageContext?.url || "не указана"}`;
+  await api("/api/movie-requests", {
+    method: "POST",
+    body: JSON.stringify({ title, year, note }),
+  });
+  els.pageStatus.textContent = "Заявка отправлена";
+  els.detectedMovie.className = "detected-card is-empty";
+  els.detectedMovie.innerHTML = "Заявка ушла администратору. Ее статус можно посмотреть в личном кабинете MovieRec.";
 }
 
 function renderProfile() {
@@ -323,6 +344,11 @@ function cleanTitleCandidates(title) {
 
 function normalize(value) {
   return String(value).toLowerCase().replace(/ё/g, "е").replace(/[^a-zа-я0-9]+/g, " ").trim();
+}
+
+function extractYear(value) {
+  const match = String(value || "").match(/\b(19\d{2}|20\d{2})\b/);
+  return match ? Number(match[1]) : "";
 }
 
 function debounce(callback, delay) {
