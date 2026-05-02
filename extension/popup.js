@@ -143,8 +143,13 @@ function renderDetectedMovie(movie, status) {
 
 async function handleDetectedAction(event) {
   const button = event.target.closest("[data-detected-action]");
-  if (!button || !state.detectedMovie) return;
+  if (!button) return;
   const action = button.dataset.detectedAction;
+  if (action === "request") {
+    await requestMissingMovie();
+    return;
+  }
+  if (!state.detectedMovie) return;
   if (action === "open") {
     openTab(`${API_BASE}/#movie/${state.detectedMovie.id}`);
     return;
@@ -166,9 +171,6 @@ async function handleDetectedAction(event) {
     await renderRecommendations();
     renderDetectedMovie(state.detectedMovie, "оценка сохранена");
   }
-  if (action === "request") {
-    await requestMissingMovie();
-  }
 }
 
 async function requestMissingMovie() {
@@ -177,13 +179,19 @@ async function requestMissingMovie() {
   const title = candidate.replace(/\(\d{4}(?:\s*[–-]\s*[^)]*)?\)/g, "").trim().slice(0, 120);
   const year = extractYear([candidate, state.pageContext?.title].filter(Boolean).join(" "));
   const note = `Заявка из расширения. Страница: ${state.pageContext?.url || "не указана"}`;
-  await api("/api/movie-requests", {
-    method: "POST",
-    body: JSON.stringify({ title, year, note }),
-  });
-  els.pageStatus.textContent = "Заявка отправлена";
-  els.detectedMovie.className = "detected-card is-empty";
-  els.detectedMovie.innerHTML = "Заявка ушла администратору. Ее статус можно посмотреть в личном кабинете MovieRec.";
+  try {
+    await api("/api/movie-requests", {
+      method: "POST",
+      body: JSON.stringify({ title, year, note }),
+    });
+    els.pageStatus.textContent = "Заявка отправлена";
+    els.detectedMovie.className = "detected-card is-empty";
+    els.detectedMovie.innerHTML = "Заявка ушла администратору. Ее статус можно посмотреть в личном кабинете MovieRec.";
+  } catch (error) {
+    els.pageStatus.textContent = "Не удалось отправить";
+    els.detectedMovie.className = "detected-card is-empty";
+    els.detectedMovie.innerHTML = `${escapeHtml(error.message || "Ошибка отправки заявки")}. Проверьте, что сайт запущен и вы вошли в аккаунт.`;
+  }
 }
 
 function renderProfile() {

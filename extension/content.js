@@ -99,16 +99,21 @@
     const candidate = pageContext.candidates[0] || document.title;
     const title = candidate.replace(/\(\d{4}(?:\s*[–-]\s*[^)]*)?\)/g, "").slice(0, 120).trim();
     if (!title) return;
-    await fetchJson("/api/movie-requests", {
-      method: "POST",
-      body: JSON.stringify({
-        title,
-        year: extractYear([candidate, pageContext.title].join(" ")),
-        note: `Заявка из расширения. Страница: ${pageContext.url}`,
-      }),
-    });
-    context.textContent = "Заявка отправлена";
-    list.innerHTML = '<div class="mrec-missing"><span>Заявка ушла администратору. Статус будет виден в личном кабинете MovieRec.</span></div>';
+    try {
+      await fetchJson("/api/movie-requests", {
+        method: "POST",
+        body: JSON.stringify({
+          title,
+          year: extractYear([candidate, pageContext.title].join(" ")),
+          note: `Заявка из расширения. Страница: ${pageContext.url}`,
+        }),
+      });
+      context.textContent = "Заявка отправлена";
+      list.innerHTML = '<div class="mrec-missing"><span>Заявка ушла администратору. Статус будет виден в личном кабинете MovieRec.</span></div>';
+    } catch (error) {
+      context.textContent = "Не удалось отправить";
+      list.innerHTML = `<div class="mrec-missing"><span>${escapeHtml(error.message || "Ошибка отправки заявки")}. Проверьте, что сайт запущен и вы вошли в аккаунт.</span></div>`;
+    }
   }
 
   async function findMatchedMovie(text) {
@@ -123,7 +128,9 @@
       headers: { "Content-Type": "application/json", ...(options.headers || {}) },
       ...options,
     });
-    return response.json();
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || payload.message || "API error");
+    return payload;
   }
 
   async function resolveApiBase() {
