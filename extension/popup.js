@@ -93,9 +93,8 @@ async function detectActivePageMovie() {
       return;
     }
   }
-  const fallback = await api(`/api/search/semantic?q=${encodeURIComponent(context.candidates.join(" "))}`).catch(() => ({ movies: [] }));
-  state.detectedMovie = fallback.movies?.[0] || null;
-  renderDetectedMovie(state.detectedMovie, state.detectedMovie ? "похоже по странице" : "Фильм на странице не найден");
+  state.detectedMovie = null;
+  renderDetectedMovie(null, "Точного совпадения в базе нет");
 }
 
 async function getActivePageContext() {
@@ -118,7 +117,10 @@ function renderDetectedMovie(movie, status) {
   els.pageStatus.textContent = status || "";
   if (!movie) {
     els.detectedMovie.className = "detected-card is-empty";
-    els.detectedMovie.innerHTML = "Откройте страницу фильма на IMDb, TMDb, Кинопоиске, YouTube или выделите название на странице.";
+    const candidate = state.pageContext?.candidates?.[0];
+    els.detectedMovie.innerHTML = candidate
+      ? `Похоже, это “${escapeHtml(candidate)}”, но точного совпадения в локальной базе MovieRec нет. Можно найти фильм вручную ниже или отправить заявку на сайте.`
+      : "Откройте страницу фильма на IMDb, TMDb, Кинопоиске, YouTube или выделите название на странице.";
     return;
   }
   els.detectedMovie.className = "detected-card";
@@ -287,20 +289,36 @@ function openTab(url) {
 
 function findBestPageMatch(candidate, movies) {
   const normalized = normalize(candidate);
+  if (!normalized) return null;
   return (
     movies.find((movie) => normalize(movie.title) === normalized) ||
-    movies.find((movie) => normalized.includes(normalize(movie.title)) || normalize(movie.title).includes(normalized)) ||
-    movies[0] ||
+    movies.find((movie) => {
+      const title = normalize(movie.title);
+      if (!title || title.length < 4) return false;
+      return normalized.startsWith(`${title} `) || normalized.includes(` ${title} `) || normalized.endsWith(` ${title}`);
+    }) ||
     null
   );
 }
 
 function cleanTitleCandidates(title) {
-  const cleaned = String(title || "")
-    .replace(/\s*[-|—]\s*(IMDb|Кинопоиск|TMDb|YouTube|Google|Wikipedia|Википедия).*$/i, "")
-    .replace(/\(\d{4}\)/g, "")
-    .trim();
-  return [...new Set([cleaned, String(title || "").trim()].filter((value) => value.length >= 2))];
+  const values = Array.isArray(title) ? title : [title];
+  return [
+    ...new Set(
+      values
+        .flatMap((value) => {
+          const raw = String(value || "").trim();
+          const cleaned = raw
+            .replace(/\s*[-|—]\s*(IMDb|Кинопоиск|TMDb|YouTube|Google|Wikipedia|Википедия).*$/i, "")
+            .replace(/\s+(фильм|сериал|аниме|мультфильм)\b.*$/i, "")
+            .replace(/\(\d{4}(?:\s*[–-]\s*[^)]*)?\)/g, "")
+            .replace(/\b\d{4}\b.*$/g, "")
+            .trim();
+          return [cleaned, raw];
+        })
+        .filter((value) => value.length >= 2 && value.length <= 120),
+    ),
+  ];
 }
 
 function normalize(value) {
