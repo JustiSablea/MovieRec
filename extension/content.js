@@ -1,7 +1,9 @@
 (() => {
   const ROOT_ID = "movierec-extension-root";
+  const POSITION_KEY = "movierec-widget-position";
   let apiBase = "http://127.0.0.1:8000";
   let panelOpen = false;
+  let dragState = null;
 
   if (document.getElementById(ROOT_ID)) return;
 
@@ -9,9 +11,12 @@
   root.id = ROOT_ID;
   root.innerHTML = `
     <style>
-      #${ROOT_ID}{position:fixed;z-index:2147483647;right:18px;bottom:18px;font-family:Inter,system-ui,sans-serif;color:#f5f5f7}
+      #${ROOT_ID}{position:fixed;z-index:2147483647;right:18px;bottom:18px;font-family:Inter,system-ui,sans-serif;color:#f5f5f7;user-select:none}
       #${ROOT_ID} *{box-sizing:border-box}
-      #movierec-fab{display:inline-flex;min-width:112px;min-height:42px;align-items:center;justify-content:center;border:0;border-radius:999px;background:linear-gradient(92deg,#d33ed5,#f00f24);color:white;cursor:pointer;font:800 13px Inter,system-ui,sans-serif;box-shadow:0 14px 34px rgba(0,0,0,.35)}
+      #movierec-fab-wrap{display:flex;gap:7px;align-items:center;justify-content:flex-end}
+      #movierec-fab{display:inline-flex;min-width:112px;min-height:42px;align-items:center;justify-content:center;border:0;border-radius:999px;background:linear-gradient(92deg,#d33ed5,#f00f24);color:white;cursor:grab;font:800 13px Inter,system-ui,sans-serif;box-shadow:0 14px 34px rgba(0,0,0,.35);touch-action:none}
+      #movierec-fab:active{cursor:grabbing}
+      #movierec-hide{display:inline-grid;width:30px;height:30px;place-items:center;border:1px solid rgba(255,255,255,.1);border-radius:999px;background:#171719;color:#d8d8df;cursor:pointer;font:900 16px Inter,system-ui,sans-serif;box-shadow:0 10px 24px rgba(0,0,0,.28)}
       #movierec-panel{position:absolute;right:0;bottom:52px;display:none;width:min(340px,calc(100vw - 34px));overflow:hidden;border:1px solid rgba(255,255,255,.1);border-radius:16px;background:#171719;box-shadow:0 22px 52px rgba(0,0,0,.42)}
       #movierec-panel.is-open{display:block}
       .mrec-head{padding:15px 15px 12px;border-bottom:1px solid rgba(255,255,255,.08)}
@@ -26,12 +31,16 @@
       <div id="mrec-list" class="mrec-list"></div>
       <div class="mrec-actions"><button class="mrec-primary" id="mrec-open-site" type="button">Сайт</button><button class="mrec-ghost" id="mrec-refresh" type="button">Обновить</button></div>
     </div>
-    <button id="movierec-fab" type="button" aria-expanded="false">MovieRec</button>
+    <div id="movierec-fab-wrap">
+      <button id="movierec-hide" type="button" aria-label="Скрыть MovieRec">×</button>
+      <button id="movierec-fab" type="button" aria-expanded="false" title="Нажмите, чтобы открыть. Потяните, чтобы переместить.">MovieRec</button>
+    </div>
   `;
 
   document.documentElement.appendChild(root);
 
   const fab = root.querySelector("#movierec-fab");
+  const hideButton = root.querySelector("#movierec-hide");
   const panel = root.querySelector("#movierec-panel");
   const list = root.querySelector("#mrec-list");
   const context = root.querySelector("#mrec-context");
@@ -44,12 +53,12 @@
     });
   }
 
-  fab.addEventListener("click", () => {
-    panelOpen = !panelOpen;
-    panel.classList.toggle("is-open", panelOpen);
-    fab.setAttribute("aria-expanded", String(panelOpen));
-    if (panelOpen) renderPanel();
-  });
+  restorePosition();
+  fab.addEventListener("pointerdown", startDrag);
+  fab.addEventListener("pointermove", moveDrag);
+  fab.addEventListener("pointerup", endDrag);
+  fab.addEventListener("pointercancel", cancelDrag);
+  hideButton.addEventListener("click", () => root.remove());
 
   root.querySelector("#mrec-open-site").addEventListener("click", () => {
     window.open(`${apiBase}/#recommendations`, "_blank", "noopener,noreferrer");
@@ -61,6 +70,76 @@
     const requestButton = event.target.closest("[data-mrec-request]");
     if (requestButton) requestMissingMovie();
   });
+
+  function togglePanel() {
+    panelOpen = !panelOpen;
+    panel.classList.toggle("is-open", panelOpen);
+    fab.setAttribute("aria-expanded", String(panelOpen));
+    if (panelOpen) renderPanel();
+  }
+
+  function startDrag(event) {
+    dragState = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      rootLeft: root.getBoundingClientRect().left,
+      rootTop: root.getBoundingClientRect().top,
+      moved: false,
+    };
+    fab.setPointerCapture?.(event.pointerId);
+  }
+
+  function moveDrag(event) {
+    if (!dragState || event.pointerId !== dragState.pointerId) return;
+    const dx = event.clientX - dragState.startX;
+    const dy = event.clientY - dragState.startY;
+    if (Math.abs(dx) + Math.abs(dy) < 4) return;
+    dragState.moved = true;
+    const rect = root.getBoundingClientRect();
+    const left = clamp(dragState.rootLeft + dx, 8, window.innerWidth - rect.width - 8);
+    const top = clamp(dragState.rootTop + dy, 8, window.innerHeight - rect.height - 8);
+    root.style.left = `${left}px`;
+    root.style.top = `${top}px`;
+    root.style.right = "auto";
+    root.style.bottom = "auto";
+  }
+
+  function endDrag(event) {
+    if (!dragState || event.pointerId !== dragState.pointerId) return;
+    fab.releasePointerCapture?.(event.pointerId);
+    const wasDragged = dragState.moved;
+    dragState = null;
+    if (wasDragged) {
+      savePosition();
+      return;
+    }
+    togglePanel();
+  }
+
+  function cancelDrag() {
+    dragState = null;
+  }
+
+  function restorePosition() {
+    const raw = localStorage.getItem(POSITION_KEY);
+    if (!raw) return;
+    try {
+      const position = JSON.parse(raw);
+      if (!Number.isFinite(position.left) || !Number.isFinite(position.top)) return;
+      root.style.left = `${clamp(position.left, 8, window.innerWidth - 120)}px`;
+      root.style.top = `${clamp(position.top, 8, window.innerHeight - 48)}px`;
+      root.style.right = "auto";
+      root.style.bottom = "auto";
+    } catch {
+      localStorage.removeItem(POSITION_KEY);
+    }
+  }
+
+  function savePosition() {
+    const rect = root.getBoundingClientRect();
+    localStorage.setItem(POSITION_KEY, JSON.stringify({ left: rect.left, top: rect.top }));
+  }
 
   async function renderPanel() {
     await resolveApiBase();
@@ -201,6 +280,10 @@
   function extractYear(value) {
     const match = String(value || "").match(/\b(19\d{2}|20\d{2})\b/);
     return match ? Number(match[1]) : "";
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
   }
 
   function escapeHtml(value) {
